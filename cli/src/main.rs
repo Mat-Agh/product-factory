@@ -5,11 +5,14 @@
 
 mod backup;
 mod dashboard;
+mod descriptor;
 mod diagrams;
 mod docs_map;
 mod doctor;
 mod guard;
 mod install;
+mod memory;
+mod rules;
 mod util;
 
 use std::path::PathBuf;
@@ -82,6 +85,23 @@ enum Cmd {
     },
     /// Copy Claude Code memory into <factory>/.claude-export/<date>/ for review
     Export,
+    /// Show this repo's Claude Code auto memory (for /factory memory)
+    Memory {
+        /// Repository to inspect (default: current directory)
+        #[arg(long)]
+        root: Option<PathBuf>,
+        /// Machine-readable output
+        #[arg(long)]
+        json: bool,
+    },
+    /// Path-scoped Claude Code rules generated from the descriptor
+    Rules {
+        #[command(subcommand)]
+        action: RulesCmd,
+        /// Folder at or below the descriptor (default: current directory)
+        #[arg(long, global = true)]
+        root: Option<PathBuf>,
+    },
     /// Serve a product's .factory/ folder so dashboard.html can show live jobs (loopback only)
     Dashboard {
         /// Folder to serve (default: .factory)
@@ -102,8 +122,22 @@ enum DiagramCmd {
 
 #[derive(Subcommand)]
 enum InstallCmd {
-    /// Copy the kit into a product repo for you to commit there
-    Project { path: PathBuf },
+    /// Copy the kit into a product repo (or a multi-repo workspace root) for you to commit there
+    Project {
+        path: PathBuf,
+        /// Hide AI attribution in commits and PRs (same as vcs.attribution: none)
+        #[arg(long)]
+        no_ai_attribution: bool,
+    },
+    /// Install into one module repo of a multi-repo workspace, so sessions opened there use the factory
+    Module {
+        path: PathBuf,
+        /// The workspace folder that holds .factory/factory.yaml
+        #[arg(long)]
+        workspace: PathBuf,
+        #[arg(long)]
+        no_ai_attribution: bool,
+    },
     /// Link the kit into ~/.claude (or $CLAUDE_CONFIG_DIR) so it follows git pull
     User {
         /// Also wire the guard hook into the user settings (every project on this machine)
@@ -116,6 +150,12 @@ enum InstallCmd {
         #[arg(long)]
         with_guard: bool,
     },
+}
+
+#[derive(Subcommand)]
+enum RulesCmd {
+    /// Write .claude/rules/modules/<area>.md for every module in a multi-repo descriptor
+    Sync,
 }
 
 #[derive(Subcommand)]
@@ -159,10 +199,18 @@ fn run(cli: Cli) -> Result<i32, i32> {
         Cmd::Install { target } => {
             let f = factory(&cli.factory)?;
             match target {
-                InstallCmd::Project { path } => install::project(&f, &path),
+                InstallCmd::Project {
+                    path,
+                    no_ai_attribution,
+                } => install::project(&f, &path, no_ai_attribution),
+                InstallCmd::Module {
+                    path,
+                    workspace,
+                    no_ai_attribution,
+                } => install::module(&f, &path, &workspace, no_ai_attribution),
                 InstallCmd::User { with_guard } => install::user(&f, with_guard),
                 InstallCmd::All { path, with_guard } => {
-                    install::user(&f, with_guard).max(install::project(&f, &path))
+                    install::user(&f, with_guard).max(install::project(&f, &path, false))
                 }
             }
         }
@@ -177,6 +225,11 @@ fn run(cli: Cli) -> Result<i32, i32> {
         }
         Cmd::Export => backup::export(&factory(&cli.factory)?),
         Cmd::Dashboard { dir, port } => dashboard::main(dir, port),
+        Cmd::Memory { root, json } => memory::main(root, json),
+        Cmd::Rules {
+            action: RulesCmd::Sync,
+            root,
+        } => rules::main(root),
     })
 }
 

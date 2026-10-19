@@ -21,6 +21,7 @@ how to use them.
 | `/factory rework <job> <note>` | A PR or escalation needs changes | The engineer addresses your note, and review and QA run again |
 | `/factory release [version]` | Merged work is ready to ship | A release PR plus your exact publish steps |
 | `/factory retro [job]` | A job is finished and you want the factory to learn from it | `retro.md` plus an offer to PR improvements to the factory |
+| `/factory memory` | Claude has been remembering things about this repo | `.factory/memory-review.md` with a verdict per auto memory; approved items land in `AGENTS.md`/docs (via a PR) or `CLAUDE.local.md` |
 | `/factory clean` | PRs were merged or closed | Their worktrees and merged branches are removed |
 
 ## `/factory init`
@@ -128,6 +129,15 @@ Reads the finished job (all artifacts, the review rounds, your rework notes)
 and writes `retro.md`: what went wrong, what agents missed, and **proposed**
 edits to your product's `AGENTS.md` and to the factory. It offers to open a
 PR against the factory repo. Nothing changes without your merge.
+
+## `/factory memory`
+
+Claude Code keeps per-machine auto memory for each repo. Factory agents never
+see it, because subagents do not load it. This command reads it with `pf memory`,
+sorts every entry into team, personal, already in repo, stale or secret, and
+proposes where each one should go. Nothing changes until you pick rows.
+Approved team knowledge goes through a docs job and becomes a reviewed PR.
+`/factory init` and `/factory retro` run the same check.
 
 ## `/factory clean`
 

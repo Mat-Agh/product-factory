@@ -31,11 +31,14 @@ blocked with the install hint above.
 | `pf guard --self-test` | Run the 73 built-in policy cases | [COMP-004](COMP-004-guard-hook.md) |
 | `pf docs-map [--fix] [--strict] [--allow <prefix>]` | `docs/` tree, generated README links and map | [COMP-012](COMP-012-docs-gate.md) |
 | `pf diagrams check \| render` | Mermaid sources to committed SVGs | [COMP-014](COMP-014-diagrams.md) |
-| `pf install project <path> \| user [--with-guard] \| all <path>` | Put the factory into a product or a user config | [COMP-007](COMP-007-installer.md) |
+| `pf install project <path> [--no-ai-attribution] \| module <path> --workspace <root> \| user [--with-guard] \| all <path>` | Put the factory into a product or a user config | [COMP-007](COMP-007-installer.md) |
 | `pf doctor [project]` | Health check; exit code = failures | [COMP-008](COMP-008-doctor.md) |
 | `pf mirror add <name> <url> \| push \| bundle [dir]` | Backup remotes and offline bundles | [COMP-009](COMP-009-backup-tools.md) |
 | `pf export` | Copy Claude Code memory into `.claude-export/<date>/` for review | [COMP-009](COMP-009-backup-tools.md) |
 | `pf dashboard [--dir .factory] [--port 8000]` | Serve the dashboard on loopback | [COMP-006](COMP-006-backlog-and-dashboard.md) |
+| `pf install module <path> --workspace <root>` | Put the Claude Code kit into one module repo of a workspace | [COMP-016](COMP-016-session-integration.md) |
+| `pf rules sync` | Generate path-scoped `.claude/rules/modules/<area>.md` from the descriptor | [COMP-016](COMP-016-session-integration.md) |
+| `pf memory [--json] [--root <repo>]` | Show the repo's auto memory, for `/factory memory` | [COMP-016](COMP-016-session-integration.md) |
 
 `--factory <path>` (global) names the factory checkout for `install`, `doctor`,
 `mirror` and `export`. Without it, `pf` uses `$PRODUCT_FACTORY_HOME`, then an

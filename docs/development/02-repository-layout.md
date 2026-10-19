@@ -15,6 +15,7 @@ product-factory/
 │   │   │   ├── protocol.md       shared agent rules (COMP-002)
 │   │   │   └── CONSTITUTION.md   → link to docs/governance/CONSTITUTION.md (copied as a file on install)
 │   │   ├── agents/*.md           10 role agents (COMP-003)
+│   │   ├── rules/product-factory.md  always-on session rule (COMP-016)
 │   │   └── settings.factory.json `pf guard` hook wiring (COMP-004)
 │   └── .factory/
 │       ├── factory.yaml          descriptor template (COMP-005)
@@ -22,7 +23,7 @@ product-factory/
 │       └── dashboard.html        dashboard (COMP-006)
 ├── cli/                          ── the `pf` Rust CLI (COMP-015) ──
 │   ├── Cargo.toml, Cargo.lock
-│   └── src/                      main, guard, docs_map, diagrams, install, doctor, backup, dashboard, util
+│   └── src/                      main, guard, docs_map, diagrams, install, doctor, backup, dashboard, descriptor, rules, memory, util
 └── docs/                         ── all documentation ──
     ├── README.md                 home: start here, areas, rules, generated map
     ├── governance/               CONSTITUTION (COMP-013)

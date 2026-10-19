@@ -23,6 +23,11 @@ It contains:
   diagrams, installer (project copy or user symlinks), doctor, mirror and bundle
   backups, memory export, and the dashboard server. There is no Python and no
   bash script.
+- **Session integration:** an always-on rule makes every Claude session in a
+  factory repo, or in a module of a factory workspace, route change requests
+  through `/factory`. Module kits and path-scoped module rules cover multi-repo
+  workspaces such as Daria Connect, and `/factory memory` promotes auto memory
+  into git.
 - **Documentation:** everything is under `docs/`, one connected tree generated
   and checked by `pf docs-map`. It covers governance, the operator guide,
   architecture, component contracts, the development handbook, ADRs, status

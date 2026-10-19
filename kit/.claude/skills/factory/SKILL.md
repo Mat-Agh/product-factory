@@ -1,6 +1,7 @@
 ---
 name: factory
-description: Run the Product Factory. Use when the user types /factory followed by a request, or by one of init, idea, issue, next, status, rework, release, retro or clean. The session that runs it becomes the coordinator, which triages the work, spawns the role agents, and moves each job from idea to a reviewed, tested PR that a human merges.
+description: Run the Product Factory. Use when the user types /factory followed by a request, or by one of init, idea, issue, next, status, rework, release, retro, memory or clean. The session that runs it becomes the coordinator, which triages the work, spawns the role agents, and moves each job from idea to a reviewed, tested PR that a human merges.
+when_to_use: In any repository that has .factory/factory.yaml (or a parent workspace that does), use this whenever the user asks to build, add, change, fix, refactor, document, design, plan, spike, release or ship something, even when they do not type /factory. Do not use it for questions, explanations, code reading or status checks.
 ---
 
 # Product Factory — coordinator
@@ -18,8 +19,12 @@ humans merge, fail closed.
 ## Inputs every run reads
 
 1. `.factory/factory.yaml` is the project descriptor: product, layout, modules,
-   VCS, docs paths, surfaces, gates, escalation paths and limits. If it is
-   missing, run **/factory init** first.
+   VCS, docs paths, surfaces, gates, escalation paths and limits. Look for it in
+   the current repository first, then in each parent folder. A **workspace**
+   descriptor (`layout: multi-repo`) in a parent folder governs its module repos.
+   When the session started inside a module, that module is the default `module`
+   for new jobs, and the workspace folder is `<repo>` for job state. If no
+   descriptor is found, run **/factory init** first.
 2. `AGENTS.md` (or `CLAUDE.md`) gives setup, dev server, validation commands and
    conventions. Agents read everything repo-specific from these two files.
    None of it lives in the agent files.
@@ -91,8 +96,10 @@ and tell the user**. Never guess a verdict.
 
 ## Files and state
 
-`<repo>` is the main checkout (`git rev-parse --show-toplevel`). `<name>` is its
-folder name. `.factory/jobs/` is gitignored runtime state.
+`<repo>` is the folder that holds `.factory/factory.yaml`. That is the main checkout
+for a single repo, or the workspace folder for `multi-repo`. `<name>` is its folder
+name. `.factory/jobs/` is gitignored runtime state. Worktrees always live
+**outside** `<repo>`, so the workspace's own `git status` stays clean.
 
 ```
 <repo>/.factory/factory.yaml                    descriptor (committed)
@@ -100,7 +107,8 @@ folder name. `.factory/jobs/` is gitignored runtime state.
 <repo>/.factory/jobs/<job-id>/job.json          state: you are its only writer
 <repo>/.factory/jobs/<job-id>/*.md              artifacts, one owner each
 <repo>/.factory/jobs/<job-id>/round-<N>/        one folder per review round
-<repo>/../<name>-factory/<job-id>/              the job's worktree on factory/<job-id>
+<repo>/../<name>-factory/<job-id>/              single-repo: the job's worktree on factory/<job-id>
+<repo>/../<name>-factory/<area>/<job-id>/       multi-repo: worktree of the owning module's clone
 ```
 
 ### job.json
@@ -148,10 +156,24 @@ Use this for a repo the factory has never run in.
    `docs/`, missing folder READMEs or a stale map, list the problems for the
    user and offer the fix: move the files with `git mv`, then run `--fix`. Do
    not move anything without the user's yes.
-6. Check the guard hook is wired in `.claude/settings.json`. Check that the base
-   branch has protection on the remote (`gh api repos/{owner}/{repo}/branches/<base>/protection`),
-   and if it does not, tell the user. Do not change protection yourself.
-7. Do not commit. Tell the user what to review and commit.
+6. **Workspace (`multi-repo`).** For each module, check that `pf install module
+   <module path> --workspace .` has been run, which gives each module repo the
+   skill, agents, rule and guard so sessions opened inside a module also use
+   the factory. Then run `pf rules sync`, which writes one path-scoped
+   `.claude/rules/modules/<area>.md` per module from the descriptor. List
+   anything missing, and give the exact command.
+7. **Attribution.** If `AGENTS.md` or `CLAUDE.md` forbids naming AI tools in
+   commits or PRs, set `vcs.attribution: none` in the descriptor and re-run
+   `pf install project .` (and `pf install module` for each module). This
+   writes `"attribution": {"commit": "", "pr": "", "sessionUrl": false}` into
+   `.claude/settings.json`. Agents and you then add no AI trailer or line.
+8. **Memory.** Run `/factory memory` once, so knowledge already sitting in this
+   repo's auto memory is promoted into the repo or retired.
+9. Check the guard hook is wired in `.claude/settings.json`. Check that the base
+   branch has protection on the remote (`gh api repos/{owner}/{repo}/branches/<base>/protection`
+   on GitHub, or the protected-branch settings on GitLab), and if it does not,
+   tell the user. Do not change protection yourself.
+10. Do not commit. Tell the user what to review and commit.
 
 ## /factory <request>
 
@@ -161,7 +183,8 @@ Use this for a repo the factory has never run in.
    the number, so retry with the next one.
 2. **Triage** (you). Read the descriptor, `AGENTS.md`, `.factory/backlog.md`,
    open jobs (`.factory/jobs/*/job.json` not in `done`/`closed`), and the open
-   PRs/issues (`gh pr list`, `gh issue list`, when a remote exists). Then write
+   PRs or MRs and issues (`gh pr list` and `gh issue list` on GitHub, `glab mr list` and
+   `glab issue list` on GitLab, when a remote exists). Then write
    `triage.md`:
    ```markdown
    # Triage: <title>
@@ -179,10 +202,10 @@ Use this for a repo the factory has never run in.
    question exists, set `needs-human` and ask it. Do not guess product intent.
 3. **Worktree.** Every lane ends in a PR, so every job gets a worktree:
    run `git worktree add -b factory/<job-id> <worktree> <vcs.base_branch>`. In a
-   `multi-repo` layout, run it inside the owning module's clone
-   (`git -C <workspace_root>/<module.path> worktree add …`), name the worktree
-   `<module clone>-factory/<job-id>`, and use the module's `vcs` overrides when
-   it has them. Job state still lives at `<repo>/.factory/jobs/`. Then
+   `multi-repo` layout, run it from the owning module's clone
+   (`git -C <repo>/<module.path> worktree add -b factory/<job-id> <repo>/../<name>-factory/<area>/<job-id> <base>`),
+   and use the module's `vcs` overrides (host, remote, base branch) when it has
+   them. A job that spans modules is split by triage into one job per module. Job state still lives at `<repo>/.factory/jobs/`. Then
    run the fresh-checkout setup from `AGENTS.md` in the worktree. If either
    fails, stop and tell the user. Write `job.json` with the lane, `stage` set to
    the first stage after triage, and every review lens `pending` or `skipped`.
@@ -285,18 +308,53 @@ version bump and release notes. The human merges, tags and publishes.
 ## /factory retro [job-id]
 
 Read the finished job(s): every artifact, the review rounds and the human's
-rework notes. Write `retro.md` in the job folder, covering what went wrong,
+rework notes. Also run `pf memory --json`, and include any memory written since the
+job started in the same proposals, using the `/factory memory` verdicts. Write `retro.md` in the job folder, covering what went wrong,
 what the agents missed, and **proposed** edits to the product's `AGENTS.md` or
 docs and to the factory's agents or checklists. Never apply factory changes
 silently. Offer to open a PR against the Product Factory repo (`factory.source`
 in the descriptor) with the proposed edits and a dated evolution-log entry.
+
+## /factory memory
+
+Promote what Claude learned in auto memory into the repo, where the factory and
+every teammate can see it. Auto memory is a per-machine cache, and factory
+subagents never load it.
+
+1. Run `pf memory --json` (from `<repo>`, and from each module repo in a
+   workspace). It lists every memory file with its `type`, name, description,
+   modification time and body, plus the directory it read.
+2. Classify each memory, and write `.factory/memory-review.md`. Give one row per
+   memory with its verdict and the exact proposed edit:
+   - **promote (team)**: a durable fact about the product or repo, such as a
+     convention, command, constraint, gotcha, decision or external reference.
+     Propose the edit to the owning `AGENTS.md`, `docs/` page or
+     `.claude/rules/` file, with the file and wording.
+   - **promote (personal)**: an operator preference that applies only to this
+     project on this machine. Propose a line in `CLAUDE.local.md`. Cross-project
+     preferences go to the Product Factory's `docs/operator/USER.md` instead.
+   - **already in repo**: the repo already says it. Propose deleting the memory.
+   - **stale or wrong**: it contradicts the repo or the code. Propose deleting
+     it, and quote the contradiction.
+   - **secret**: it contains a credential, token, host secret or private data.
+     Flag it for the operator. Never copy it anywhere.
+3. Show the operator the review, and ask which rows to apply. Do nothing until
+   they answer.
+4. For approved **team** promotions, run a `docs` job (`/factory` with the
+   approved edits as the request), so the change lands as a reviewed PR. Write
+   approved **personal** lines to `CLAUDE.local.md` directly, and make sure
+   `.gitignore` lists it.
+5. For each promoted, duplicate or stale memory the operator approved, delete
+   the memory file and remove its line from that directory's `MEMORY.md`. Leave
+   a one-line pointer memory only where it helps future sessions, such as
+   "conventions for X live in docs/…".
 
 ## /factory clean
 
 For every job in `pr-open` whose PR is merged or closed (`gh pr view <url> --json state`),
 run `git worktree remove <worktree>` and then `git branch -D factory/<job-id>`
 only if the PR is merged. Check that the worktree path is under
-`../<name>-factory/` and that the branch starts with `factory/` before removing
+`<repo>/../<name>-factory/` and that the branch starts with `factory/` before removing
 anything. Set `stage` to `done` (merged) or `closed`. Never touch other
 branches or worktrees.
 

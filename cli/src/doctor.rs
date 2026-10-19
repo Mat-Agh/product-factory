@@ -4,7 +4,7 @@
 use std::fs;
 use std::path::Path;
 
-use crate::{diagrams, docs_map, guard, install, util};
+use crate::{descriptor, diagrams, docs_map, guard, install, memory, rules, util};
 
 #[derive(Default)]
 struct Doc {
@@ -153,6 +153,12 @@ pub fn main(factory: &Path, project: Option<&Path>) -> i32 {
             d.bad("legacy Python guard still wired (re-run pf install project)");
         }
         let agents_md = read("AGENTS.md");
+        let claude_md = read("CLAUDE.md");
+        d.soft(
+            claude_md.is_empty() || claude_md.contains("@AGENTS.md"),
+            "CLAUDE.md loads AGENTS.md",
+            "CLAUDE.md exists but does not import @AGENTS.md, so Claude never reads AGENTS.md (the factory rule in .claude/rules/ still loads); add an @AGENTS.md line",
+        );
         d.check(
             agents_md
                 .lines()
@@ -205,12 +211,66 @@ pub fn main(factory: &Path, project: Option<&Path>) -> i32 {
             ".factory/dashboard.html",
             None,
         );
+        compare(
+            &kit.join(".claude/rules/product-factory.md"),
+            ".claude/rules/product-factory.md",
+            None,
+        );
         d.soft(
             !drift,
             format!("kit matches factory @ {}", install::revision(factory)),
             format!(
                 "re-run pf install project {} to update (review the diff first)",
                 p.display()
+            ),
+        );
+        d.check(
+            p.join(".claude/rules/product-factory.md").exists(),
+            "always-on factory rule (.claude/rules/product-factory.md)",
+            "factory rule missing: sessions will not route work through /factory (pf install project)",
+        );
+        let attribution_off = |settings: &str| {
+            serde_json::from_str::<serde_json::Value>(settings)
+                .ok()
+                .is_some_and(|v| v.get("attribution") == Some(&install::no_attribution_value()))
+        };
+        if let Some(desc) = descriptor::find(&p).filter(|x| x.root == p) {
+            if desc.attribution_none() {
+                d.check(
+                    attribution_off(&settings),
+                    "AI attribution off (vcs.attribution: none)",
+                    "vcs.attribution: none but .claude/settings.json still allows AI attribution (pf install project)",
+                );
+            }
+            if desc.multi_repo() {
+                for f in rules::check(&desc) {
+                    d.bad(format!("{f} missing or stale (pf rules sync)"));
+                }
+                for m in &desc.modules {
+                    let Some(path) = m.get("path") else { continue };
+                    let mp = p.join(path);
+                    let mset =
+                        fs::read_to_string(mp.join(".claude/settings.json")).unwrap_or_default();
+                    let ok = mp.join(".claude/skills/factory/SKILL.md").exists()
+                        && mp.join(".claude/rules/product-factory.md").exists()
+                        && mset.contains("pf guard")
+                        && (!desc.attribution_none() || attribution_off(&mset));
+                    d.check(
+                        ok,
+                        format!("module {path} installed"),
+                        format!("module {path} not installed or stale (pf install module {path} --workspace .)"),
+                    );
+                }
+            }
+        }
+        let mem = memory::collect(&p);
+        let n = mem["memories"].as_array().map_or(0, |a| a.len());
+        d.soft(
+            n == 0,
+            "no auto memory waiting for review",
+            format!(
+                "{n} auto memories in {} (review them with /factory memory)",
+                mem["dir"].as_str().unwrap_or("")
             ),
         );
         if p.join("docs").is_dir() {

@@ -27,6 +27,7 @@ source and never restate it. Current delivery status is in
 | [COMP-013](COMP-013-constitution.md) | Constitution | `docs/governance/CONSTITUTION.md` |
 | [COMP-014](COMP-014-diagrams.md) | Diagrams | `docs/assets/diagrams/*.mmd`, `cli/src/diagrams.rs` |
 | [COMP-015](COMP-015-pf-cli.md) | `pf` CLI | `cli/` |
+| [COMP-016](COMP-016-session-integration.md) | Project session integration and memory | `kit/.claude/rules/product-factory.md`, `cli/src/{rules,memory,install}.rs` |
 
 Adding a component means adding a `COMP-NNN-*.md` here, a row in this table and
 in `IMPLEMENTATION_STATUS.md`, and a route in the
@@ -53,4 +54,5 @@ in `IMPLEMENTATION_STATUS.md`, and a route in the
   - [COMP-013 — Constitution](COMP-013-constitution.md)
   - [COMP-014 — Diagrams](COMP-014-diagrams.md)
   - [COMP-015 — `pf` CLI](COMP-015-pf-cli.md)
+  - [COMP-016 — Project session integration and memory](COMP-016-session-integration.md)
 <!-- documentation-routing:end -->

@@ -48,6 +48,7 @@ Then, in Claude Code inside the product repo:
 /factory rework <job> <note>        send a job back with your feedback
 /factory release [version]          readiness brief + launch kit (release PR)
 /factory retro [job]                propose factory/AGENTS.md improvements
+/factory memory                     promote what Claude remembered into the repo (with approval)
 /factory clean                      remove worktrees of merged/closed jobs
 ```
 

@@ -20,6 +20,9 @@ print usage.
 | `pf mirror add \| push \| bundle` | Backup remotes and offline bundles | [COMP-009](../components/COMP-009-backup-tools.md) |
 | `pf export` | Copy Claude Code memory into the repo for review | [COMP-009](../components/COMP-009-backup-tools.md) |
 | `pf dashboard` | Serve a product's `.factory/` on loopback | [COMP-006](../components/COMP-006-backlog-and-dashboard.md) |
+| `pf install module` | Kit for one module repo of a multi-repo workspace | [COMP-016](../components/COMP-016-session-integration.md) |
+| `pf rules sync` | Path-scoped module rules from the descriptor | [COMP-016](../components/COMP-016-session-integration.md) |
+| `pf memory` | Show a repo's auto memory | [COMP-016](../components/COMP-016-session-integration.md) |
 
 ## Samples
 
@@ -33,6 +36,11 @@ pf install user
 pf install user --with-guard           # also guard every project on this machine
 pf install project ~/Work/MyApp
 pf install all ~/Work/MyApp
+pf install project ~/Work/Connect --no-ai-attribution   # workspace root
+pf install module Daria-Connect-Back-End --workspace ~/Work/Connect
+pf rules sync                           # in the workspace
+pf memory                               # this repo's auto memory
+pf memory --json --root ~/Work/Connect
 CLAUDE_CONFIG_DIR=/tmp/h pf install user
 
 # Health

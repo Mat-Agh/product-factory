@@ -6,6 +6,29 @@
 Append-only. One dated entry for each factory-level change: what changed, why,
 and its evidence.
 
+## 2026-10-19 — Sessions default to the factory; workspaces and memory
+
+- Added the always-on rule `kit/.claude/rules/product-factory.md`, installed in
+  every factory repo and module. It routes change requests through `/factory` and
+  keeps knowledge in git. Gave the skill a `when_to_use` trigger.
+- Multi-repo workspaces: the skill finds the descriptor in a parent folder.
+  Worktrees live outside the workspace (`<ws>-factory/<area>/<job-id>`). Added
+  `pf install module` for child repos (each nested repo is its own Claude Code
+  project) and `pf rules sync` for path-scoped module rules.
+- Memory: added `pf memory` and `/factory memory`, which promote auto memory
+  into `AGENTS.md`, docs or rules, or `CLAUDE.local.md`, with approval. Auto
+  memory is not loaded into subagents, so knowledge left there was invisible to
+  factory roles ([ADR-010](../decisions/ADR-010-session-behaviour-and-memory.md)).
+- Attribution: added `vcs.attribution: none`, and `pf install --no-ai-attribution`
+  writes Claude Code's `attribution` setting, as required by Connect's
+  no-AI-attribution rule.
+- Added `doctor` checks for the rule, attribution, module installs, module rules,
+  a `CLAUDE.md` that does not import `AGENTS.md`, and auto memory awaiting review.
+- Added the Connect walkthrough (`docs/guide/07-workspace-connect.md`) and the
+  draft descriptor (`docs/guide/examples/connect.factory.yaml`).
+- Evidence: 15 cargo tests and clippy clean; an end-to-end scratch-workspace run;
+  `pf memory` on the real Connect auto memory (read-only).
+
 ## 2026-10-19 — All tooling ported to one Rust CLI, `pf`
 
 - Following the operator's Rust-by-default rule ([ADR-009](../decisions/ADR-009-rust-tooling.md)),

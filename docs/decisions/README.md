@@ -21,6 +21,7 @@ next number. A reversed decision is marked `Superseded by ADR-NNN` and kept.
 | [007](ADR-007-truth-in-product-repo.md) | Product truth stays in the product repo; descriptor versus `AGENTS.md` split | Accepted |
 | [008](ADR-008-idea-and-release-lanes.md) | Idea and release lanes; launch material is drafts only | Accepted |
 | [009](ADR-009-rust-tooling.md) | All factory tooling is one Rust CLI, `pf`; the hook fails closed without it | Accepted |
+| [010](ADR-010-session-behaviour-and-memory.md) | Sessions default to the factory; auto memory is promoted into git; module kits in workspaces | Accepted |
 
 ## Template
 
@@ -52,4 +53,5 @@ next number. A reversed decision is marked `Superseded by ADR-NNN` and kept.
   - [ADR-007 — Product truth stays in the product repo](ADR-007-truth-in-product-repo.md)
   - [ADR-008 — Idea and release lanes; launch material is drafts only](ADR-008-idea-and-release-lanes.md)
   - [ADR-009 — All factory tooling is one Rust CLI](ADR-009-rust-tooling.md)
+  - [ADR-010 — Sessions default to the factory; auto memory is promoted into git](ADR-010-session-behaviour-and-memory.md)
 <!-- documentation-routing:end -->

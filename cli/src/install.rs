@@ -9,6 +9,7 @@ use std::sync::LazyLock;
 use regex::Regex;
 use serde_json::{Value, json};
 
+use crate::descriptor;
 use crate::util::{self, say, warn};
 
 /// The hook command. It fails closed: without `pf` on PATH every Bash call is blocked
@@ -135,7 +136,133 @@ fn remove_legacy(path: &Path, what: &str) {
     }
 }
 
-pub fn project(factory: &Path, target: &Path) -> i32 {
+/// The settings value that hides all AI attribution, readable by old and new Claude Code.
+pub fn no_attribution_value() -> Value {
+    json!({"commit": "", "pr": "", "sessionUrl": false})
+}
+
+/// Set `attribution` to hide AI trailers and PR lines. Returns a message.
+pub fn merge_attribution(settings: &Path) -> Result<String, String> {
+    let mut v: Value = match fs::read_to_string(settings) {
+        Ok(s) if !s.trim().is_empty() => {
+            serde_json::from_str(&s).map_err(|e| format!("{}: {e}", settings.display()))?
+        }
+        _ => json!({}),
+    };
+    let obj = v
+        .as_object_mut()
+        .ok_or_else(|| format!("{} is not a JSON object", settings.display()))?;
+    if obj.get("attribution") == Some(&no_attribution_value()) {
+        return Ok(format!(
+            "AI attribution already off in {}",
+            settings.display()
+        ));
+    }
+    obj.insert("attribution".into(), no_attribution_value());
+    let body = serde_json::to_string_pretty(&v).map_err(|e| e.to_string())? + "\n";
+    fs::write(settings, body).map_err(|e| e.to_string())?;
+    Ok(format!(
+        "turned AI attribution off in {} (vcs.attribution: none)",
+        settings.display()
+    ))
+}
+
+/// The Claude Code side of an install: the /factory skill with the constitution, the
+/// agents, the always-on factory rule, the guard hook and the attribution policy.
+fn install_claude_kit(factory: &Path, root: &Path, attribution_none: bool) -> Result<(), String> {
+    let kit = kit(factory);
+    let skill = root.join(".claude/skills/factory");
+    if skill.exists() {
+        fs::remove_dir_all(&skill).map_err(|e| e.to_string())?;
+    }
+    copy_tree(&kit.join(".claude/skills/factory"), &skill).map_err(|e| e.to_string())?;
+    let constitution = skill.join("CONSTITUTION.md");
+    let text = fs::read_to_string(&constitution).map_err(|e| e.to_string())?;
+    fs::write(&constitution, shipped_constitution(&text)).map_err(|e| e.to_string())?;
+    let agents_dir = root.join(".claude/agents");
+    fs::create_dir_all(&agents_dir).map_err(|e| e.to_string())?;
+    let agents = agent_files(factory);
+    for a in &agents {
+        fs::copy(a, agents_dir.join(a.file_name().unwrap())).map_err(|e| e.to_string())?;
+    }
+    let rules_dir = root.join(".claude/rules");
+    fs::create_dir_all(&rules_dir).map_err(|e| e.to_string())?;
+    fs::copy(
+        kit.join(RULE),
+        root.join(".claude")
+            .join(RULE.trim_start_matches(".claude/")),
+    )
+    .map_err(|e| e.to_string())?;
+    say(format!(
+        "copied the /factory skill (with the constitution), {} agents and the always-on factory rule",
+        agents.len()
+    ));
+    remove_legacy(
+        &root.join(".claude/hooks/factory-guard.py"),
+        "Python guard .claude/hooks/factory-guard.py",
+    );
+    let settings = root.join(".claude/settings.json");
+    say(merge_hook(&settings, HOOK_CMD)?);
+    if attribution_none {
+        say(merge_attribution(&settings)?);
+    }
+    Ok(())
+}
+
+/// Install into a module repo of a multi-repo workspace: the Claude Code kit only, so a
+/// session opened inside the module also runs under the factory. The workspace keeps the
+/// descriptor, backlog and job state; the module's own AGENTS.md and CLAUDE.md are untouched.
+pub fn module(factory: &Path, target: &Path, workspace: &Path, no_attribution: bool) -> i32 {
+    let root = util::absolute(target);
+    let ws = util::absolute(workspace);
+    if util::output("git", &["rev-parse", "--show-toplevel"], Some(&root)).as_deref()
+        != Some(root.to_string_lossy().as_ref())
+    {
+        warn(format!("{} is not the top of a git repo", root.display()));
+        return 1;
+    }
+    let Some(d) = descriptor::find(&ws).filter(|d| d.root == ws) else {
+        warn(format!(
+            "no .factory/factory.yaml in {} (pf install project it first)",
+            ws.display()
+        ));
+        return 1;
+    };
+    if !d.multi_repo() {
+        warn(format!(
+            "{}/.factory/factory.yaml is not layout: multi-repo",
+            ws.display()
+        ));
+        return 1;
+    }
+    let rel = util::rel(&ws, &root);
+    if !d.modules.iter().any(|m| {
+        m.get("path")
+            .is_some_and(|p| p.trim_end_matches('/') == rel)
+    }) {
+        warn(format!(
+            "{rel} is not listed under modules: in the workspace descriptor; add it first"
+        ));
+        return 1;
+    }
+    println!(
+        "Installing Product Factory @ {} into module {rel} of {}",
+        revision(factory),
+        ws.display()
+    );
+    if let Err(e) = install_claude_kit(factory, &root, d.attribution_none() || no_attribution) {
+        warn(e);
+        return 1;
+    }
+    println!(
+        "Done. Nothing was committed. Sessions opened in {rel} now use the workspace factory."
+    );
+    0
+}
+
+const RULE: &str = ".claude/rules/product-factory.md";
+
+pub fn project(factory: &Path, target: &Path, no_attribution: bool) -> i32 {
     let root = util::absolute(target);
     if util::output("git", &["rev-parse", "--show-toplevel"], Some(&root)).is_none() {
         warn(format!("{} is not a git repo", root.display()));
@@ -148,29 +275,10 @@ pub fn project(factory: &Path, target: &Path) -> i32 {
         root.display()
     );
     let step = || -> Result<(), String> {
-        let skill = root.join(".claude/skills/factory");
-        if skill.exists() {
-            fs::remove_dir_all(&skill).map_err(|e| e.to_string())?;
-        }
-        copy_tree(&kit.join(".claude/skills/factory"), &skill).map_err(|e| e.to_string())?;
-        let constitution = skill.join("CONSTITUTION.md");
-        let text = fs::read_to_string(&constitution).map_err(|e| e.to_string())?;
-        fs::write(&constitution, shipped_constitution(&text)).map_err(|e| e.to_string())?;
-        let agents_dir = root.join(".claude/agents");
-        fs::create_dir_all(&agents_dir).map_err(|e| e.to_string())?;
-        let agents = agent_files(factory);
-        for a in &agents {
-            fs::copy(a, agents_dir.join(a.file_name().unwrap())).map_err(|e| e.to_string())?;
-        }
-        say(format!(
-            "copied the /factory skill (with the constitution) and {} agents",
-            agents.len()
-        ));
-        remove_legacy(
-            &root.join(".claude/hooks/factory-guard.py"),
-            "Python guard .claude/hooks/factory-guard.py",
-        );
-        say(merge_hook(&root.join(".claude/settings.json"), HOOK_CMD)?);
+        let attribution_none = descriptor::find(&root)
+            .filter(|d| d.root == root)
+            .is_some_and(|d| d.attribution_none());
+        install_claude_kit(factory, &root, attribution_none || no_attribution)?;
 
         let fdir = root.join(".factory");
         fs::create_dir_all(&fdir).map_err(|e| e.to_string())?;

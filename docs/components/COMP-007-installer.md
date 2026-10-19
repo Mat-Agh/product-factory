@@ -12,6 +12,7 @@
 | `pf install project <path>` | **Copies** the kit into a product repo, for you to commit there | yes |
 | `pf install user [--with-guard]` | **Symlinks** the kit into `${CLAUDE_CONFIG_DIR:-~/.claude}`, so it follows `git pull` | yes |
 | `pf install all <path>` | Both | yes |
+| `pf install module <path> --workspace <root>` | The Claude Code kit only (skill, agents, rule, guard, attribution) into one module repo listed in the workspace descriptor | yes |
 
 ## `project` writes
 
@@ -19,7 +20,9 @@
 |---|---|
 | `.claude/skills/factory/` | Replaced from the kit. The constitution is copied as a file, with the factory-repo routing block stripped because its links resolve only in the factory repo |
 | `.claude/agents/*.md` | The ten agents are overwritten. Other agents are untouched |
+| `.claude/rules/product-factory.md` | The always-on factory rule, overwritten ([COMP-016](COMP-016-session-integration.md)) |
 | `.claude/settings.json` | The `pf guard` hook entry is **merged**. The file is never overwritten, other settings are preserved, and legacy `factory-guard.py` entries are removed |
+| `.claude/settings.json` → `attribution` | Set to hide AI attribution when `vcs.attribution: none` or `--no-ai-attribution` |
 | `.claude/hooks/factory-guard.py`, `.factory/docs-map.py` | Legacy Python files are removed if present |
 | `.factory/factory.yaml`, `.factory/backlog.md` | Created only if missing |
 | `.factory/dashboard.html` | Overwritten |

@@ -14,6 +14,7 @@ a dated entry in [EVOLUTION_LOG](../status/EVOLUTION_LOG.md) and the affected ro
 | `CONSTITUTION.md` | protocol and agents that apply the rule; [COMP-013](../components/COMP-013-constitution.md); an ADR if it reverses a decision; Hermes `docs/06-invariants.md` |
 | Coordinator skill: a command | [guide/02-commands.md](../guide/02-commands.md), [COMP-001](../components/COMP-001-coordinator-skill.md), README command list |
 | Coordinator skill: a lane or stage | [JOB_LIFECYCLE](../architecture/JOB_LIFECYCLE.md) (state machine and lane table), [guide/00](../guide/00-overview.md), [guide/03](../guide/03-reading-a-job.md), dashboard `COLS` if it is a new stage |
+| The always-on rule (`kit/.claude/rules/product-factory.md`) or module rule rendering (`cli/src/rules.rs`) | [COMP-016](../components/COMP-016-session-integration.md); keep the rule consistent with CONSTITUTION and the protocol |
 | Protocol | [COMP-002](../components/COMP-002-agent-protocol.md); re-read all 10 agents for contradictions |
 | A role agent's behaviour | [COMP-003](../components/COMP-003-role-agents.md) roster row if tools, model or outputs change |
 | An artifact's name or verdict line | **breaking**: SKILL verdict table, JOB_LIFECYCLE artifact table, [guide/03](../guide/03-reading-a-job.md), dashboard `KNOWN` |

@@ -34,6 +34,7 @@ vcs:
   branch_prefix: factory/
   open_pr: true                 # false = stop at a local branch for the human
   human_merge: true             # not configurable in practice: the constitution requires it
+  attribution: default          # none = no AI trailer or line in commits and PRs (pf install writes the setting)
 
 docs:
   root: docs                    # all documentation lives here (CONSTITUTION §1); checked by `pf docs-map`

@@ -38,6 +38,7 @@ there is recorded evidence that it works.
 | [COMP-012](../components/COMP-012-docs-gate.md) Docs map | yes | yes | `pf docs-map --fix --strict` on this repo: 62 docs, every folder has a README, every doc is reachable from `docs/README.md` (2026-10-19) | Run on a real product (`/factory init`) |
 | [COMP-014](../components/COMP-014-diagrams.md) Diagrams | yes | yes | 7 diagrams parse with Mermaid 10.9.8 and 11.17.2; SVGs rendered and checked as `<img>` in Chrome (2026-10-19) | Confirm display on GitHub from the operator's network |
 | [COMP-015](../components/COMP-015-pf-cli.md) `pf` CLI | yes | yes | `cargo test` 10/10, `cargo clippy` 0 warnings, `cargo fmt` clean; every subcommand run end to end (2026-10-19) | Prebuilt binaries (optional, see ADR-009) |
+| [COMP-016](../components/COMP-016-session-integration.md) Session integration and memory | yes | partially | Scratch workspace with two nested repos: workspace and module installs, `pf rules sync`, attribution off, doctor flags missing modules; `pf memory` read the real Connect auto memory (9 entries); 15 cargo tests (2026-10-19) | Observe a live Claude session routing a request through `/factory`; run `/factory memory` on Connect |
 | [COMP-013](../components/COMP-013-constitution.md) Constitution | v1 | n/a | — | Revisit after the pilot retro |
 
 ## Open operator actions

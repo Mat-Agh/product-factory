@@ -36,6 +36,8 @@ Duplicating either one in the other is a defect.
 | `vcs.branch_prefix` | string | `factory/` | coordinator, guard | Job branches. The guard allows pushes only to `factory/*` |
 | `vcs.open_pr` | bool | true | coordinator | `false` means stop at a local branch |
 | `vcs.human_merge` | bool | true | — | Documentation of the constitutional rule. Not a switch |
+| `vcs.attribution` | `default \| none` | default | `pf install`, coordinator, agents | `none` = no AI trailer or line in commits or PRs; `pf install` writes `"attribution": {"commit": "", "pr": "", "sessionUrl": false}` to `.claude/settings.json` |
+| `docs.root` | path | `docs` | every agent, `pf docs-map` | Where all documentation lives (CONSTITUTION §1) |
 | `docs.prd_dir`, `docs.adr_dir`, `docs.design_dir` | path | `docs/product`, `docs/adr`, `docs/design` | product-manager, tech-lead, designer | Where durable outputs land in the branch |
 | `docs.changelog` | path | `CHANGELOG.md` | engineer, release-manager | Changelog |
 | `docs.index` | path | `docs/README.md` | every agent | Link map instead of dump-reading |

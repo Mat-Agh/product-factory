@@ -40,6 +40,10 @@
 
 ## Multi-repo products (Daria Connect style)
 
+The full walkthrough, with commands, is [07-workspace-connect.md](07-workspace-connect.md). In short:
+`pf install project <workspace>`, then a `layout: multi-repo` descriptor, then
+`pf install module <child> --workspace <workspace>` for each child, then `pf rules sync`.
+
 Set `layout: multi-repo` and `workspace_root` to the folder that holds the
 module clones. Then add one `modules[]` entry per child repo, with its `area`
 (used for the `repo::<area>` label), `path`, `agents_md`, `gates` and `tests`.
