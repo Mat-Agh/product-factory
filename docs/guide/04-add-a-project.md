@@ -1,5 +1,8 @@
 # 04 — Add a project
 
+**Status:** Active
+**Last updated:** 2026-10-19
+
 1. **Install the kit** into the product repo:
    ```bash
    ~/Work/ProductFactory/scripts/install.sh project ~/Work/MyApp
@@ -29,7 +32,8 @@
    ~/Work/ProductFactory/scripts/doctor.sh ~/Work/MyApp
    ```
    Then commit `.claude/`, `.factory/` (without `jobs/`), `AGENTS.md` and
-   `CLAUDE.md` in the product repo yourself.
+   `CLAUDE.md` in the product repo yourself. A filled example of the `AGENTS.md`
+   the factory needs is in [examples/AGENTS.example.md](examples/AGENTS.example.md).
 
 6. **Pilot.** Run one trivial job and one standard job end to end before you use
    the factory for anything larger. Run `/factory retro` on both.
@@ -55,3 +59,10 @@ scripts/install.sh project ~/Work/MyApp
 ```
 Your `factory.yaml` and `backlog.md` are kept. Review the diff in the product
 repo and commit it.
+
+<!-- documentation-routing:start -->
+## Documentation routing
+
+- [Parent README](README.md)
+- [Governing agent guide](../../AGENTS.md)
+<!-- documentation-routing:end -->

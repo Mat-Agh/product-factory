@@ -1,4 +1,7 @@
-# 01 — Architecture
+# Factory overview
+
+**Status:** Active
+**Last updated:** 2026-10-19
 
 ## Layers
 
@@ -128,3 +131,10 @@ Codex review lens) is on the roadmap.
 The guard is a second line of defence, not a sandbox. A determined process with a
 shell can still write files. Branch protection on the base branch is the control
 that holds, and `doctor.sh` checks for it.
+
+<!-- documentation-routing:start -->
+## Documentation routing
+
+- [Parent README](README.md)
+- [Governing agent guide](../../AGENTS.md)
+<!-- documentation-routing:end -->

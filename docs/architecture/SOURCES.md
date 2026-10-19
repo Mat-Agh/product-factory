@@ -1,4 +1,7 @@
-# 02 — Sources and design decisions
+# Research sources and design synthesis
+
+**Status:** Active — research record
+**Last updated:** 2026-10-19
 
 The factory combines two designs. This page records what came from each source,
 where they conflicted, and why each conflict was resolved the way it was.
@@ -72,7 +75,14 @@ a community gap review (`mkelley33/zazencodes-season-3#7`). What it contributes:
 ## Deliberately left out (for now)
 
 - Cron and issue polling (Hermes Door B). This waits until the manual loop has
-  proven itself. See [05-roadmap.md](05-roadmap.md).
+  proven itself. See [ROADMAP.md](../ROADMAP.md).
 - Mixture-of-agents and cross-vendor routing. These are on the roadmap as an
   optional extra review lens.
 - Auto-merge in any form.
+
+<!-- documentation-routing:start -->
+## Documentation routing
+
+- [Parent README](README.md)
+- [Governing agent guide](../../AGENTS.md)
+<!-- documentation-routing:end -->

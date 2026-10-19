@@ -2,7 +2,10 @@
 
 This repo is the factory itself, not a product. It holds rules
 (`CONSTITUTION.md`), the installable kit (`kit/`), the operator profile
-(`operator/`), adapters, scripts and docs. Read `README.md` first.
+(`operator/`), adapters, scripts and docs. Read `README.md` first, then route
+through [`docs/development/16-documentation-link-map.md`](docs/development/16-documentation-link-map.md).
+Current state: [`CURRENT_STATE.md`](CURRENT_STATE.md). How to change things:
+[`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## Working on the factory
 
@@ -13,8 +16,10 @@ This repo is the factory itself, not a product. It holds rules
   docs. Link to them.
 - Keep the kit project-agnostic. Anything about a specific product belongs in
   that product's `AGENTS.md` or `.factory/factory.yaml`, never here.
-- Every factory-level change updates, **in the same commit**, the docs it
-  affects and adds a dated entry to `docs/evolution-log.md`.
+- Every factory-level change updates, **in the same commit**, the docs listed for
+  it in `docs/development/03-changing-the-factory.md`, the affected rows of
+  `docs/components/IMPLEMENTATION_STATUS.md`, and adds a dated entry to
+  `docs/EVOLUTION_LOG.md`.
 - After changing the guard hook, run `python3 tests/guard_test.py`, and add a
   case for the new behaviour.
 - After changing scripts, run `bash -n scripts/*.sh` and `scripts/doctor.sh`.
@@ -24,6 +29,7 @@ This repo is the factory itself, not a product. It holds rules
 ```bash
 python3 tests/guard_test.py
 bash -n scripts/*.sh
+python3 scripts/check-docs.py      # --inventory after adding/removing a doc
 scripts/doctor.sh
 ```
 

@@ -89,7 +89,7 @@ spec assumption that is really a product or business decision.
 ## 7. The factory improves from its own record
 
 - Every factory-level change gets a dated entry in
-  `docs/evolution-log.md`.
+  `docs/EVOLUTION_LOG.md`.
 - `/factory retro` turns finished jobs into **proposed** rule or checklist
   changes, delivered as a PR to this repo. The factory never silently rewrites
   its own rules.

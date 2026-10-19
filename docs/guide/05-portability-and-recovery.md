@@ -1,4 +1,7 @@
-# 03 — Portability and recovery
+# 05 — Portability and recovery
+
+**Status:** Active
+**Last updated:** 2026-10-19
 
 **Goal:** losing any single thing, whether the Claude account, the GitHub account,
 the laptop or the agent vendor, costs at most the work in flight on that one
@@ -62,7 +65,7 @@ design, but each job's branch and PR carry its summary. Re-run a job with
 fresh.
 
 **Agent vendor unavailable.** Use the role files directly from Codex, Cursor or
-Hermes ([adapters/](../adapters/)). The procedure is markdown, so any capable
+Hermes ([adapters/](../../adapters/)). The procedure is markdown, so any capable
 agent can run one role at a time.
 
 ## Health
@@ -70,3 +73,10 @@ agent can run one role at a time.
 `scripts/doctor.sh [project]` checks tools, auth, guard tests, mirrors, the user
 links, the project install, kit drift and branch protection. Run it on any new
 machine, and after every factory update.
+
+<!-- documentation-routing:start -->
+## Documentation routing
+
+- [Parent README](README.md)
+- [Governing agent guide](../../AGENTS.md)
+<!-- documentation-routing:end -->

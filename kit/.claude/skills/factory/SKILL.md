@@ -40,7 +40,7 @@ Triage sets three things, and they pick the lane.
 
 | type / tier | Stages, in order |
 |---|---|
-| `trivial` (any type except idea/release) | triage → build → review(code, security*) → gate |
+| `trivial` (feature, docs, chore only; a bug is always reproduced first) | triage → build → review(code, security*) → gate |
 | `feature` standard | triage → spec → design† → plan → build → review → qa → gate |
 | `feature` cross-cutting | triage → spec → design† → plan(+ADR) → build → review(all lenses) → qa → gate (always ESCALATE) |
 | `bug` | triage → repro → plan → build → review → qa → gate |

@@ -1,5 +1,8 @@
 # 00 — How the Product Factory works
 
+**Status:** Active
+**Last updated:** 2026-10-19
+
 You own the product and the decisions. The factory is a crew of specialist
 agents that turn ideas into pull requests with evidence attached. **You merge,
 tag, release and publish. Those steps are always yours.**
@@ -30,7 +33,7 @@ flowchart LR
 Triage picks a **type** (idea, feature, bug, design, spike, docs, chore,
 release), a **tier** (trivial, standard, cross-cutting) and a **surface** (ui,
 api, none). Those three choose the lane. The full lane table is in
-[`kit/.claude/skills/factory/SKILL.md`](../kit/.claude/skills/factory/SKILL.md).
+[`kit/.claude/skills/factory/SKILL.md`](../../kit/.claude/skills/factory/SKILL.md).
 
 | You ask for | Lane | You get |
 |---|---|---|
@@ -65,3 +68,10 @@ scope, credentials or pixels. Call a compile "done".
 /factory rework 007-tenant-org-name The FA string should be "نام سازمان", not a transliteration
 /factory release 1.4.0
 ```
+
+<!-- documentation-routing:start -->
+## Documentation routing
+
+- [Parent README](README.md)
+- [Governing agent guide](../../AGENTS.md)
+<!-- documentation-routing:end -->

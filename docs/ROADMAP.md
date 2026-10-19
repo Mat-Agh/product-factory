@@ -1,4 +1,7 @@
-# 05 — Roadmap
+# Roadmap
+
+**Status:** Active
+**Last updated:** 2026-10-19
 
 Grow autonomy only as fast as evidence allows. Each phase has an exit criterion,
 and the factory does not move to the next phase until that criterion is met.
@@ -57,3 +60,10 @@ failure. Human interventions for real decisions are expected.
 ## Never
 
 Auto-merge, auto-deploy, auto-publish, auto-send, or factory-managed secrets.
+
+<!-- documentation-routing:start -->
+## Documentation routing
+
+- [Parent README](README.md)
+- [Governing agent guide](../AGENTS.md)
+<!-- documentation-routing:end -->

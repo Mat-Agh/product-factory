@@ -28,7 +28,17 @@ triage, bounded plans, evidence-based done, human merge, and truth that lives in
 the repo. The second is the Claude Code software-factory pattern from the
 ZazenCodes video: one orchestrator skill, file-driven subagents, parallel review
 lenses, worktree-per-job and machine-readable verdicts. See
-[docs/02-sources-and-decisions.md](docs/02-sources-and-decisions.md).
+[docs/architecture/SOURCES.md](docs/architecture/SOURCES.md) and the
+[decision records](docs/decisions/README.md).
+
+## New here?
+
+Read [docs/guide/00-overview.md](docs/guide/00-overview.md), then follow
+[docs/guide/01-getting-started.md](docs/guide/01-getting-started.md). It goes
+from an empty machine to your first factory PR, with every command and its
+expected output. Terms are explained in the
+[glossary](docs/guide/GLOSSARY.md). What works today is recorded in
+[CURRENT_STATE.md](CURRENT_STATE.md).
 
 ## Start on any machine or account
 
@@ -69,9 +79,10 @@ Codex, Cursor, Gemini or Hermes can run the same roles. See
 | [kit/](kit/) | What gets installed into a product repo: the `/factory` skill, the 10 role agents, the guard hook, the descriptor template, backlog, dashboard, and the `AGENTS.md` section. |
 | [operator/USER.md](operator/USER.md) | Who you are and how you want agents to work. Lives in git, not in any vendor's memory. |
 | [adapters/](adapters/) | How Hermes, Codex, Cursor and others run the same roles. |
-| [scripts/](scripts/) | `install.sh`, `doctor.sh`, `mirror.sh` (backup remotes and offline bundles), `export-claude.sh`. |
+| [scripts/](scripts/) | `install.sh`, `doctor.sh`, `mirror.sh` (backup remotes and offline bundles), `export-claude.sh`, `check-docs.py`. |
 | [tests/](tests/) | Guard hook tests (`python3 tests/guard_test.py`). |
-| [docs/](docs/) | Overview, architecture, sources, portability, adding a project, roadmap, evolution log. |
+| [docs/](docs/README.md) | Operator guide, architecture, component contracts and status, development handbook, ADRs, roadmap, evolution log. |
+| [CURRENT_STATE.md](CURRENT_STATE.md) · [CONTRIBUTING.md](CONTRIBUTING.md) | What exists and is verified now · how to change the factory |
 
 ## Survives losing this account
 
@@ -79,4 +90,4 @@ Nothing the factory needs lives only in one account. The rules, roles, operator
 profile and procedures are in this repo, which can be mirrored to several remotes
 and an offline bundle. Each product's descriptor, PRDs, ADRs and backlog are in
 the product's own repo. Work in flight is in branches and PRs. See
-[docs/03-portability-and-recovery.md](docs/03-portability-and-recovery.md).
+[docs/guide/05-portability-and-recovery.md](docs/guide/05-portability-and-recovery.md).
