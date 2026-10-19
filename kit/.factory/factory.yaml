@@ -1,0 +1,81 @@
+# Product Factory — project descriptor.
+# The only project-specific file the factory reads besides AGENTS.md.
+# `/factory init` drafts this from the repo; lines marked `# verify` are guesses.
+# Agents read conventions, commands and docs from AGENTS.md; keep them there,
+# not here. This file says WHERE things are and WHAT the policy is.
+
+factory:
+  version: 1
+  source: https://github.com/Mat-Agh/product-factory   # where /factory retro proposes changes
+
+product:
+  name: Example Product
+  one_liner: What it is, for whom, in one sentence.
+  locales: [en]                 # e.g. [en, fa]; agents pair copy and RTL checks with these
+  themes: [light]               # e.g. [dark, light]; UI review pairs these
+
+layout: single-repo             # single-repo | multi-repo
+workspace_root: .               # multi-repo: the folder holding module clones
+
+# Single-repo: one module at ".". Multi-repo: one entry per child repo.
+modules:
+  - area: app                   # matches issue labels area::<area> / repo::<area>
+    path: .
+    owner_role: engineer
+    agents_md: AGENTS.md        # the module's live instructions
+    gates: see AGENTS.md        # or a list: ["npm run lint", "npm test", "npm run build"]
+    tests: yes                  # no = the module forbids unit tests; QA uses documented manual acceptance
+    # vcs: { host: gitlab, base_branch: develop }   # multi-repo: per-module override of the vcs block
+
+vcs:
+  host: github                  # github | gitlab
+  remote: origin
+  base_branch: main             # PRs/MRs target this; never committed to directly
+  branch_prefix: factory/
+  open_pr: true                 # false = stop at a local branch for the human
+  human_merge: true             # not configurable in practice: the constitution requires it
+
+docs:
+  prd_dir: docs/product         # PRDs and discovery outputs land here (in the branch)
+  adr_dir: docs/adr
+  design_dir: docs/design
+  changelog: CHANGELOG.md
+  index: docs/README.md         # the link map agents use instead of dump-reading docs/
+
+design:
+  source: repo                  # repo | figma:<file-key>
+  require_source: false         # true = designer stops when a needed frame is missing
+
+surfaces:
+  ui:
+    dev_command: see AGENTS.md  # must accept a port
+    port_base: 5100             # job n uses port_base + 10n + {0 engineer, 1 ux, 2 ui, 3 tester}
+    browser_tool: agent-browser # agent-browser | playwright
+  api:
+    contract: none              # e.g. openapi.yaml
+
+acceptance:
+  ledger: none                  # e.g. docs/qa/ledger.md
+  gates: []                     # extra product-level gates
+
+risk:
+  # Paths whose change always escalates, in addition to CONSTITUTION §5.
+  escalate_paths:
+    - ".github/workflows/**"
+    - "**/migrations/**"
+    - "**/auth/**"
+    - "**/*.lock"
+    - "Dockerfile*"
+    - "infra/**"
+
+release:
+  drafts_dir: docs/launch       # announcement drafts (never sent by the factory)
+  store_listing: none           # e.g. fastlane/metadata
+
+limits:
+  max_resumes: 2                # engineer resumes after round 1; then escalate
+  max_parallel_jobs: 3
+
+models:                         # documentation of intent; the agent files carry the actual model
+  deep: opus                    # product-manager, designer, tech-lead, reviewer-security, release-manager
+  build: sonnet                 # engineer, tester, reviewer-code, reviewer-ux, reviewer-ui

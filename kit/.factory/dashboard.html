@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Product Factory</title>
+<style>
+  :root { --bg:#f7f7f5; --panel:#fff; --ink:#1d1d1b; --mute:#6b6b66; --line:#e3e2dc;
+          --pass:#1f7a4d; --chg:#b4541a; --pend:#9a9a93; --hum:#b3261e; --acc:#2c5bd6; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+          --bg:#141413; --panel:#1e1e1c; --ink:#ecebe6; --mute:#9d9c95; --line:#33322f;
+          --pass:#5cc08d; --chg:#e9925a; --pend:#77766f; --hum:#ff7a70; --acc:#7da2ff; } }
+  * { box-sizing:border-box }
+  body { margin:0; font:14px/1.45 system-ui,-apple-system,Segoe UI,sans-serif; background:var(--bg); color:var(--ink) }
+  header { display:flex; gap:16px; align-items:baseline; padding:16px; border-bottom:1px solid var(--line); flex-wrap:wrap }
+  h1 { font-size:18px; margin:0 } .mute { color:var(--mute) }
+  .board { display:grid; grid-template-columns:repeat(6,minmax(180px,1fr)); gap:12px; padding:16px; overflow-x:auto }
+  @media (max-width:760px){ .board{ grid-template-columns:1fr } }
+  .col h2 { font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--mute); margin:0 0 8px }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:10px; margin-bottom:8px; cursor:pointer }
+  .card.human { border-color:var(--hum); box-shadow:inset 3px 0 0 var(--hum) }
+  .card b { display:block; font-size:13px; word-break:break-word }
+  .meta { font-size:12px; color:var(--mute); margin-top:4px }
+  .chips { display:flex; gap:4px; flex-wrap:wrap; margin-top:6px }
+  .chip { font-size:11px; padding:1px 6px; border-radius:999px; border:1px solid currentColor }
+  .PASS { color:var(--pass) } .CHANGES { color:var(--chg) } .pending { color:var(--pend) } .skipped { color:var(--pend); opacity:.5 }
+  dialog { width:min(900px,96vw); max-height:90vh; border:1px solid var(--line); border-radius:10px; background:var(--panel); color:var(--ink); padding:0 }
+  dialog header { position:sticky; top:0; background:var(--panel) }
+  .files { display:flex; gap:6px; flex-wrap:wrap; padding:8px 16px }
+  .files button { font:inherit; font-size:12px; border:1px solid var(--line); background:transparent; color:var(--acc); border-radius:6px; padding:2px 8px; cursor:pointer }
+  pre { white-space:pre-wrap; padding:0 16px 16px; margin:0; font:12.5px/1.5 ui-monospace,Menlo,monospace }
+  a { color:var(--acc) }
+</style>
+</head>
+<body>
+<header>
+  <h1>Product Factory</h1>
+  <span class="mute" id="summary">loading…</span>
+  <span class="mute">Serve with <code>python3 -m http.server</code> from <code>.factory/</code></span>
+</header>
+<main class="board" id="board"></main>
+<dialog id="dlg"><header><b id="dlgTitle"></b><button onclick="dlg.close()">Close</button></header>
+  <div class="files" id="dlgFiles"></div><pre id="dlgBody"></pre></dialog>
+<script>
+const COLS = [
+  ["Product", ["triage","discovery","spec","design","repro"]],
+  ["Plan", ["plan"]],
+  ["Build", ["build"]],
+  ["Review & QA", ["review","qa","release"]],
+  ["Gate / PR", ["gate","pr-open"]],
+  ["Human & done", ["needs-human","done","closed"]],
+];
+const KNOWN = ["triage.md","discovery.md","spec.md","repro.md","design.md","plan.md","build.md","qa.md","gate.md","pr.md","release.md","retro.md"];
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+async function listDir(path) {
+  const r = await fetch(path, {cache:"no-store"}); if (!r.ok) return [];
+  const html = await r.text();
+  return [...html.matchAll(/href="([^"?#]+)"/g)].map(m => decodeURIComponent(m[1])).filter(h => !h.startsWith("/") && !h.startsWith(".."));
+}
+async function load() {
+  const ids = (await listDir("jobs/")).filter(h => h.endsWith("/")).map(h => h.slice(0,-1));
+  const jobs = (await Promise.all(ids.map(id => fetch(`jobs/${id}/job.json`, {cache:"no-store"})
+      .then(r => r.ok ? r.json() : null).catch(() => null)))).filter(Boolean);
+  render(jobs);
+}
+function render(jobs) {
+  const board = document.getElementById("board"); board.innerHTML = "";
+  const human = jobs.filter(j => j.stage === "needs-human").length;
+  document.getElementById("summary").textContent =
+    `${jobs.length} jobs · ${jobs.filter(j=>!["done","closed"].includes(j.stage)).length} active · ${human} need you`;
+  for (const [title, stages] of COLS) {
+    const col = document.createElement("section"); col.className = "col";
+    col.innerHTML = `<h2>${title}</h2>`;
+    for (const j of jobs.filter(j => stages.includes(j.stage)).sort((a,b)=>a.id.localeCompare(b.id))) {
+      const c = document.createElement("div"); c.className = "card" + (j.stage==="needs-human" ? " human" : "");
+      const chips = Object.entries(j.reviews||{}).map(([k,v]) => `<span class="chip ${esc(v)}">${esc(k)}</span>`).join("");
+      c.innerHTML = `<b>${esc(j.id)}</b><div class="meta">${esc(j.type)} · ${esc(j.tier)} · ${esc(j.stage)}${j.round?` · r${esc(j.round)}`:""}</div>
+        <div class="chips">${chips}</div>${j.pr?`<div class="meta"><a href="${esc(j.pr)}" target="_blank" rel="noopener">PR</a></div>`:""}`;
+      c.onclick = () => openJob(j); col.appendChild(c);
+    }
+    board.appendChild(col);
+  }
+}
+async function openJob(j) {
+  dlgTitle.textContent = `${j.id} — ${j.request||""}`;
+  const top = await listDir(`jobs/${j.id}/`);
+  const rounds = top.filter(h => /^round-\d+\/$/.test(h));
+  let files = KNOWN.filter(f => top.includes(f)).concat(top.filter(f => /^rework-\d+\.md$/.test(f)));
+  for (const r of rounds) files = files.concat((await listDir(`jobs/${j.id}/${r}`)).filter(f=>f.endsWith(".md")).map(f => r + f));
+  files.push("job.json");
+  dlgFiles.innerHTML = ""; files.forEach(f => { const b = document.createElement("button"); b.textContent = f; b.onclick = () => show(j.id, f); dlgFiles.appendChild(b); });
+  show(j.id, files[0]); dlg.showModal();
+}
+async function show(id, f) { const r = await fetch(`jobs/${id}/${f}`, {cache:"no-store"}); dlgBody.textContent = r.ok ? await r.text() : "(missing)"; }
+load(); setInterval(load, 3000);
+</script>
+</body>
+</html>
