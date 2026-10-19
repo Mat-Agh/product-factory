@@ -151,6 +151,7 @@ Details: [development/09-tools-scripts-and-commands.md](../development/09-tools-
 <!-- documentation-routing:start -->
 ## Documentation routing
 
-- [Parent README](README.md)
-- [Governing agent guide](../../AGENTS.md)
+- Parent: [Operator guide](README.md)
+- Documentation home: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
 <!-- documentation-routing:end -->

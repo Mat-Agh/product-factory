@@ -4,18 +4,19 @@
 **Last updated:** 2026-10-19
 
 The factory has three levels of verification. Record every result in
-[IMPLEMENTATION_STATUS](../components/IMPLEMENTATION_STATUS.md) with a date.
+[IMPLEMENTATION_STATUS](../status/IMPLEMENTATION_STATUS.md) with a date.
 
 ## 1. Static and unit (every commit)
 
 ```bash
 python3 tests/guard_test.py        # guard policy: 73 cases as of 2026-10-19
 bash -n scripts/*.sh               # script syntax
-python3 scripts/check-docs.py      # links, headers, inventory
+scripts/render-diagrams.sh --check # diagrams match their sources
+python3 kit/.factory/docs-map.py --strict --allow kit/   # docs tree, links, map
 scripts/doctor.sh                  # machine + factory repo health
 ```
 
-All four must pass before a commit.
+All five must pass before a commit.
 
 ## 2. Installer smoke test
 
@@ -67,6 +68,7 @@ evolution-log line when a pilot completes.
 <!-- documentation-routing:start -->
 ## Documentation routing
 
-- [Parent README](README.md)
-- [Governing agent guide](../../AGENTS.md)
+- Parent: [Factory development handbook](README.md)
+- Documentation home: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
 <!-- documentation-routing:end -->

@@ -16,19 +16,20 @@
 ## `export-claude.sh`
 
 Copies the global `CLAUDE.md` and every `~/.claude/projects/*/memory/*.md` into
-`operator/claude-export/<date>/`, plus an inventory of user-level skills and
+`.claude-export/<date>/`, plus an inventory of user-level skills and
 agents the factory does not manage. It copies no credentials, sessions or
 transcripts. The folder is gitignored on purpose. Review it, fold the durable
-facts into `operator/USER.md` or a product's `AGENTS.md`, then delete it.
+facts into `docs/operator/USER.md` or a product's `AGENTS.md`, then delete it.
 
 ## Verification
 
 `bash -n` passes for both scripts. Live runs are pending the first mirror
-setup (see [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md)).
+setup (see [IMPLEMENTATION_STATUS.md](../status/IMPLEMENTATION_STATUS.md)).
 
 <!-- documentation-routing:start -->
 ## Documentation routing
 
-- [Parent README](README.md)
-- [Governing agent guide](../../AGENTS.md)
+- Parent: [Components](README.md)
+- Documentation home: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
 <!-- documentation-routing:end -->

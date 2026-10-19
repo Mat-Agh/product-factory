@@ -1,5 +1,8 @@
 # Codex, Cursor, Gemini CLI and other agents
 
+**Status:** Active
+**Last updated:** 2026-10-19
+
 The role files are plain markdown. The Claude Code frontmatter (`name`, `tools`,
 `model`) is metadata that other agents can ignore. Any agent that reads
 `AGENTS.md` sees the Product Factory section the installer appended, and that
@@ -36,3 +39,11 @@ codex exec "You are the Product Factory reviewer-code. Read .claude/skills/facto
 The hook works only in Claude Code. Elsewhere, branch protection on the remote
 is the control, and the agent's own approval mode (for example Codex
 `--ask-for-approval`) is the second line.
+
+<!-- documentation-routing:start -->
+## Documentation routing
+
+- Parent: [Adapters](README.md)
+- Documentation home: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
+<!-- documentation-routing:end -->

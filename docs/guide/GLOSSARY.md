@@ -6,7 +6,7 @@
 | Term | Meaning |
 |---|---|
 | **Acceptance criteria** | A numbered list in `spec.md` (copied into `plan.md`) of observable behaviours, each with a way to check it. "Done" means every one has evidence. |
-| **Adapter** | Instructions for running the factory's roles in a tool other than Claude Code (Hermes, Codex, Cursor). See `adapters/`. |
+| **Adapter** | Instructions for running the factory's roles in a tool other than Claude Code (Hermes, Codex, Cursor). See `docs/adapters/`. |
 | **ADR** | Architecture Decision Record: a short document recording one technical decision, its context and its consequences. Products keep theirs under `docs.adr_dir`, and the factory keeps its own in `docs/decisions/`. |
 | **Agent / role agent** | A Claude Code subagent defined by one markdown file in `.claude/agents/`, with its own instructions, tools and model. The factory has ten. |
 | **`AGENTS.md`** | The file at a repo root that tells any AI agent how to work in that repo: setup, commands, conventions. `CLAUDE.md` usually just imports it (`@AGENTS.md`). |
@@ -30,7 +30,7 @@
 | **Living sample** | Existing code in the repo that new code should copy in structure, instead of inventing a new pattern. |
 | **Module** | One repository or area of a product. A single-repo product has one, and multi-repo products (like Daria Connect) have several. |
 | **`needs-human`** | The stage a job enters when it cannot continue without you. The coordinator quotes the reason. |
-| **Operator** | You: the person who runs the factory and makes the decisions it escalates. Described in `operator/USER.md`. |
+| **Operator** | You: the person who runs the factory and makes the decisions it escalates. Described in `docs/operator/USER.md`. |
 | **PR / MR** | Pull request (GitHub) or merge request (GitLab): a proposed set of changes on a branch, which a human reviews and merges. |
 | **PRD** | Product Requirements Document: what a product or feature must do, and why. |
 | **Protocol** | `.claude/skills/factory/protocol.md`, the rules every agent reads first. |
@@ -50,6 +50,7 @@
 <!-- documentation-routing:start -->
 ## Documentation routing
 
-- [Parent README](README.md)
-- [Governing agent guide](../../AGENTS.md)
+- Parent: [Operator guide](README.md)
+- Documentation home: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
 <!-- documentation-routing:end -->

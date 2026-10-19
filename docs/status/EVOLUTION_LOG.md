@@ -6,6 +6,33 @@
 Append-only. One dated entry for each factory-level change: what changed, why,
 and its evidence.
 
+## 2026-10-19 — All docs under `docs/`, live docs map, rendered diagrams
+
+- **Rule (CONSTITUTION §1, v1.1):** documentation lives under `docs/` in one
+  folder per area, each with a README. READMEs link to their parent, documents and
+  subfolders. Every document links back to its folder README. `docs/README.md`
+  carries a map of the whole tree. This applies to the factory repo and to every
+  product.
+- Moved `CONSTITUTION.md` → `docs/governance/`, `CONTRIBUTING.md` →
+  `docs/development/`, `CURRENT_STATE.md`, `IMPLEMENTATION_STATUS.md`,
+  `ROADMAP.md` and `EVOLUTION_LOG.md` → `docs/status/`, `adapters/` →
+  `docs/adapters/`, and `operator/` → `docs/operator/`. Rewrote every relative
+  link. The kit carries the constitution as a link, and the installer copies it
+  into products with the repo-only routing block stripped.
+- Replaced `scripts/check-docs.py` and `DOCUMENT_INVENTORY.md` with
+  `kit/.factory/docs-map.py`, which generates and checks routing blocks, the map,
+  missing READMEs, broken links and orphans. It is installed into products as
+  `.factory/docs-map.py`, used by agents (protocol), reviewer-code, `/factory init`
+  and `doctor.sh`.
+- GitHub showed "Unable to render rich display". All 7 Mermaid diagrams were
+  valid (Mermaid 10.9.8 and 11.17.2), so the failure was GitHub's live renderer
+  (`viewscreen.githubusercontent.com`) not loading. Diagrams are now
+  `docs/assets/diagrams/*.mmd` rendered to committed SVGs by
+  `scripts/render-diagrams.sh`, with a `--check` freshness gate.
+- Evidence: `docs-map.py --strict` OK (62 docs); `render-diagrams.sh --check` OK;
+  `guard_test.py` 73/73; installer smoke test, including `docs-map.py` inside the
+  installed product.
+
 ## 2026-10-19 — Documentation set aligned with the operator's repo conventions
 
 - Restructured `docs/` to match the Daria Connect repositories. Added
@@ -39,6 +66,7 @@ and its evidence.
 <!-- documentation-routing:start -->
 ## Documentation routing
 
-- [Parent README](README.md)
-- [Governing agent guide](../AGENTS.md)
+- Parent: [Status](README.md)
+- Documentation home: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
 <!-- documentation-routing:end -->

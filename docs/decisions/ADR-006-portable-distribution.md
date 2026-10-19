@@ -20,7 +20,7 @@ Code stores skills, agents and memory under `~/.claude`, on one machine.
   `installed.lock` recording its source revision.
 - **Machines get symlinks** (`install.sh user`), so `git pull` updates every
   project on that machine that uses the user install.
-- Operator preferences live in `operator/USER.md`, imported into Claude Code
+- Operator preferences live in `docs/operator/USER.md`, imported into Claude Code
   through `CLAUDE.md`. Vendor memory is exported for review, never treated as
   the source.
 - No account ids, tokens or hosted state exist anywhere in the factory.
@@ -41,6 +41,7 @@ updating is an explicit `install.sh project` followed by review.
 <!-- documentation-routing:start -->
 ## Documentation routing
 
-- [Parent README](README.md)
-- [Governing agent guide](../../AGENTS.md)
+- Parent: [Architecture decisions](README.md)
+- Documentation home: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
 <!-- documentation-routing:end -->

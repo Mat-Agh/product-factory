@@ -206,7 +206,7 @@ def main():
     command = (payload.get("tool_input") or {}).get("command", "")
     reason = check(command)
     if reason:
-        print(f"factory-guard: {reason} (see CONSTITUTION.md §5)", file=sys.stderr)
+        print(f"factory-guard: {reason} (see .claude/skills/factory/CONSTITUTION.md §5)", file=sys.stderr)
         return 2
     return 0
 

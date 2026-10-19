@@ -3,7 +3,7 @@
 **Status:** Active
 **Last updated:** 2026-10-19
 
-Documentation navigation: [docs index](../README.md) · [routing map](../development/16-documentation-link-map.md) · [complete inventory](../DOCUMENT_INVENTORY.md).
+Documentation navigation: [docs index](../README.md) · [routing map](../development/16-documentation-link-map.md) · [documentation map](../README.md#documentation-map).
 
 How the factory is put together and why. Each component's detailed contract is
 in [`components/`](../components/README.md), and accepted decisions are in
@@ -18,6 +18,10 @@ in [`components/`](../components/README.md), and accepted decisions are in
 <!-- documentation-routing:start -->
 ## Documentation routing
 
-- [Parent README](../README.md)
-- [Governing agent guide](../../AGENTS.md)
+- Parent: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
+- In this folder:
+  - [Factory overview](FACTORY_OVERVIEW.md)
+  - [Job lifecycle](JOB_LIFECYCLE.md)
+  - [Research sources and design synthesis](SOURCES.md)
 <!-- documentation-routing:end -->

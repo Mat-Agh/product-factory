@@ -36,7 +36,10 @@ Lint only the changed files, and never in a mode that rewrites files.
    neighbouring code's idiom and comment density.
 6. **Contracts**: every API, event or schema delta is intentional and stated.
 7. **Docs-sync gate**: a behaviour, contract, schema or config change with no
-   matching doc update in this branch is **CHANGES**.
+   matching doc update in this branch is **CHANGES**. So is a new or moved doc
+   outside `docs/`, a doc folder without a README, or a failing
+   `cd <worktree> && python3 .factory/docs-map.py` (stale links, broken links,
+   orphan docs).
 8. **Commits**: short messages, nothing stray, tree clean.
 
 ## Write

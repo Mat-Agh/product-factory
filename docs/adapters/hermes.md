@@ -1,5 +1,8 @@
 # Hermes adapter
 
+**Status:** Active
+**Last updated:** 2026-10-19
+
 `Mat-Agh/Hermes` (`$HOME/Work/Hermes`) is the earlier implementation of the same
 philosophy on Hermes Agent, 9Router and GitLab. Use it when you want cron
 intake, Telegram control or multi-provider routing. Use Claude Code `/factory`
@@ -36,3 +39,11 @@ generate Hermes profile `SOUL.md` files and skills from `kit/.claude/agents/*.md
 and to retire the duplicated Hermes role text. Until then, a rule change goes
 into `CONSTITUTION.md` first and is mirrored into Hermes `docs/06-invariants.md`
 in the same session.
+
+<!-- documentation-routing:start -->
+## Documentation routing
+
+- Parent: [Adapters](README.md)
+- Documentation home: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
+<!-- documentation-routing:end -->

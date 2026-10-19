@@ -59,7 +59,7 @@ Duplicating either one in the other is a defect.
 `/factory init` writes it and marks guesses with `# verify`. `scripts/doctor.sh
 <project>` checks that it exists and reads `vcs.base_branch` to check branch
 protection. There is no schema validator yet (see
-[IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md)).
+[IMPLEMENTATION_STATUS.md](../status/IMPLEMENTATION_STATUS.md)).
 
 ## Compatibility
 
@@ -70,6 +70,7 @@ migration in the evolution log, and update every agent that reads the key.
 <!-- documentation-routing:start -->
 ## Documentation routing
 
-- [Parent README](README.md)
-- [Governing agent guide](../../AGENTS.md)
+- Parent: [Components](README.md)
+- Documentation home: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
 <!-- documentation-routing:end -->

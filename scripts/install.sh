@@ -42,7 +42,13 @@ install_project() {
 
   mkdir -p "$root/.claude/skills" "$root/.claude/agents" "$root/.claude/hooks" "$root/.factory"
   rm -rf "$root/.claude/skills/factory"
-  cp -R "$KIT/.claude/skills/factory" "$root/.claude/skills/factory"
+  cp -RL "$KIT/.claude/skills/factory" "$root/.claude/skills/factory"   # -L: ship the constitution, not a link
+  python3 - "$root/.claude/skills/factory/CONSTITUTION.md" <<'PY_STRIP'
+import re, sys
+p = sys.argv[1]; s = open(p).read()
+s = re.sub(r"\n*<!-- documentation-routing:start -->.*?<!-- documentation-routing:end -->\n?", "\n", s, flags=re.S)
+open(p, "w").write(s)  # its doc-tree links only resolve inside the factory repo
+PY_STRIP
   cp "$KIT"/.claude/agents/*.md "$root/.claude/agents/"
   cp "$KIT/.claude/hooks/factory-guard.py" "$root/.claude/hooks/"
   chmod +x "$root/.claude/hooks/factory-guard.py"
@@ -54,7 +60,8 @@ install_project() {
     if [[ -e "$root/.factory/$f" ]]; then say "kept existing .factory/$f"
     else cp "$KIT/.factory/$f" "$root/.factory/$f"; say "created .factory/$f (run /factory init to fill it)"; fi
   done
-  cp "$KIT/.factory/dashboard.html" "$root/.factory/dashboard.html"
+  cp "$KIT/.factory/dashboard.html" "$KIT/.factory/docs-map.py" "$root/.factory/"
+  chmod +x "$root/.factory/docs-map.py"
 
   touch "$root/.gitignore"
   grep -qxF '.factory/jobs/' "$root/.gitignore" || { echo '.factory/jobs/' >> "$root/.gitignore"; say "added .factory/jobs/ to .gitignore"; }
@@ -71,6 +78,7 @@ install_project() {
     "$REV" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$root/.factory/installed.lock"
 
   echo "Done. Nothing was committed. Next: open Claude Code in $root, run /factory init, review, commit."
+  echo "Docs map: python3 .factory/docs-map.py (add --fix to generate README links and the map)."
 }
 
 link() { # <src> <dst>
@@ -87,9 +95,9 @@ install_user() {
   link "$KIT/.claude/hooks/factory-guard.py" "$home_claude/hooks/factory-guard.py"
   say "linked /factory skill, agents and guard (they follow 'git pull' in $FACTORY)"
 
-  local claude_md="$home_claude/CLAUDE.md" line="@$FACTORY/operator/USER.md"
+  local claude_md="$home_claude/CLAUDE.md" line="@$FACTORY/docs/operator/USER.md"
   touch "$claude_md"
-  grep -qxF "$line" "$claude_md" || { printf '\n# Product Factory operator profile\n%s\n' "$line" >> "$claude_md"; say "imported operator/USER.md into $claude_md"; }
+  grep -qxF "$line" "$claude_md" || { printf '\n# Product Factory operator profile\n%s\n' "$line" >> "$claude_md"; say "imported docs/operator/USER.md into $claude_md"; }
 
   if [[ "${WITH_USER_GUARD:-0}" == 1 ]]; then
     merge_hook "$home_claude/settings.json" "python3 \"$home_claude/hooks/factory-guard.py\""

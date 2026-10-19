@@ -48,13 +48,15 @@ git add -A && git commit -m init
 ```bash
 python3 tests/guard_test.py
 bash -n scripts/*.sh
-python3 scripts/check-docs.py
+python3 kit/.factory/docs-map.py --strict --allow kit/
+scripts/render-diagrams.sh --check
 scripts/doctor.sh
 ```
 
 <!-- documentation-routing:start -->
 ## Documentation routing
 
-- [Parent README](README.md)
-- [Governing agent guide](../../AGENTS.md)
+- Parent: [Factory development handbook](README.md)
+- Documentation home: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
 <!-- documentation-routing:end -->

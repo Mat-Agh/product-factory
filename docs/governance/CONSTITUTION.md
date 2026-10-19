@@ -1,5 +1,8 @@
 # Product Factory — Constitution
 
+**Status:** Active — v1.1
+**Last updated:** 2026-10-19
+
 These are the rules every agent, adapter and human in the factory follows. Every
 other file in this repo applies them. When a file disagrees with this one, this
 one wins and the other file is a bug.
@@ -19,6 +22,14 @@ Humans keep the decisions that carry risk.
   folder is scratch space, not a record.
 - Nothing important exists only in a chat, a model's memory or one vendor's
   account. If losing the account would lose it, it must go into git.
+- **Documentation lives under `docs/`** at the repo root, in one folder per
+  area, and each folder has a `README.md`. Only `README.md`, `AGENTS.md`,
+  `CLAUDE.md` and tool-required files (`LICENSE`, `CHANGELOG.md`, `SECURITY.md`)
+  stay at the root. READMEs link to their parent, their documents and their
+  subfolders, every document links back to its folder README, and `docs/README.md`
+  carries a map of the whole tree. Together these form one connected map with
+  no orphan documents. `docs-map.py` generates and checks these links. Never
+  maintain them by hand.
 
 ## 2. Separate roles, bounded scope
 
@@ -89,7 +100,7 @@ spec assumption that is really a product or business decision.
 ## 7. The factory improves from its own record
 
 - Every factory-level change gets a dated entry in
-  `docs/EVOLUTION_LOG.md`.
+  `docs/status/EVOLUTION_LOG.md`.
 - `/factory retro` turns finished jobs into **proposed** rule or checklist
   changes, delivered as a PR to this repo. The factory never silently rewrites
   its own rules.
@@ -103,3 +114,11 @@ Lead with the answer, then the supporting fact. Use complete sentences, concise
 but not clipped. No filler, no restating the ask, no metaphors or catchy labels.
 Push back when something is wrong, and say so when unsure. Do the work rather
 than dumping instructions.
+
+<!-- documentation-routing:start -->
+## Documentation routing
+
+- Parent: [Governance](README.md)
+- Documentation home: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
+<!-- documentation-routing:end -->

@@ -1,0 +1,26 @@
+stateDiagram-v2
+  [*] --> triage
+  triage --> discovery: idea
+  triage --> repro: bug
+  triage --> spec
+  triage --> plan: chore / spike
+  triage --> build: trivial
+  discovery --> spec
+  repro --> plan
+  spec --> design: ui
+  spec --> plan
+  design --> plan
+  plan --> build
+  build --> review
+  review --> build: CHANGES (resumes left)
+  review --> qa: all PASS
+  review --> gate: all PASS, no QA in lane
+  qa --> build: FAIL (resumes left)
+  qa --> gate: PASS
+  gate --> pr_open: READY / ESCALATE (draft)
+  pr_open --> done: you merge, then /factory clean
+  pr_open --> closed: you close
+  triage --> needs_human: blocking question
+  build --> needs_human: BLOCKED
+  review --> needs_human: rounds exhausted
+  needs_human --> build: /factory rework

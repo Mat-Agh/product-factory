@@ -33,11 +33,12 @@ can run one role at a time ([COMP-011](../components/COMP-011-adapters.md)).
 - The guard hook works only in Claude Code. Elsewhere, branch protection is the
   control.
 - Model diversity (a cross-vendor reviewer) needs an explicit adapter
-  ([ROADMAP](../ROADMAP.md) phase 5).
+  ([ROADMAP](../status/ROADMAP.md) phase 5).
 
 <!-- documentation-routing:start -->
 ## Documentation routing
 
-- [Parent README](README.md)
-- [Governing agent guide](../../AGENTS.md)
+- Parent: [Architecture decisions](README.md)
+- Documentation home: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
 <!-- documentation-routing:end -->

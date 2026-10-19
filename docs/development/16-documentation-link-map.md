@@ -5,18 +5,11 @@
 
 Use this map to route to the smallest useful set of documents. Read every
 document only for repo-wide documentation work. The exhaustive list is
-[DOCUMENT_INVENTORY](../DOCUMENT_INVENTORY.md).
+[documentation map](../README.md#documentation-map).
 
-```mermaid
-flowchart TB
-  Task["Task on the factory repo"] --> A["AGENTS.md"]
-  A --> M["This map"]
-  M --> S["Source of truth (CONSTITUTION, kit/…)"]
-  M --> D["Routed docs"]
-  S --> Change["Change + same-commit docs (03 change map)"]
-  D --> Change
-  Change --> Gates["Gates (04) → EVOLUTION_LOG + IMPLEMENTATION_STATUS"]
-```
+![How an agent routes a factory task through the docs](../assets/diagrams/doc-routing.svg)
+
+<sub>Diagram source: [`doc-routing.mmd`](../assets/diagrams/doc-routing.mmd) · re-render with `scripts/render-diagrams.sh`</sub>
 
 ## Knowledge order
 
@@ -41,17 +34,18 @@ flowchart TB
 | Dashboard / backlog | `kit/.factory/dashboard.html` | [COMP-006](../components/COMP-006-backlog-and-dashboard.md) |
 | Install / update / doctor | `scripts/install.sh`, `scripts/doctor.sh` | [COMP-007](../components/COMP-007-installer.md), [COMP-008](../components/COMP-008-doctor.md), [05-releases](05-releases-and-versioning.md) |
 | Portability / backups | `scripts/mirror.sh`, `scripts/export-claude.sh` | [guide/05](../guide/05-portability-and-recovery.md), [COMP-009](../components/COMP-009-backup-tools.md), [ADR-006](../decisions/ADR-006-portable-distribution.md) |
-| Operator preferences | `operator/USER.md` | [COMP-010](../components/COMP-010-operator-profile.md) |
-| Other runtimes | `adapters/*.md` | [COMP-011](../components/COMP-011-adapters.md) |
-| Docs work | [docs/README](../README.md), `scripts/check-docs.py` | [COMP-012](../components/COMP-012-docs-gate.md) |
+| Operator preferences | `docs/operator/USER.md` | [COMP-010](../components/COMP-010-operator-profile.md) |
+| Other runtimes | `docs/adapters/*.md` | [COMP-011](../components/COMP-011-adapters.md) |
+| Docs work | [docs/README](../README.md), `kit/.factory/docs-map.py` | [COMP-012](../components/COMP-012-docs-gate.md) |
 | Why it is designed this way | [decisions/README](../decisions/README.md) | [architecture/SOURCES](../architecture/SOURCES.md) |
-| What works today | [CURRENT_STATE](../../CURRENT_STATE.md) | [IMPLEMENTATION_STATUS](../components/IMPLEMENTATION_STATUS.md) |
+| What works today | [CURRENT_STATE](../status/CURRENT_STATE.md) | [IMPLEMENTATION_STATUS](../status/IMPLEMENTATION_STATUS.md) |
 | Testing | [04-testing-and-verification](04-testing-and-verification.md) | — |
-| Planning next work | [ROADMAP](../ROADMAP.md) | IMPLEMENTATION_STATUS "Remaining" column |
+| Planning next work | [ROADMAP](../status/ROADMAP.md) | IMPLEMENTATION_STATUS "Remaining" column |
 
 <!-- documentation-routing:start -->
 ## Documentation routing
 
-- [Parent README](README.md)
-- [Governing agent guide](../../AGENTS.md)
+- Parent: [Factory development handbook](README.md)
+- Documentation home: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
 <!-- documentation-routing:end -->

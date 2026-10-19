@@ -3,7 +3,7 @@
 **Status:** Active
 **Last updated:** 2026-10-19
 
-Documentation navigation: [development handbook](../development/README.md) · [routing map](../development/16-documentation-link-map.md) · [complete inventory](../DOCUMENT_INVENTORY.md).
+Documentation navigation: [development handbook](../development/README.md) · [routing map](../development/16-documentation-link-map.md) · [documentation map](../README.md#documentation-map).
 
 Accepted decisions for the Product Factory. Only the decisions indexed below are
 canonical. The research behind them is in
@@ -39,6 +39,15 @@ next number. A reversed decision is marked `Superseded by ADR-NNN` and kept.
 <!-- documentation-routing:start -->
 ## Documentation routing
 
-- [Parent README](../README.md)
-- [Governing agent guide](../../AGENTS.md)
+- Parent: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
+- In this folder:
+  - [ADR-001 — Claude Code is the primary runtime; roles stay tool-neutral](ADR-001-claude-code-primary-runtime.md)
+  - [ADR-002 — Humans merge; the gate opens a PR](ADR-002-human-only-merge.md)
+  - [ADR-003 — Context through files with first-line verdicts](ADR-003-files-not-conversation.md)
+  - [ADR-004 — Parallel review lenses, separate QA, bounded rework](ADR-004-review-lenses-and-qa.md)
+  - [ADR-005 — One worktree, branch and `job.json` per job](ADR-005-worktree-per-job.md)
+  - [ADR-006 — Portable distribution with no account dependency](ADR-006-portable-distribution.md)
+  - [ADR-007 — Product truth stays in the product repo](ADR-007-truth-in-product-repo.md)
+  - [ADR-008 — Idea and release lanes; launch material is drafts only](ADR-008-idea-and-release-lanes.md)
 <!-- documentation-routing:end -->

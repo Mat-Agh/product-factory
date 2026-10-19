@@ -13,56 +13,9 @@ procedure deterministic.
 `job.json.stage` is the state. Only the coordinator changes it, and it does so
 only after reading an artifact's verdict.
 
-```mermaid
-stateDiagram-v2
-  direction LR
-  [*] --> triage: claim (mkdir job folder)
-  triage --> needs_human: blocking question / duplicate
-  triage --> first: lane chosen, worktree created
+![Job state machine with guards](../assets/diagrams/job-state-machine.svg)
 
-  state "first stage of lane" as first
-  first --> discovery
-  first --> repro
-  first --> spec
-  first --> design
-  first --> plan
-  first --> build
-  first --> release
-
-  discovery --> spec: READY
-  spec --> design: READY & surface=ui & design needed
-  spec --> plan: READY
-  design --> spec: design-change lane
-  design --> plan: READY
-  repro --> plan: REPRODUCED
-  plan --> build: READY
-  plan --> gate: spike (ADR only)
-  release --> gate: READY
-
-  build --> review: READY
-  review --> build: any CHANGES & resumes < max
-  review --> qa: all PASS & lane has qa
-  review --> gate: all PASS & no qa
-  review --> needs_human: CHANGES & resumes = max
-  qa --> build: FAIL & resumes < max
-  qa --> gate: PASS
-  qa --> needs_human: FAIL & resumes = max
-
-  gate --> pr_open: READY (PR) / ESCALATE (draft PR)
-  gate --> needs_human: open_pr=false or no remote
-
-  discovery --> needs_human: BLOCKED
-  spec --> needs_human: BLOCKED
-  design --> needs_human: BLOCKED
-  plan --> needs_human: BLOCKED
-  build --> needs_human: BLOCKED
-  repro --> needs_human: NOT REPRODUCED
-
-  needs_human --> build: /factory rework (resumes reset)
-  pr_open --> build: /factory rework
-  pr_open --> done: PR merged + /factory clean
-  pr_open --> closed: PR closed + /factory clean
-```
+<sub>Diagram source: [`job-state-machine.mmd`](../assets/diagrams/job-state-machine.mmd) · re-render with `scripts/render-diagrams.sh`</sub>
 
 ## Guards
 
@@ -130,6 +83,7 @@ Changing any first-line format is a **breaking change** to the factory. See
 <!-- documentation-routing:start -->
 ## Documentation routing
 
-- [Parent README](README.md)
-- [Governing agent guide](../../AGENTS.md)
+- Parent: [Architecture](README.md)
+- Documentation home: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
 <!-- documentation-routing:end -->

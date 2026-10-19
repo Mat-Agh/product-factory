@@ -4,8 +4,8 @@
 **Last updated:** 2026-10-19
 
 Every change updates, in the same commit, everything listed for it below, plus
-a dated entry in [EVOLUTION_LOG](../EVOLUTION_LOG.md) and the affected rows in
-[IMPLEMENTATION_STATUS](../components/IMPLEMENTATION_STATUS.md).
+a dated entry in [EVOLUTION_LOG](../status/EVOLUTION_LOG.md) and the affected rows in
+[IMPLEMENTATION_STATUS](../status/IMPLEMENTATION_STATUS.md).
 
 ## Docs-sync map
 
@@ -17,13 +17,14 @@ a dated entry in [EVOLUTION_LOG](../EVOLUTION_LOG.md) and the affected rows in
 | Protocol | [COMP-002](../components/COMP-002-agent-protocol.md); re-read all 10 agents for contradictions |
 | A role agent's behaviour | [COMP-003](../components/COMP-003-role-agents.md) roster row if tools, model or outputs change |
 | An artifact's name or verdict line | **breaking**: SKILL verdict table, JOB_LIFECYCLE artifact table, [guide/03](../guide/03-reading-a-job.md), dashboard `KNOWN` |
-| Add or remove an agent | SKILL roles table, COMP-003, [GLOSSARY](../guide/GLOSSARY.md) if it introduces a term, `kit/AGENTS.factory.md` role list, [adapters/hermes.md](../../adapters/hermes.md) mapping |
+| Add or remove an agent | SKILL roles table, COMP-003, [GLOSSARY](../guide/GLOSSARY.md) if it introduces a term, `kit/AGENTS.factory.md` role list, [adapters/hermes.md](../adapters/hermes.md) mapping |
 | A descriptor key | template `kit/.factory/factory.yaml`, [COMP-005](../components/COMP-005-project-descriptor.md) schema table, every agent that reads it |
 | The guard hook | `tests/guard_test.py` first, then [COMP-004](../components/COMP-004-guard-hook.md) policy table |
 | `install.sh` | [COMP-007](../components/COMP-007-installer.md), [guide/01](../guide/01-getting-started.md), [guide/04](../guide/04-add-a-project.md) |
 | `doctor.sh` | [COMP-008](../components/COMP-008-doctor.md) check table, [guide/06](../guide/06-troubleshooting.md) if a new failure mode appears |
 | Any script's flags | [09-tools-scripts-and-commands](09-tools-scripts-and-commands.md) |
-| A new document | the area README, the [link map](16-documentation-link-map.md), `check-docs.py --inventory` |
+| A new, moved or renamed document | put it under `docs/<area>/`; run `python3 kit/.factory/docs-map.py --fix --strict --allow kit/`; describe it in the area README's own text; add a route in the [link map](16-documentation-link-map.md) if agents need it |
+| A diagram | edit `docs/assets/diagrams/<name>.mmd`, run `scripts/render-diagrams.sh`, commit both files ([COMP-014](../components/COMP-014-diagrams.md)) |
 | A design decision | a new `decisions/ADR-NNN-*.md` and the [decisions index](../decisions/README.md) |
 
 ## Procedures
@@ -77,6 +78,7 @@ each one:
 <!-- documentation-routing:start -->
 ## Documentation routing
 
-- [Parent README](README.md)
-- [Governing agent guide](../../AGENTS.md)
+- Parent: [Factory development handbook](README.md)
+- Documentation home: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
 <!-- documentation-routing:end -->

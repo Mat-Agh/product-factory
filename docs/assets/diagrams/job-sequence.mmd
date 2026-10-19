@@ -1,0 +1,31 @@
+sequenceDiagram
+  participant H as Human
+  participant C as Coordinator (/factory session)
+  participant PM as product-manager
+  participant TL as tech-lead
+  participant E as engineer-<job>
+  participant RV as 4 reviewers (parallel)
+  participant QA as tester
+  participant G as Git host
+  H->>C: /factory <request>
+  C->>C: claim job · triage.md · worktree on factory/<job>
+  C->>PM: spec
+  PM-->>C: spec.md (STATUS: READY)
+  C->>TL: Plan.
+  TL-->>C: plan.md (STATUS: READY)
+  C->>E: Build round 1
+  E-->>C: build.md (STATUS: READY) + commits
+  loop ≤ 1 + max_resumes rounds
+    C->>RV: Review round N (one message)
+    RV-->>C: round-N/review-*.md (VERDICT …) — wait for all
+    alt any CHANGES
+      C->>E: SendMessage: address round N
+    end
+  end
+  C->>QA: Acceptance.
+  QA-->>C: qa.md (VERDICT: PASS)
+  C->>TL: Gate.
+  TL-->>C: gate.md (READY | ESCALATE) + pr.md
+  C->>G: push factory/<job>, open PR (draft if ESCALATE)
+  G-->>H: PR to review
+  H->>G: merge (human only)

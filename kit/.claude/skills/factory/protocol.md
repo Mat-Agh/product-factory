@@ -48,6 +48,12 @@ docs. Never read whole `docs/` trees.
   reset or clean work you did not create. Never write secrets anywhere.
 - Copy the patterns already in the code (living samples) instead of inventing
   layout. Match the surrounding idiom, naming and comment density.
+- Documentation goes under the descriptor's `docs.root` (default `docs/`), in the
+  folder for its area. A new folder needs a `README.md` with a title,
+  `**Status:**` and `**Last updated:**`. After you add, move or rename any doc
+  in the worktree, run `cd <worktree> && python3 .factory/docs-map.py --fix` and
+  commit the regenerated links together with your change. Never put new docs at
+  the repo root.
 - Evidence beats assertion. When you claim something works, show the command and
   its result, or what the page or device showed.
 - Pages: start the dev server from `AGENTS.md` in the worktree, on the port in

@@ -2,7 +2,7 @@
 
 **Status:** Implemented
 **Last updated:** 2026-10-19
-**Source:** [`operator/USER.md`](../../operator/USER.md)
+**Source:** [`docs/operator/USER.md`](../operator/USER.md)
 
 ## Purpose
 
@@ -12,7 +12,7 @@ the durable record. Vendor memory is a cache.
 
 ## Interface
 
-- **Claude Code:** `install.sh user` adds `@<factory>/operator/USER.md` to
+- **Claude Code:** `install.sh user` adds `@<factory>/docs/operator/USER.md` to
   `~/.claude/CLAUDE.md`, so it loads in every session.
 - **Other agents:** reference it from their global instructions, or paste it in.
 - **Sources:** distilled on 2026-10-19 from the Hermes `USER.md` and `SOUL.md`
@@ -28,6 +28,7 @@ the durable record. Vendor memory is a cache.
 <!-- documentation-routing:start -->
 ## Documentation routing
 
-- [Parent README](README.md)
-- [Governing agent guide](../../AGENTS.md)
+- Parent: [Components](README.md)
+- Documentation home: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
 <!-- documentation-routing:end -->

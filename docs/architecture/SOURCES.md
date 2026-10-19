@@ -75,7 +75,7 @@ a community gap review (`mkelley33/zazencodes-season-3#7`). What it contributes:
 ## Deliberately left out (for now)
 
 - Cron and issue polling (Hermes Door B). This waits until the manual loop has
-  proven itself. See [ROADMAP.md](../ROADMAP.md).
+  proven itself. See [ROADMAP.md](../status/ROADMAP.md).
 - Mixture-of-agents and cross-vendor routing. These are on the roadmap as an
   optional extra review lens.
 - Auto-merge in any form.
@@ -83,6 +83,7 @@ a community gap review (`mkelley33/zazencodes-season-3#7`). What it contributes:
 <!-- documentation-routing:start -->
 ## Documentation routing
 
-- [Parent README](README.md)
-- [Governing agent guide](../../AGENTS.md)
+- Parent: [Architecture](README.md)
+- Documentation home: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
 <!-- documentation-routing:end -->

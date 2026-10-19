@@ -1,0 +1,31 @@
+flowchart TB
+  subgraph Factory["Product Factory repo (portable, mirrored)"]
+    C["CONSTITUTION.md — rules"]
+    O["docs/operator/USER.md — who you are"]
+    K["kit/ — skill · agents · guard · templates"]
+    A["adapters/ — Hermes · Codex · Cursor"]
+  end
+  subgraph Machine["Any machine, any account"]
+    U["~/.claude (links to kit, imports USER.md)"]
+    R["Agent runtime: Claude Code (primary) · Hermes · Codex …"]
+  end
+  subgraph Product["Each product repo (source of truth)"]
+    AG["AGENTS.md + docs/ + code"]
+    FY[".factory/factory.yaml — descriptor"]
+    BL[".factory/backlog.md"]
+    KC[".claude/ — installed kit copy"]
+    J[".factory/jobs/ — runtime state (gitignored)"]
+  end
+  subgraph Remote["Git host"]
+    BR["factory/* branches"]
+    PRS["PRs / MRs · issues · branch protection"]
+  end
+  K -- "install.sh project (copy)" --> KC
+  K -- "install.sh user (symlink)" --> U
+  O --> U
+  U --> R
+  KC --> R
+  R -- reads --> AG & FY & BL
+  R -- writes --> J
+  R -- "push factory/*, open PR" --> BR --> PRS
+  PRS -- "human merges" --> AG

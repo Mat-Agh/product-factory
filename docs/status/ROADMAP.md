@@ -64,6 +64,7 @@ Auto-merge, auto-deploy, auto-publish, auto-send, or factory-managed secrets.
 <!-- documentation-routing:start -->
 ## Documentation routing
 
-- [Parent README](README.md)
-- [Governing agent guide](../AGENTS.md)
+- Parent: [Status](README.md)
+- Documentation home: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
 <!-- documentation-routing:end -->

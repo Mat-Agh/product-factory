@@ -3,12 +3,12 @@
 **Status:** Active
 **Last updated:** 2026-10-19
 
-Documentation navigation: [docs index](../README.md) · [routing map](../development/16-documentation-link-map.md) · [complete inventory](../DOCUMENT_INVENTORY.md).
+Documentation navigation: [docs index](../README.md) · [routing map](../development/16-documentation-link-map.md) · [documentation map](../README.md#documentation-map).
 
 One contract per factory piece: what it is for, its interface, its
 configuration, how it is verified, and its known limits. Contracts link to the
 source and never restate it. Current delivery status is in
-[IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md).
+[IMPLEMENTATION_STATUS.md](../status/IMPLEMENTATION_STATUS.md).
 
 | ID | Component | Source |
 |---|---|---|
@@ -21,10 +21,11 @@ source and never restate it. Current delivery status is in
 | [COMP-007](COMP-007-installer.md) | Installer | `scripts/install.sh`, `kit/AGENTS.factory.md` |
 | [COMP-008](COMP-008-doctor.md) | Doctor | `scripts/doctor.sh` |
 | [COMP-009](COMP-009-backup-tools.md) | Mirror and memory export | `scripts/mirror.sh`, `scripts/export-claude.sh` |
-| [COMP-010](COMP-010-operator-profile.md) | Operator profile | `operator/USER.md` |
-| [COMP-011](COMP-011-adapters.md) | Adapters | `adapters/*.md` |
-| [COMP-012](COMP-012-docs-gate.md) | Documentation gate | `scripts/check-docs.py` |
-| [COMP-013](COMP-013-constitution.md) | Constitution | `CONSTITUTION.md` |
+| [COMP-010](COMP-010-operator-profile.md) | Operator profile | `docs/operator/USER.md` |
+| [COMP-011](COMP-011-adapters.md) | Adapters | `docs/adapters/*.md` |
+| [COMP-012](COMP-012-docs-gate.md) | Docs map (structure and live links) | `kit/.factory/docs-map.py` |
+| [COMP-013](COMP-013-constitution.md) | Constitution | `docs/governance/CONSTITUTION.md` |
+| [COMP-014](COMP-014-diagrams.md) | Diagrams | `docs/assets/diagrams/*.mmd`, `scripts/render-diagrams.sh` |
 
 Adding a component means adding a `COMP-NNN-*.md` here, a row in this table and
 in `IMPLEMENTATION_STATUS.md`, and a route in the
@@ -33,6 +34,21 @@ in `IMPLEMENTATION_STATUS.md`, and a route in the
 <!-- documentation-routing:start -->
 ## Documentation routing
 
-- [Parent README](../README.md)
-- [Governing agent guide](../../AGENTS.md)
+- Parent: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
+- In this folder:
+  - [COMP-001 — `/factory` coordinator skill](COMP-001-coordinator-skill.md)
+  - [COMP-002 — Agent protocol](COMP-002-agent-protocol.md)
+  - [COMP-003 — Role agents](COMP-003-role-agents.md)
+  - [COMP-004 — Guard hook](COMP-004-guard-hook.md)
+  - [COMP-005 — Project descriptor](COMP-005-project-descriptor.md)
+  - [COMP-006 — Backlog and dashboard](COMP-006-backlog-and-dashboard.md)
+  - [COMP-007 — Installer](COMP-007-installer.md)
+  - [COMP-008 — Doctor](COMP-008-doctor.md)
+  - [COMP-009 — Mirror and memory export](COMP-009-backup-tools.md)
+  - [COMP-010 — Operator profile](COMP-010-operator-profile.md)
+  - [COMP-011 — Adapters](COMP-011-adapters.md)
+  - [COMP-012 — Docs map](COMP-012-docs-gate.md)
+  - [COMP-013 — Constitution](COMP-013-constitution.md)
+  - [COMP-014 — Diagrams](COMP-014-diagrams.md)
 <!-- documentation-routing:end -->

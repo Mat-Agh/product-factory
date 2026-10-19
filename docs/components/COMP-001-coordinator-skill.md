@@ -48,10 +48,10 @@ coordination.
 ## Verification
 
 - Static: the skill is a markdown procedure, with no code.
-  `python3 scripts/check-docs.py` checks its links.
+  `python3 kit/.factory/docs-map.py --strict --allow kit/` checks its links.
 - Behaviour: the end-to-end pilot procedure in
   [development/04-testing-and-verification.md](../development/04-testing-and-verification.md#3-end-to-end-pilot).
-  **It has not been run yet** (see [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md)).
+  **It has not been run yet** (see [IMPLEMENTATION_STATUS.md](../status/IMPLEMENTATION_STATUS.md)).
 
 ## Known limitations
 
@@ -69,6 +69,7 @@ Follow [development/03-changing-the-factory.md](../development/03-changing-the-f
 <!-- documentation-routing:start -->
 ## Documentation routing
 
-- [Parent README](README.md)
-- [Governing agent guide](../../AGENTS.md)
+- Parent: [Components](README.md)
+- Documentation home: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
 <!-- documentation-routing:end -->

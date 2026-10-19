@@ -4,7 +4,7 @@
 **Last updated:** 2026-10-19
 
 These are the rules for changing the factory. The rules the factory applies to
-products are in [`CONSTITUTION.md`](../../CONSTITUTION.md). This page covers
+products are in [`CONSTITUTION.md`](../governance/CONSTITUTION.md). This page covers
 how the factory's own source stays correct.
 
 ## 1. One source per concept
@@ -16,7 +16,7 @@ how the factory's own source stays correct.
 | Rules shared by all agents | `kit/.claude/skills/factory/protocol.md` |
 | One role's behaviour and artifact format | `kit/.claude/agents/<role>.md` |
 | Descriptor schema | `kit/.factory/factory.yaml` (template), explained in [COMP-005](../components/COMP-005-project-descriptor.md) |
-| Operator preferences | `operator/USER.md` |
+| Operator preferences | `docs/operator/USER.md` |
 
 Docs **explain and link**. They never restate a rule, a lane table or an
 artifact format in a way that could drift. Where a summary table is
@@ -56,7 +56,7 @@ tell the human", never "assume".
 Agents and docs never invent commands, file names, credentials or product
 behaviour. Docs about commands show commands that have been run. Docs about
 behaviour say whether it is verified (see
-[IMPLEMENTATION_STATUS](../components/IMPLEMENTATION_STATUS.md)).
+[IMPLEMENTATION_STATUS](../status/IMPLEMENTATION_STATUS.md)).
 
 ## 6. Smallest effective mechanism
 
@@ -67,13 +67,14 @@ cost in tokens, latency and maintenance.
 ## 7. Evidence for every change
 
 A factory change is done when its gates pass (`guard_test`, `bash -n`,
-`check-docs`, `doctor`), its docs and implementation status are updated, the
+`docs-map`, `doctor`), its docs and implementation status are updated, the
 evolution log has an entry, and **behavioural changes have been observed in a
 real or scratch job**. A change that only "reads correctly" is not done.
 
 <!-- documentation-routing:start -->
 ## Documentation routing
 
-- [Parent README](README.md)
-- [Governing agent guide](../../AGENTS.md)
+- Parent: [Factory development handbook](README.md)
+- Documentation home: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
 <!-- documentation-routing:end -->

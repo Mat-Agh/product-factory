@@ -3,7 +3,7 @@
 **Status:** Active
 **Last updated:** 2026-10-19
 
-Documentation navigation: [docs index](../README.md) · [routing map](16-documentation-link-map.md) · [complete inventory](../DOCUMENT_INVENTORY.md).
+Documentation navigation: [docs index](../README.md) · [routing map](16-documentation-link-map.md) · [documentation map](../README.md#documentation-map).
 
 This handbook is for anyone, human or agent, who changes the factory itself.
 Using the factory on a product is covered in the [operator guide](../guide/README.md).
@@ -15,7 +15,7 @@ and not read the whole handbook for ordinary work.
 | Step | Document | Purpose |
 |---|---|---|
 | 1 | [AGENTS.md](../../AGENTS.md) | Repo scope, gates, what not to do |
-| 2 | [CONTRIBUTING.md](../../CONTRIBUTING.md) | Branches, commits, PRs, review |
+| 2 | [CONTRIBUTING.md](CONTRIBUTING.md) | Branches, commits, PRs, review |
 | 3 | [16-documentation-link-map.md](16-documentation-link-map.md) | The smallest set of docs for your task |
 | 4 | [00-factory-engineering-principles.md](00-factory-engineering-principles.md) | Invariants for changing the factory |
 | 5 | [03-changing-the-factory.md](03-changing-the-factory.md) | "When you change X, also update Y" |
@@ -36,6 +36,16 @@ and not read the whole handbook for ordinary work.
 <!-- documentation-routing:start -->
 ## Documentation routing
 
-- [Parent README](../README.md)
-- [Governing agent guide](../../AGENTS.md)
+- Parent: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
+- In this folder:
+  - [00 — Factory engineering principles](00-factory-engineering-principles.md)
+  - [01 — Development setup](01-dev-setup.md)
+  - [02 — Repository layout](02-repository-layout.md)
+  - [03 — Changing the factory](03-changing-the-factory.md)
+  - [04 — Testing and verification](04-testing-and-verification.md)
+  - [05 — Releases and versioning](05-releases-and-versioning.md)
+  - [09 — Tools, scripts and commands](09-tools-scripts-and-commands.md)
+  - [16 — Documentation link map](16-documentation-link-map.md)
+  - [Contributing to the Product Factory](CONTRIBUTING.md)
 <!-- documentation-routing:end -->

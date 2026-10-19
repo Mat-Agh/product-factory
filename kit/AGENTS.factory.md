@@ -3,8 +3,8 @@
 ## Product Factory
 
 This repo is run by the [Product Factory](https://github.com/Mat-Agh/product-factory).
-Its descriptor is `.factory/factory.yaml`, and its rules are in that repo's
-`CONSTITUTION.md`.
+Its descriptor is `.factory/factory.yaml`, and its rules are in
+`.claude/skills/factory/CONSTITUTION.md`.
 
 - **Claude Code:** `/factory <request>` runs the whole pipeline (triage → spec →
   design → plan → build → review lenses → QA → gate → PR). See
@@ -15,6 +15,10 @@ Its descriptor is `.factory/factory.yaml`, and its rules are in that repo's
   `product-manager`, `designer`, `tech-lead`, `engineer`, `reviewer-code`,
   `reviewer-security`, `reviewer-ux`, `reviewer-ui`, `tester` and
   `release-manager`. Job state lives in `.factory/jobs/<job-id>/`.
+- **Documentation:** all docs live under `docs/`, one folder per area, each
+  with a `README.md`. After adding or moving a doc, run
+  `python3 .factory/docs-map.py --fix`, which regenerates the README links and
+  the map in `docs/README.md`.
 - **Hard rules:** work on `factory/<job-id>` branches in worktrees. Humans merge,
   tag, release and deploy. Never force-push or use `--no-verify`. Never stash or
   reset work you did not create. Never put secrets in git. Done means the gates

@@ -53,7 +53,7 @@ installation.
 ## Known limitations
 
 - Every agent runs on Claude, so there is no cross-vendor review yet. A Codex
-  lens is planned ([ROADMAP](../ROADMAP.md) phase 5).
+  lens is planned ([ROADMAP](../status/ROADMAP.md) phase 5).
 - UX and UI lenses depend on a browser CLI and a working dev-server section in
   `AGENTS.md`. Without them, they review by reading code only.
 
@@ -64,6 +64,7 @@ See [development/03-changing-the-factory.md](../development/03-changing-the-fact
 <!-- documentation-routing:start -->
 ## Documentation routing
 
-- [Parent README](README.md)
-- [Governing agent guide](../../AGENTS.md)
+- Parent: [Components](README.md)
+- Documentation home: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
 <!-- documentation-routing:end -->

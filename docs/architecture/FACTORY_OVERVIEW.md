@@ -5,39 +5,9 @@
 
 ## Layers
 
-```mermaid
-flowchart TB
-  subgraph Factory["Product Factory repo (portable, mirrored)"]
-    C["CONSTITUTION.md — rules"]
-    O["operator/USER.md — who you are"]
-    K["kit/ — skill · agents · guard · templates"]
-    A["adapters/ — Hermes · Codex · Cursor"]
-  end
-  subgraph Machine["Any machine, any account"]
-    U["~/.claude (links to kit, imports USER.md)"]
-    R["Agent runtime: Claude Code (primary) · Hermes · Codex …"]
-  end
-  subgraph Product["Each product repo (source of truth)"]
-    AG["AGENTS.md + docs/ + code"]
-    FY[".factory/factory.yaml — descriptor"]
-    BL[".factory/backlog.md"]
-    KC[".claude/ — installed kit copy"]
-    J[".factory/jobs/ — runtime state (gitignored)"]
-  end
-  subgraph Remote["Git host"]
-    BR["factory/* branches"]
-    PRS["PRs / MRs · issues · branch protection"]
-  end
-  K -- "install.sh project (copy)" --> KC
-  K -- "install.sh user (symlink)" --> U
-  O --> U
-  U --> R
-  KC --> R
-  R -- reads --> AG & FY & BL
-  R -- writes --> J
-  R -- "push factory/*, open PR" --> BR --> PRS
-  PRS -- "human merges" --> AG
-```
+![Factory layers: factory repo, machine, product repo, git host](../assets/diagrams/layers.svg)
+
+<sub>Diagram source: [`layers.mmd`](../assets/diagrams/layers.mmd) · re-render with `scripts/render-diagrams.sh`</sub>
 
 | Layer | Holds | Lifetime | Lost if… |
 |---|---|---|---|
@@ -49,39 +19,9 @@ flowchart TB
 
 ## Runtime: one job
 
-```mermaid
-sequenceDiagram
-  participant H as Human
-  participant C as Coordinator (/factory session)
-  participant PM as product-manager
-  participant TL as tech-lead
-  participant E as engineer-<job>
-  participant RV as 4 reviewers (parallel)
-  participant QA as tester
-  participant G as Git host
-  H->>C: /factory <request>
-  C->>C: claim job · triage.md · worktree on factory/<job>
-  C->>PM: spec
-  PM-->>C: spec.md (STATUS: READY)
-  C->>TL: Plan.
-  TL-->>C: plan.md (STATUS: READY)
-  C->>E: Build round 1
-  E-->>C: build.md (STATUS: READY) + commits
-  loop ≤ 1 + max_resumes rounds
-    C->>RV: Review round N (one message)
-    RV-->>C: round-N/review-*.md (VERDICT …) — wait for all
-    alt any CHANGES
-      C->>E: SendMessage: address round N
-    end
-  end
-  C->>QA: Acceptance.
-  QA-->>C: qa.md (VERDICT: PASS)
-  C->>TL: Gate.
-  TL-->>C: gate.md (READY | ESCALATE) + pr.md
-  C->>G: push factory/<job>, open PR (draft if ESCALATE)
-  G-->>H: PR to review
-  H->>G: merge (human only)
-```
+![Runtime sequence of one job](../assets/diagrams/job-sequence.svg)
+
+<sub>Diagram source: [`job-sequence.mmd`](../assets/diagrams/job-sequence.mmd) · re-render with `scripts/render-diagrams.sh`</sub>
 
 ## Contracts between components
 
@@ -135,6 +75,7 @@ that holds, and `doctor.sh` checks for it.
 <!-- documentation-routing:start -->
 ## Documentation routing
 
-- [Parent README](README.md)
-- [Governing agent guide](../../AGENTS.md)
+- Parent: [Architecture](README.md)
+- Documentation home: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
 <!-- documentation-routing:end -->

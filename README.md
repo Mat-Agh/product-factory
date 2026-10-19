@@ -4,24 +4,9 @@ An agentic product factory. You give it an idea or a request. It produces a
 reviewed, tested, documented, launch-ready product increment as a pull
 request. **You merge.**
 
-```mermaid
-flowchart LR
-  Idea["Idea / request / issue"] --> T["Triage<br/>(coordinator)"]
-  T --> P["Product<br/>discovery · PRD · spec"]
-  P --> D["Design<br/>flows · states · tokens"]
-  D --> L["Tech Lead<br/>bounded plan"]
-  L --> B["Engineer<br/>worktree + branch"]
-  B --> R{"Review lenses<br/>code · security · ux · ui"}
-  R -- "any CHANGES (≤2 resumes)" --> B
-  R -- "all PASS" --> Q["QA<br/>evidence"]
-  Q --> G{"Gate"}
-  G -- READY --> PR["PR"]
-  G -- ESCALATE --> DPR["Draft PR + question"]
-  PR --> H(["Human merges"])
-  DPR --> H
-  H --> Rel["Release kit → human publishes"]
-  Rel --> Retro["Retro → factory improves"]
-```
+![The Product Factory pipeline: idea to human merge, release and retro](docs/assets/diagrams/pipeline.svg)
+
+<sub>Diagram source: [`pipeline.mmd`](docs/assets/diagrams/pipeline.mmd) · re-render with `scripts/render-diagrams.sh`</sub>
 
 It merges two designs. The first is the Hermes factory (`Mat-Agh/Hermes`): roles,
 triage, bounded plans, evidence-based done, human merge, and truth that lives in
@@ -38,7 +23,7 @@ Read [docs/guide/00-overview.md](docs/guide/00-overview.md), then follow
 from an empty machine to your first factory PR, with every command and its
 expected output. Terms are explained in the
 [glossary](docs/guide/GLOSSARY.md). What works today is recorded in
-[CURRENT_STATE.md](CURRENT_STATE.md).
+[CURRENT_STATE.md](docs/status/CURRENT_STATE.md).
 
 ## Start on any machine or account
 
@@ -69,20 +54,20 @@ The dashboard is `cd .factory && python3 -m http.server`, then open
 <http://localhost:8000/dashboard.html>.
 
 Codex, Cursor, Gemini or Hermes can run the same roles. See
-[adapters/](adapters/).
+[docs/adapters/](docs/adapters/README.md).
 
 ## What is where
 
 | Path | What |
 |---|---|
-| [CONSTITUTION.md](CONSTITUTION.md) | The rules. Everything else applies them. |
-| [kit/](kit/) | What gets installed into a product repo: the `/factory` skill, the 10 role agents, the guard hook, the descriptor template, backlog, dashboard, and the `AGENTS.md` section. |
-| [operator/USER.md](operator/USER.md) | Who you are and how you want agents to work. Lives in git, not in any vendor's memory. |
-| [adapters/](adapters/) | How Hermes, Codex, Cursor and others run the same roles. |
-| [scripts/](scripts/) | `install.sh`, `doctor.sh`, `mirror.sh` (backup remotes and offline bundles), `export-claude.sh`, `check-docs.py`. |
-| [tests/](tests/) | Guard hook tests (`python3 tests/guard_test.py`). |
-| [docs/](docs/README.md) | Operator guide, architecture, component contracts and status, development handbook, ADRs, roadmap, evolution log. |
-| [CURRENT_STATE.md](CURRENT_STATE.md) · [CONTRIBUTING.md](CONTRIBUTING.md) | What exists and is verified now · how to change the factory |
+| [docs/](docs/README.md) | **All documentation**, one connected tree with a generated map. Start at [docs/README.md](docs/README.md) |
+| [docs/governance/CONSTITUTION.md](docs/governance/CONSTITUTION.md) | The rules. Everything else applies them |
+| [docs/guide/](docs/guide/README.md) | Operator handbook, from zero to the first PR |
+| [docs/status/](docs/status/README.md) | Current state, implementation status, roadmap, evolution log |
+| [docs/development/](docs/development/README.md) | How to change the factory, including [CONTRIBUTING](docs/development/CONTRIBUTING.md) |
+| [kit/](kit/) | Payload installed into a product repo: the `/factory` skill, 10 role agents, the guard hook, the descriptor template, backlog, dashboard, `docs-map.py`, and the `AGENTS.md` section |
+| [scripts/](scripts/) | `install.sh`, `doctor.sh`, `mirror.sh`, `export-claude.sh`, `render-diagrams.sh` |
+| [tests/](tests/) | Guard hook tests (`python3 tests/guard_test.py`) |
 
 ## Survives losing this account
 

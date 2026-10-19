@@ -58,34 +58,9 @@ cd .factory/jobs/004-tenant-org-name && head -n1 *.md round-*/*.md
 
 `job.json` → `stage` moves through the lane:
 
-```mermaid
-stateDiagram-v2
-  [*] --> triage
-  triage --> discovery: idea
-  triage --> repro: bug
-  triage --> spec
-  triage --> plan: chore / spike
-  triage --> build: trivial
-  discovery --> spec
-  repro --> plan
-  spec --> design: ui
-  spec --> plan
-  design --> plan
-  plan --> build
-  build --> review
-  review --> build: CHANGES (resumes left)
-  review --> qa: all PASS
-  review --> gate: all PASS, no QA in lane
-  qa --> build: FAIL (resumes left)
-  qa --> gate: PASS
-  gate --> pr_open: READY / ESCALATE (draft)
-  pr_open --> done: you merge, then /factory clean
-  pr_open --> closed: you close
-  triage --> needs_human: blocking question
-  build --> needs_human: BLOCKED
-  review --> needs_human: rounds exhausted
-  needs_human --> build: /factory rework
-```
+![Job stages, simplified](../assets/diagrams/job-stages.svg)
+
+<sub>Diagram source: [`job-stages.mmd`](../assets/diagrams/job-stages.mmd) · re-render with `scripts/render-diagrams.sh`</sub>
 
 The full state machine and its guards are in
 [architecture/JOB_LIFECYCLE.md](../architecture/JOB_LIFECYCLE.md).
@@ -133,6 +108,7 @@ Merge it yourself on GitHub or GitLab. Then run `/factory clean`.
 <!-- documentation-routing:start -->
 ## Documentation routing
 
-- [Parent README](README.md)
-- [Governing agent guide](../../AGENTS.md)
+- Parent: [Operator guide](README.md)
+- Documentation home: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
 <!-- documentation-routing:end -->

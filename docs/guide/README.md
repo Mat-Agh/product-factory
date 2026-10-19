@@ -3,7 +3,7 @@
 **Status:** Active
 **Last updated:** 2026-10-19
 
-Documentation navigation: [docs index](../README.md) · [routing map](../development/16-documentation-link-map.md) · [complete inventory](../DOCUMENT_INVENTORY.md).
+Documentation navigation: [docs index](../README.md) · [routing map](../development/16-documentation-link-map.md) · [documentation map](../README.md#documentation-map).
 
 This is the handbook for the person who runs the factory. It assumes no prior
 knowledge. Unfamiliar words are defined in the [glossary](GLOSSARY.md).
@@ -33,6 +33,17 @@ knowledge. Unfamiliar words are defined in the [glossary](GLOSSARY.md).
 <!-- documentation-routing:start -->
 ## Documentation routing
 
-- [Parent README](../README.md)
-- [Governing agent guide](../../AGENTS.md)
+- Parent: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
+- In this folder:
+  - [00 — How the Product Factory works](00-overview.md)
+  - [01 — Getting started](01-getting-started.md)
+  - [02 — Commands](02-commands.md)
+  - [03 — Reading a job](03-reading-a-job.md)
+  - [04 — Add a project](04-add-a-project.md)
+  - [05 — Portability and recovery](05-portability-and-recovery.md)
+  - [06 — Troubleshooting](06-troubleshooting.md)
+  - [Glossary](GLOSSARY.md)
+- Subfolders:
+  - [Examples](examples/README.md)
 <!-- documentation-routing:end -->

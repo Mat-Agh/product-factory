@@ -3,14 +3,19 @@
 **Status:** Active
 **Last verified:** 2026-10-19
 
-This tree documents the Product Factory: what it is, how to use it, how it is
-built, how to develop it, and what state it is in now. The rules themselves live
-in [`CONSTITUTION.md`](../CONSTITUTION.md). The executable procedure lives in
-[`kit/`](../kit/). These docs explain them and link to them. They never restate
-them.
+All documentation for the Product Factory lives in this folder. Only `README.md`,
+`AGENTS.md` and `CLAUDE.md` stay at the repository root, because tools look for
+them there. The executable kit lives in [`kit/`](../kit/). These docs explain it
+and link to it, but never restate it.
 
-Agents: open [development/16-documentation-link-map.md](development/16-documentation-link-map.md)
-first, and read only the routed documents.
+Every folder has a README. Each README links to its parent, to every document in
+its folder, and to its subfolders. Every document links back to its folder's
+README. The [documentation map](#documentation-map) below lists the whole tree.
+All of these links are generated and checked by `kit/.factory/docs-map.py`, so
+the map always matches the files.
+
+Agents: start at [development/16-documentation-link-map.md](development/16-documentation-link-map.md)
+and read only the documents it routes you to.
 
 ## Start here
 
@@ -20,44 +25,123 @@ first, and read only the routed documents.
 | Running jobs day to day | [guide/02-commands.md](guide/02-commands.md) → [guide/03-reading-a-job.md](guide/03-reading-a-job.md) → [guide/06-troubleshooting.md](guide/06-troubleshooting.md) |
 | Putting the factory on a product | [guide/04-add-a-project.md](guide/04-add-a-project.md) → [components/COMP-005-project-descriptor.md](components/COMP-005-project-descriptor.md) |
 | Protecting against account or machine loss | [guide/05-portability-and-recovery.md](guide/05-portability-and-recovery.md) |
-| Changing the factory itself | [../CONTRIBUTING.md](../CONTRIBUTING.md) → [development/README.md](development/README.md) |
-| Checking what works today | [../CURRENT_STATE.md](../CURRENT_STATE.md) → [components/IMPLEMENTATION_STATUS.md](components/IMPLEMENTATION_STATUS.md) |
+| Changing the factory itself | [development/CONTRIBUTING.md](development/CONTRIBUTING.md) → [development/README.md](development/README.md) |
+| Checking what works today | [status/CURRENT_STATE.md](status/CURRENT_STATE.md) → [status/IMPLEMENTATION_STATUS.md](status/IMPLEMENTATION_STATUS.md) |
 | Understanding why it is designed this way | [architecture/README.md](architecture/README.md) → [decisions/README.md](decisions/README.md) |
 
-## Document areas
+## Areas
 
-| Area | Contents | Index |
-|---|---|---|
-| [`guide/`](guide/README.md) | Operator handbook: overview, getting started, commands, reading a job, adding a project, portability, troubleshooting, glossary, examples | [guide/README.md](guide/README.md) |
-| [`architecture/`](architecture/README.md) | Layers, runtime, job lifecycle and state machine, enforcement, research sources | [architecture/README.md](architecture/README.md) |
-| [`components/`](components/README.md) | One contract per factory piece (`COMP-NNN-*.md`) and the implementation status of each | [components/README.md](components/README.md) |
-| [`development/`](development/README.md) | Factory engineering handbook: principles, setup, layout, change procedures, testing, releases, tools, link map | [development/README.md](development/README.md) |
-| [`decisions/`](decisions/README.md) | Accepted architecture decision records (`ADR-NNN`) | [decisions/README.md](decisions/README.md) |
-| [ROADMAP.md](ROADMAP.md) | Phases, exit criteria, and what is never automated | — |
-| [EVOLUTION_LOG.md](EVOLUTION_LOG.md) | Dated, append-only record of factory-level changes | — |
-| [DOCUMENT_INVENTORY.md](DOCUMENT_INVENTORY.md) | Generated list of every document and its status | — |
+| Folder | Holds |
+|---|---|
+| [governance/](governance/README.md) | The constitution: authority, scope, evidence and documentation rules |
+| [guide/](guide/README.md) | Operator handbook: overview, getting started, commands, reading a job, adding a project, portability, troubleshooting, glossary, examples |
+| [architecture/](architecture/README.md) | Layers, runtime, job lifecycle and state machine, enforcement, research sources |
+| [components/](components/README.md) | One contract per factory piece (`COMP-NNN`) |
+| [development/](development/README.md) | Factory engineering handbook: contributing, principles, setup, layout, change procedures, testing, releases, tools, link map |
+| [decisions/](decisions/README.md) | Architecture decision records (`ADR-NNN`) |
+| [status/](status/README.md) | Current state, implementation status, roadmap, evolution log |
+| [adapters/](adapters/README.md) | Running the roles in Hermes, Codex, Cursor and others |
+| [operator/](operator/README.md) | The operator profile that every agent loads |
 
 ## Documentation rules
 
-- Each area has a README. Open it before you edit that folder.
-- Every document starts with a `**Status:**` line and a `**Last updated:**` or
-  `**Last verified:**` line.
-- Change the docs **in the same commit** as the behaviour they describe, using
+These apply to this repo and, through CONSTITUTION §1, to every product the
+factory works on.
+
+- Documentation goes under `docs/`, in a folder for its area. Each folder has a
+  `README.md`.
+- Every document starts with a title, a `**Status:**` line, and a
+  `**Last updated:**` or `**Last verified:**` line.
+- Diagrams are SVG images rendered from `docs/assets/diagrams/*.mmd`. They are
+  never inline Mermaid, which fails wherever GitHub's live renderer is
+  unreachable. Edit the `.mmd`, then run `scripts/render-diagrams.sh`.
+- Never edit the routing blocks or the map by hand. After adding, moving or
+  renaming a document, run `python3 kit/.factory/docs-map.py --fix --strict
+  --allow kit/`. In products, run `python3 .factory/docs-map.py --fix`.
+- Update the docs **in the same commit** as the behaviour they describe, using
   the change map in [development/03-changing-the-factory.md](development/03-changing-the-factory.md).
-- Before committing, run `python3 scripts/check-docs.py`. It checks links,
-  headers and the inventory. After adding or removing a document, regenerate
-  the inventory with `--inventory`.
+
+<!-- documentation-map:start -->
+## Documentation map
+
+Generated by `python3 kit/.factory/docs-map.py --fix`. Do not edit by hand.
+
+- [Adapters](adapters/README.md) — Documented — procedures only, not exercised
+  - [Hermes adapter](adapters/hermes.md) — Active
+  - [Codex, Cursor, Gemini CLI and other agents](adapters/other-agents.md) — Active
+- [Architecture](architecture/README.md) — Active
+  - [Factory overview](architecture/FACTORY_OVERVIEW.md) — Active
+  - [Job lifecycle](architecture/JOB_LIFECYCLE.md) — Active
+  - [Research sources and design synthesis](architecture/SOURCES.md) — Active — research record
+- [Components](components/README.md) — Active
+  - [COMP-001 — `/factory` coordinator skill](components/COMP-001-coordinator-skill.md) — Implemented — not yet run end to end on a real product
+  - [COMP-002 — Agent protocol](components/COMP-002-agent-protocol.md) — Implemented
+  - [COMP-003 — Role agents](components/COMP-003-role-agents.md) — Implemented — not yet run end to end on a real product
+  - [COMP-004 — Guard hook](components/COMP-004-guard-hook.md) — Implemented — unit-tested (73/73); not yet observed inside a live Claude Code session
+  - [COMP-005 — Project descriptor](components/COMP-005-project-descriptor.md) — Implemented — schema version 1
+  - [COMP-006 — Backlog and dashboard](components/COMP-006-backlog-and-dashboard.md) — Implemented — dashboard not yet viewed against live jobs
+  - [COMP-007 — Installer](components/COMP-007-installer.md) — Implemented — smoke-tested on a scratch repo (install, re-install, user link) on 2026-10-19
+  - [COMP-008 — Doctor](components/COMP-008-doctor.md) — Implemented — verified on this machine and a scratch project on 2026-10-19
+  - [COMP-009 — Mirror and memory export](components/COMP-009-backup-tools.md) — Implemented — syntax-checked; not yet run against a second host
+  - [COMP-010 — Operator profile](components/COMP-010-operator-profile.md) — Implemented
+  - [COMP-011 — Adapters](components/COMP-011-adapters.md) — Documented — procedures only, not exercised
+  - [COMP-012 — Docs map](components/COMP-012-docs-gate.md) — Implemented — verified on this repo (2026-10-19)
+  - [COMP-013 — Constitution](components/COMP-013-constitution.md) — Active — v1.1
+  - [COMP-014 — Diagrams](components/COMP-014-diagrams.md) — Implemented — all 7 diagrams validated with Mermaid 10.9 and 11.17 and rendered (2026-10-19)
+- [Architecture decisions](decisions/README.md) — Active
+  - [ADR-001 — Claude Code is the primary runtime; roles stay tool-neutral](decisions/ADR-001-claude-code-primary-runtime.md) — Accepted
+  - [ADR-002 — Humans merge; the gate opens a PR](decisions/ADR-002-human-only-merge.md) — Accepted
+  - [ADR-003 — Context through files with first-line verdicts](decisions/ADR-003-files-not-conversation.md) — Accepted
+  - [ADR-004 — Parallel review lenses, separate QA, bounded rework](decisions/ADR-004-review-lenses-and-qa.md) — Accepted
+  - [ADR-005 — One worktree, branch and `job.json` per job](decisions/ADR-005-worktree-per-job.md) — Accepted
+  - [ADR-006 — Portable distribution with no account dependency](decisions/ADR-006-portable-distribution.md) — Accepted
+  - [ADR-007 — Product truth stays in the product repo](decisions/ADR-007-truth-in-product-repo.md) — Accepted
+  - [ADR-008 — Idea and release lanes; launch material is drafts only](decisions/ADR-008-idea-and-release-lanes.md) — Accepted
+- [Factory development handbook](development/README.md) — Active
+  - [00 — Factory engineering principles](development/00-factory-engineering-principles.md) — Active
+  - [01 — Development setup](development/01-dev-setup.md) — Active
+  - [02 — Repository layout](development/02-repository-layout.md) — Active
+  - [03 — Changing the factory](development/03-changing-the-factory.md) — Active
+  - [04 — Testing and verification](development/04-testing-and-verification.md) — Active
+  - [05 — Releases and versioning](development/05-releases-and-versioning.md) — Active
+  - [09 — Tools, scripts and commands](development/09-tools-scripts-and-commands.md) — Active
+  - [16 — Documentation link map](development/16-documentation-link-map.md) — Active — agent routing authority
+  - [Contributing to the Product Factory](development/CONTRIBUTING.md) — Active
+- [Governance](governance/README.md) — Active
+  - [Product Factory — Constitution](governance/CONSTITUTION.md) — Active — v1.1
+- [Operator guide](guide/README.md) — Active
+  - [00 — How the Product Factory works](guide/00-overview.md) — Active
+  - [01 — Getting started](guide/01-getting-started.md) — Active
+  - [02 — Commands](guide/02-commands.md) — Active
+  - [03 — Reading a job](guide/03-reading-a-job.md) — Active
+  - [04 — Add a project](guide/04-add-a-project.md) — Active
+  - [05 — Portability and recovery](guide/05-portability-and-recovery.md) — Active
+  - [06 — Troubleshooting](guide/06-troubleshooting.md) — Active
+  - [Glossary](guide/GLOSSARY.md) — Active
+  - [Examples](guide/examples/README.md) — Active
+    - [Example product `AGENTS.md`](guide/examples/AGENTS.example.md) — Example — copy the structure, replace every command with your own
+- [Operator](operator/README.md) — Active
+  - [Operator profile](operator/USER.md) — Active
+- [Status](status/README.md) — Active
+  - [Current repository state](status/CURRENT_STATE.md) — Active
+  - [Evolution log](status/EVOLUTION_LOG.md) — Active — append-only
+  - [Product Factory implementation status](status/IMPLEMENTATION_STATUS.md) — Active audit record
+  - [Roadmap](status/ROADMAP.md) — Active
+<!-- documentation-map:end -->
 
 <!-- documentation-routing:start -->
 ## Documentation routing
 
-- [Parent README](../README.md)
-- [Governing agent guide](../AGENTS.md)
-- Child README indexes:
-
-  - [architecture](architecture/README.md)
-  - [components](components/README.md)
-  - [decisions](decisions/README.md)
-  - [development](development/README.md)
-  - [guide](guide/README.md)
+- Parent: [Product Factory](../README.md)
+- Agent guide: [AGENTS.md](../AGENTS.md)
+- Subfolders:
+  - [Adapters](adapters/README.md)
+  - [Architecture](architecture/README.md)
+  - [Components](components/README.md)
+  - [Architecture decisions](decisions/README.md)
+  - [Factory development handbook](development/README.md)
+  - [Governance](governance/README.md)
+  - [Operator guide](guide/README.md)
+  - [Operator](operator/README.md)
+  - [Status](status/README.md)
 <!-- documentation-routing:end -->

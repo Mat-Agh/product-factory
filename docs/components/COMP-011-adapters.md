@@ -2,7 +2,7 @@
 
 **Status:** Documented — procedures only, not exercised
 **Last updated:** 2026-10-19
-**Source:** [`adapters/hermes.md`](../../adapters/hermes.md), [`adapters/other-agents.md`](../../adapters/other-agents.md)
+**Source:** [`docs/adapters/hermes.md`](../adapters/hermes.md), [`docs/adapters/other-agents.md`](../adapters/other-agents.md)
 **Decisions:** [ADR-001](../decisions/ADR-001-claude-code-primary-runtime.md)
 
 ## Purpose
@@ -25,6 +25,7 @@ folder and verdict contract.
 <!-- documentation-routing:start -->
 ## Documentation routing
 
-- [Parent README](README.md)
-- [Governing agent guide](../../AGENTS.md)
+- Parent: [Components](README.md)
+- Documentation home: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
 <!-- documentation-routing:end -->

@@ -1,4 +1,7 @@
-# Operator
+# Operator profile
+
+**Status:** Active
+**Last updated:** 2026-10-19
 
 This file is account-independent memory about the person who runs the factory.
 `scripts/install.sh user` imports it into `~/.claude/CLAUDE.md` with an `@`
@@ -21,6 +24,17 @@ often EN and FA (RTL), with dark and light themes paired.
 - Do the work. Do not dump instructions on me.
 - Read the live `AGENTS.md`, IDE rules and docs of the repo. Never copy them into
   agent memory or skills.
+
+## Languages for tools
+
+- **Rust by default.** Any script, CLI, hook, generator or helper program an
+  agent writes and keeps is written in Rust (a cargo crate, or a subcommand of an
+  existing Rust CLI), unless the operator says otherwise.
+- Exceptions: product code follows the product repo's own stack and conventions
+  (for example Kotlin in Daria Connect), and short throwaway shell one-liners run
+  only to inspect something may stay in shell.
+- When existing tooling is in another language, propose porting it to Rust
+  rather than extending it.
 
 ## What done means
 
@@ -45,5 +59,13 @@ often EN and FA (RTL), with dark and light themes paired.
 | Project | Where | Notes |
 |---|---|---|
 | Daria Connect | `$HOME/Work/Connect` (GitLab children, GitHub workspace) | Multi-repo: Product, Front-End, Back-End, Client (Android, never called "Frontend"), Hub (vendor plane, never shipped to customers). |
-| Hermes harness | `$HOME/Work/Hermes` (`Mat-Agh/Hermes`) | The earlier factory implementation on Hermes Agent and 9Router. See `adapters/hermes.md`. |
+| Hermes harness | `$HOME/Work/Hermes` (`Mat-Agh/Hermes`) | The earlier factory implementation on Hermes Agent and 9Router. See `docs/adapters/hermes.md`. |
 | Product Factory | `$HOME/Work/ProductFactory` (`Mat-Agh/product-factory`) | This repo. |
+
+<!-- documentation-routing:start -->
+## Documentation routing
+
+- Parent: [Operator](README.md)
+- Documentation home: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
+<!-- documentation-routing:end -->

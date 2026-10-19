@@ -33,7 +33,7 @@ It never commits, never pushes, and refuses a target that is not a git repo.
 ## `user` writes
 
 Symlinks for `skills/factory`, each agent and the guard script. It appends an
-`@<factory>/operator/USER.md` import to `CLAUDE.md` once. It leaves alone any
+`@<factory>/docs/operator/USER.md` import to `CLAUDE.md` once. It leaves alone any
 existing non-symlink file of the same name, and warns. A user-wide guard hook
 is opt-in (`WITH_USER_GUARD=1`).
 
@@ -54,6 +54,7 @@ duplicate the AGENTS section), then a user install into a temporary
 <!-- documentation-routing:start -->
 ## Documentation routing
 
-- [Parent README](README.md)
-- [Governing agent guide](../../AGENTS.md)
+- Parent: [Components](README.md)
+- Documentation home: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
 <!-- documentation-routing:end -->

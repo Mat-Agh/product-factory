@@ -9,24 +9,9 @@ tag, release and publish. Those steps are always yours.**
 
 ## From idea to market
 
-```mermaid
-flowchart LR
-  subgraph Discover
-    I["/factory idea"] --> DS["discovery.md<br/>problem · users · market · metrics"]
-    DS --> PRD["PRD"] --> DC["design concept"] --> ADR["architecture ADR"] --> RM["roadmap"]
-  end
-  subgraph Build["Build (per backlog item)"]
-    N["/factory next"] --> S["spec"] --> DG["design"] --> PL["plan"] --> E["build"] --> RV["review ×4"] --> QA["QA"] --> GT["gate → PR"]
-  end
-  subgraph Ship
-    REL["/factory release"] --> KIT["changelog · notes · listing · docs · announcement drafts"]
-  end
-  RM -- "you pick items" --> N
-  GT -- "you merge" --> REL
-  KIT -- "you tag & publish" --> MKT(["Market"])
-  MKT -- "feedback → issues" --> N
-  GT -. "/factory retro" .-> F["factory improves"]
-```
+![From idea to market](../assets/diagrams/idea-to-market.svg)
+
+<sub>Diagram source: [`idea-to-market.mmd`](../assets/diagrams/idea-to-market.mmd) · re-render with `scripts/render-diagrams.sh`</sub>
 
 ## Lanes: the crew depends on the work
 
@@ -72,6 +57,7 @@ scope, credentials or pixels. Call a compile "done".
 <!-- documentation-routing:start -->
 ## Documentation routing
 
-- [Parent README](README.md)
-- [Governing agent guide](../../AGENTS.md)
+- Parent: [Operator guide](README.md)
+- Documentation home: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
 <!-- documentation-routing:end -->

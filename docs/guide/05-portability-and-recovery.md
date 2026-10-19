@@ -12,7 +12,7 @@ thing. It never costs the factory, the rules or a product's history.
 | Piece | Primary home | Backup | Restore |
 |---|---|---|---|
 | Rules, roles, procedures | this repo on GitHub | mirror remotes and offline bundles (`scripts/mirror.sh`) | `git clone` from any mirror or the bundle |
-| Operator profile (how you work) | `operator/USER.md` | same as above | `scripts/install.sh user` |
+| Operator profile (how you work) | `docs/operator/USER.md` | same as above | `scripts/install.sh user` |
 | Product truth (PRDs, ADRs, code, descriptor, backlog) | each product repo | that product's own mirrors | `git clone` |
 | Work in flight | `factory/*` branches and PRs | any local clone has the branches | re-push from a clone, re-open the PR |
 | Claude Code memory | `~/.claude` on one machine | `scripts/export-claude.sh` → review → fold into `USER.md` | re-installed from `USER.md`, not from the export |
@@ -23,7 +23,7 @@ thing. It never costs the factory, the rules or a product's history.
 1. **Never edit the factory only in `~/.claude`.** The user install is a set of
    symlinks into this repo, so any edit there lands in the repo. Commit it.
 2. **Durable facts go to git.** When an agent learns something about you, write
-   it to `operator/USER.md`. When it learns something about a product, write it
+   it to `docs/operator/USER.md`. When it learns something about a product, write it
    to that product's `AGENTS.md` or docs. Vendor memory is a cache.
 3. **The project kit is a committed copy.** A teammate or a fresh account gets
    the factory by cloning the product, even without this repo.
@@ -65,7 +65,7 @@ design, but each job's branch and PR carry its summary. Re-run a job with
 fresh.
 
 **Agent vendor unavailable.** Use the role files directly from Codex, Cursor or
-Hermes ([adapters/](../../adapters/)). The procedure is markdown, so any capable
+Hermes ([adapters/](../adapters/)). The procedure is markdown, so any capable
 agent can run one role at a time.
 
 ## Health
@@ -77,6 +77,7 @@ machine, and after every factory update.
 <!-- documentation-routing:start -->
 ## Documentation routing
 
-- [Parent README](README.md)
-- [Governing agent guide](../../AGENTS.md)
+- Parent: [Operator guide](README.md)
+- Documentation home: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
 <!-- documentation-routing:end -->

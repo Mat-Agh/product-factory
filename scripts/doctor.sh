@@ -17,6 +17,8 @@ for t in git python3; do command -v $t >/dev/null && ok "$t" || bad "$t missing"
 for t in gh glab jq claude; do command -v $t >/dev/null && ok "$t" || note "$t not installed (optional)"; done
 command -v gh >/dev/null && { gh auth status >/dev/null 2>&1 && ok "gh authenticated" || note "gh not logged in (gh auth login)"; }
 python3 "$FACTORY/tests/guard_test.py" >/dev/null 2>&1 && ok "guard hook tests pass" || bad "guard hook tests fail (python3 tests/guard_test.py)"
+python3 "$KIT/.factory/docs-map.py" --root "$FACTORY" --strict --allow kit/ >/dev/null 2>&1 && ok "factory docs map current" || bad "factory docs map stale or broken (python3 kit/.factory/docs-map.py --strict --allow kit/)"
+"$FACTORY/scripts/render-diagrams.sh" --check >/dev/null 2>&1 && ok "diagrams match their sources" || bad "diagrams stale (scripts/render-diagrams.sh)"
 
 echo "Factory repo"
 remotes="$(git -C "$FACTORY" remote | wc -l | tr -d ' ')"
@@ -42,10 +44,14 @@ if [[ -n "${1:-}" ]]; then
   grep -q '^## Product Factory' "$P/AGENTS.md" 2>/dev/null && ok "AGENTS.md factory section" || bad "AGENTS.md lacks the Product Factory section"
   for s in Setup "Dev server" Gates; do grep -qiE "^#+ .*$s" "$P/AGENTS.md" 2>/dev/null && ok "AGENTS.md has a $s heading" || note "AGENTS.md: no '$s' heading yet (the factory needs it)"; done
   drift=0
-  for a in "$KIT"/.claude/agents/*.md "$KIT/.claude/skills/factory/SKILL.md" "$KIT/.claude/skills/factory/protocol.md" "$KIT/.claude/hooks/factory-guard.py"; do
+  for a in "$KIT"/.claude/agents/*.md "$KIT"/.claude/skills/factory/*.md "$KIT/.claude/hooks/factory-guard.py" "$KIT/.factory/docs-map.py" "$KIT/.factory/dashboard.html"; do
     rel="${a#$KIT/}"; cmp -s "$a" "$P/$rel" || { drift=1; note "drift: $rel differs from factory kit"; }
   done
   [[ $drift == 0 ]] && ok "kit matches factory @ $(git -C "$FACTORY" rev-parse --short HEAD)" || note "re-run scripts/install.sh project $P to update (review the diff first)"
+  if [[ -f "$P/.factory/docs-map.py" ]]; then
+    dm="$(cd "$P" && python3 .factory/docs-map.py 2>&1 | tail -1)"
+    [[ "$dm" == "docs map OK"* ]] && ok "$dm" || note "docs: $dm (python3 .factory/docs-map.py --fix)"
+  fi
   if command -v gh >/dev/null && git -C "$P" remote get-url origin 2>/dev/null | grep -q github; then
     base="$(sed -n 's/^ *base_branch: *\([^ #]*\).*/\1/p' "$P/.factory/factory.yaml" | head -1)"
     repo="$(cd "$P" && gh repo view --json nameWithOwner -q .nameWithOwner 2>/dev/null)"

@@ -11,7 +11,7 @@ rounds run out, `gate.md`. **You never write specs, designs, plans, code,
 reviews or QA yourself.** Agents do that work, and each one writes only its own
 files.
 
-The rules in `CONSTITUTION.md` apply throughout. The short form: truth lives in the
+The rules in `CONSTITUTION.md` (next to this file) apply throughout. The short form: truth lives in the
 product repo, scope stays bounded, context comes from files, done needs evidence,
 humans merge, fail closed.
 
@@ -144,10 +144,14 @@ Use this for a repo the factory has never run in.
 4. Check that `AGENTS.md` states the fresh-checkout setup, the dev-server command
    and port flag, and the lint, build and test commands. List each missing item
    for the user, and offer to draft it. Do not invent commands.
-5. Check the guard hook is wired in `.claude/settings.json`. Check that the base
+5. Run `python3 .factory/docs-map.py`. If it reports documentation outside
+   `docs/`, missing folder READMEs or a stale map, list the problems for the
+   user and offer the fix: move the files with `git mv`, then run `--fix`. Do
+   not move anything without the user's yes.
+6. Check the guard hook is wired in `.claude/settings.json`. Check that the base
    branch has protection on the remote (`gh api repos/{owner}/{repo}/branches/<base>/protection`),
    and if it does not, tell the user. Do not change protection yourself.
-6. Do not commit. Tell the user what to review and commit.
+7. Do not commit. Tell the user what to review and commit.
 
 ## /factory <request>
 

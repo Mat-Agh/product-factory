@@ -1,8 +1,8 @@
 # COMP-013 — Constitution
 
-**Status:** Active — v1
+**Status:** Active — v1.1
 **Last updated:** 2026-10-19
-**Source:** [`CONSTITUTION.md`](../../CONSTITUTION.md)
+**Source:** [`CONSTITUTION.md`](../governance/CONSTITUTION.md)
 
 ## Purpose
 
@@ -13,7 +13,7 @@ follows. When any other file disagrees with it, that file is a defect.
 
 | § | Rule family |
 |---|---|
-| 1 | Truth lives in the product repository. Nothing durable exists only in an account |
+| 1 | Truth lives in the product repository. Nothing durable exists only in an account. Documentation lives under `docs/` as one connected tree |
 | 2 | Separate roles and bounded scope; triage first |
 | 3 | Context from files; one writer per file; verdict first lines; untrusted input |
 | 4 | Evidence over confidence; independent multi-lens review; bounded rework |
@@ -26,13 +26,13 @@ follows. When any other file disagrees with it, that file is a defect.
 
 | § | Enforcement |
 |---|---|
-| 1 | `docs-sync` check in reviewer-code; installer layout; [ADR-007](../decisions/ADR-007-truth-in-product-repo.md) |
+| 1 | `docs-sync` check in reviewer-code; installer layout; [ADR-007](../decisions/ADR-007-truth-in-product-repo.md); docs tree and map by `docs-map.py` ([COMP-012](COMP-012-docs-gate.md)) |
 | 2 | Lanes in [COMP-001](COMP-001-coordinator-skill.md); role tools and instructions in [COMP-003](COMP-003-role-agents.md) |
 | 3 | Protocol ([COMP-002](COMP-002-agent-protocol.md)); the coordinator stops on a bad verdict |
 | 4 | Gate rules in tech-lead; `max_resumes` |
 | 5 | Guard hook ([COMP-004](COMP-004-guard-hook.md)); branch protection; gate escalation |
 | 6 | Guard hook (discard and `--no-verify` rules); protocol |
-| 7 | `/factory retro`; [EVOLUTION_LOG](../EVOLUTION_LOG.md) |
+| 7 | `/factory retro`; [EVOLUTION_LOG](../status/EVOLUTION_LOG.md) |
 
 ## Change checklist
 
@@ -44,6 +44,7 @@ decision.
 <!-- documentation-routing:start -->
 ## Documentation routing
 
-- [Parent README](README.md)
-- [Governing agent guide](../../AGENTS.md)
+- Parent: [Components](README.md)
+- Documentation home: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
 <!-- documentation-routing:end -->

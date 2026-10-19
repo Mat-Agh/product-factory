@@ -80,13 +80,13 @@ You should see:
 ```
 Linking Product Factory @ <commit> into /home/<you>/.claude
   linked /factory skill, agents and guard (they follow 'git pull' in /home/<you>/Work/ProductFactory)
-  imported operator/USER.md into /home/<you>/.claude/CLAUDE.md
+  imported docs/operator/USER.md into /home/<you>/.claude/CLAUDE.md
   user-wide guard hook not enabled (set WITH_USER_GUARD=1 to apply it in every project)
 Done.
 ```
 
 `/factory` and the ten role agents are now available in every Claude Code
-session on this machine. Your working preferences (`operator/USER.md`) load into
+session on this machine. Your working preferences (`docs/operator/USER.md`) load into
 every session.
 
 ## 4. Check the machine
@@ -191,6 +191,7 @@ Then open <http://localhost:8000/dashboard.html>.
 <!-- documentation-routing:start -->
 ## Documentation routing
 
-- [Parent README](README.md)
-- [Governing agent guide](../../AGENTS.md)
+- Parent: [Operator guide](README.md)
+- Documentation home: [Product Factory documentation](../README.md)
+- Agent guide: [AGENTS.md](../../AGENTS.md)
 <!-- documentation-routing:end -->
