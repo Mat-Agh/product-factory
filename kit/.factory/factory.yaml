@@ -31,7 +31,9 @@ vcs:
   host: github                  # github | gitlab
   remote: origin
   base_branch: main             # PRs/MRs target this; never committed to directly
-  branch_prefix: factory/
+  branch_template: "factory/{job-id}"   # or "{kind}/{job-id}" to match the repo's branch conventions (pf audit checks)
+  branch_kinds: { feature: feature, bug: fix, design: feature, docs: docs, chore: chore, spike: docs, idea: docs, release: chore }
+  commit_convention: none       # none | conventional (type(scope): subject), as the repo's hooks require
   open_pr: true                 # false = stop at a local branch for the human
   human_merge: true             # not configurable in practice: the constitution requires it
   attribution: default          # none = no AI trailer or line in commits and PRs (pf install writes the setting)

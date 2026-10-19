@@ -3,6 +3,7 @@
 //! Install once per machine: `cargo install --path cli` (from a factory checkout), or
 //! `cargo install --git ssh://git@github.com/Mat-Agh/product-factory.git pf`.
 
+mod audit;
 mod backup;
 mod dashboard;
 mod descriptor;
@@ -85,6 +86,17 @@ enum Cmd {
     },
     /// Copy Claude Code memory into <factory>/.claude-export/<date>/ for review
     Export,
+    /// Inventory the existing agentic setup (instructions, hooks, CI, conventions, secrets) before adopting a project
+    Audit {
+        /// Repository to audit (default: current directory)
+        path: Option<PathBuf>,
+        /// Machine-readable output
+        #[arg(long)]
+        json: bool,
+        /// Also audit every module of a multi-repo descriptor
+        #[arg(long)]
+        modules: bool,
+    },
     /// Show this repo's Claude Code auto memory (for /factory memory)
     Memory {
         /// Repository to inspect (default: current directory)
@@ -225,6 +237,11 @@ fn run(cli: Cli) -> Result<i32, i32> {
         }
         Cmd::Export => backup::export(&factory(&cli.factory)?),
         Cmd::Dashboard { dir, port } => dashboard::main(dir, port),
+        Cmd::Audit {
+            path,
+            json,
+            modules,
+        } => audit::main(path, json, modules),
         Cmd::Memory { root, json } => memory::main(root, json),
         Cmd::Rules {
             action: RulesCmd::Sync,

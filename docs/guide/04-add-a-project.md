@@ -3,6 +3,9 @@
 **Status:** Active
 **Last updated:** 2026-10-19
 
+0. **If the project already has a process** (agent rules, hooks, CI, other
+   automation), audit it first: `pf audit <path>`, then `/factory adopt` after
+   install. See [COMP-017](../components/COMP-017-adoption.md).
 1. **Install the kit** into the product repo:
    ```bash
    pf install project ~/Work/MyApp

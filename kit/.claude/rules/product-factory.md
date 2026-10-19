@@ -18,7 +18,9 @@ in a parent folder.
   wants an explanation, a code read, a review of something already written,
   `/factory status`, or says to work "outside the factory" or "directly".
 - Never edit, commit or push on the base branch yourself. Factory work happens on
-  `factory/<job-id>` branches in worktrees. Only humans merge, tag, release,
+  job branches (`vcs.branch_template` in the descriptor) in worktrees. Follow this
+  repo's branch and commit conventions. Never bypass its git hooks or CI checks,
+  and never set their skip switches. Only humans merge, tag, release,
   deploy or publish.
 - At the start of a working session, if the operator asks what is going on, run
   `/factory status`.

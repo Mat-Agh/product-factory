@@ -28,13 +28,17 @@ It contains:
   through `/factory`. Module kits and path-scoped module rules cover multi-repo
   workspaces such as Daria Connect, and `/factory memory` promotes auto memory
   into git.
+- **Adoption:** `pf audit` and `/factory adopt` take over a project that already
+  has its own process. The factory keeps that process, configures itself to obey
+  it (branch template, commit convention, attribution, risk paths), and proposes
+  only the necessary edits ([COMP-017](../components/COMP-017-adoption.md)).
 - **Documentation:** everything is under `docs/`, one connected tree generated
   and checked by `pf docs-map`. It covers governance, the operator guide,
   architecture, component contracts, the development handbook, ADRs, status
   (this page, implementation status, roadmap, evolution log), adapters and the
   operator profile. Diagrams are committed SVGs rendered from Mermaid sources.
 
-**Verification state:** `pf` passes its 10 cargo tests (including the 73 guard
+**Verification state:** `pf` passes its 18 cargo tests (including the 80 guard
 policy cases) and matches the Python tools it replaced. Every subcommand has
 run end to end on scratch setups. The docs map and diagram checks pass. **No job has run end to end
 on a real product yet.** That is the Phase 1 exit criterion. Details:

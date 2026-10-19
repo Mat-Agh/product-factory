@@ -13,6 +13,7 @@ how to use them.
 | Command | Use it when | Result |
 |---|---|---|
 | `/factory init` | First time in a repo | Draft `.factory/factory.yaml` plus a list of `AGENTS.md` gaps |
+| `/factory adopt` | The repo already has its own agent rules, hooks, CI or automation | `.factory/adoption.md`: everything found, and how each item is kept, obeyed, aligned or synchronised. Applied only with your approval |
 | `/factory <request>` | You want something built, fixed or written | A PR (or a draft PR with a question for you) |
 | `/factory idea <idea>` | You have a product idea, not a feature | A docs PR (discovery, PRD, concept, ADR, roadmap) plus proposed backlog lines |
 | `/factory issue <n\|url>` | The request already lives in an issue | Same as `<request>`, and the PR is linked back to the issue |
@@ -36,6 +37,18 @@ Run it once per product repo, after `pf install project`.
 - **What you do:** fix every `# verify`, add the `AGENTS.md` items it lists,
   then commit.
 - **If a descriptor already exists**, it prints it and changes nothing.
+
+## `/factory adopt`
+
+Run it first on any project that already has a process. It runs `pf audit` and
+reads every instruction, rule, hook and CI file the audit lists. Each finding is
+classified as **keep**, **configure the factory** (for example match the
+repo's branch names), **align** (only where a rule breaks the constitution's
+authority or safety rules), **synchronise** (mirror the factory rule into
+other tools' rule folders) or **decide**. The result goes in
+`.factory/adoption.md`. Nothing is deleted. Approved descriptor changes apply
+directly, and approved file edits land as reviewed jobs. `/factory init` runs this
+automatically when it finds an existing setup.
 
 ## `/factory <request>`
 

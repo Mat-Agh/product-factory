@@ -43,12 +43,50 @@ each with its own stack, `develop` branch, CI and `AGENTS.md`.
 | Clean trees on `develop` | `cd ~/Work/Connect && git submodule foreach 'git status --porcelain; git branch --show-current'` | nothing dirty, every child on `develop` |
 | Hermes intake paused | Hermes cron for Connect (`$HOME/Work/Hermes`) | paused while you pilot, so two systems don't take the same issue |
 
+## Step 0 — Audit and adopt (first, before anything is installed)
+
+Connect already runs its own process. Five CI pipelines, git hooks, branch and
+commit conventions, Hermes, Codex/Cursor/Junie rules and Firebase agent skills
+are all in place. The factory adopts them (CONSTITUTION §8). It inventories them,
+keeps them, configures itself to obey them, and only proposes edits where they
+must change.
+
+```bash
+cd ~/Work/Connect
+pf audit .                                   # workspace root
+for m in Daria-Connect-Product Daria-Connect-Front-End Daria-Connect-Back-End Daria-Connect Daria-Connect-Federation; do pf audit "$m"; done
+```
+
+After step 1, run `/factory adopt` in Claude Code at the root. It reads every
+file the audit lists and writes the reconciliation to `.factory/adoption.md`.
+Nothing changes until you approve rows.
+
+### What the audit found (2026-10-19, read-only)
+
+| # | Finding | Evidence | Class | Reconciliation |
+|---|---|---|---|---|
+| 1 | **Branch names**: hooks and CI accept only `main`, `develop`, `feature/…`, `fix/…`, `docs\|chore\|refactor\|test\|ci\|build\|perf/…`, `release/x.y.z`, `hotfix/x.y.z`, `.hermes/<n>-…` and `codex/…`. A `factory/<job-id>` branch is **rejected**. This was a BLOCKER in Back-End and Front-End, and the same rules are in Client, Federation and Product | `build-logic/…/GitConventionRules.kt` (Back-End, Client, Federation), `tooling/ci/git-conventions.ts` (Front-End), `.ci/conventions.py` (Product) | configure the factory | `vcs.branch_template: "{kind}/{job-id}"` with `branch_kinds` (feature→`feature`, bug→`fix`, docs→`docs`, chore→`chore` …). Job branches become `feature/004-org-name`, which the conventions accept, and the guard then allows only those shapes. This is already in the draft descriptor. Optional later step: add a `factory/…` pattern to the conventions, as was done for `.hermes/` and `codex/` |
+| 2 | **Commit subjects** must be Conventional Commits with a lowercase subject (`type(scope)!: …`), and author emails must be `@dariahamrah.ir` | same files, `.githooks/pre-commit` | configure the factory | `vcs.commit_convention: conventional`. Commits use your git identity, which is already `m.aghalarkhani@dariahamrah.ir` |
+| 3 | **No AI attribution** anywhere (root `AGENTS.md`, mirrored in each child) | `AGENTS.md`, `CLAUDE.md` | configure the factory | `vcs.attribution: none`, and `pf install` writes Claude Code's `attribution` setting |
+| 4 | **Approval-triggered auto-merge**: `merge_when_approved` waits for a human Approve, then merges once green | `.ci/approve.yml`, `.ci/merge_when_approved.py` (all five) | keep | Compatible. Your Approve is the merge decision, and the guard blocks agents from approving. Escalated MRs open as drafts and merge only after you mark them ready |
+| 5 | **Git hooks** exist in every child (`.githooks/`: commit-msg, pre-commit, pre-push running `ciValidate`). They are **not active** locally, because `core.hooksPath` is unset | `.githooks/install.sh` | keep, then decide | Factory commits run whatever hooks are active, and CI enforces the same rules either way. Recommended: run `.githooks/install.sh` in each child, so factory pushes fail locally before CI |
+| 6 | **Hook bypass switches**: `DARIA_HOOK_SKIP_GRADLE`, `GIT_CONVENTION_SKIP_COMMIT_SUBJECTS` | `.githooks/*` | align (enforced) | The guard now blocks setting any `*SKIP*`, `HUSKY` or `LEFTHOOK` variable around git writes, and `core.hooksPath` overrides |
+| 7 | **Rule mirrors kept in sync by convention**: `.cursor/rules`, `.codex/rules`, `.agents/rules` (Back-End has 19 each), plus `CLAUDE.md` and `AGENTS.md` | root `CLAUDE.md` ("kept in sync by convention") | synchronise | Mirror the factory rule into each folder that holds rules, as `product-factory.md` (`.mdc` for Cursor), and add one "Product Factory" line to each `AGENTS.md` and `CLAUDE.md`. These are proposed edits, landed as one `chore` MR per child |
+| 8 | **`CLAUDE.md` doesn't import `AGENTS.md`** (root and all children), so Claude Code doesn't auto-load `AGENTS.md` | each `CLAUDE.md` | synchronise | Add `@AGENTS.md` in the same MRs as row 7 |
+| 9 | **Hermes** is named as the issue automation in root, Back-End, Front-End and Product instructions, issue templates and `docs/hermes.md`. Its `.hermes/<iid>-…` branches are allowed by the conventions | 16, 13 and 10 mentions | decide | Choose: (a) retire Hermes' Connect intake and name the factory as the delivery pipeline, or (b) keep Hermes for intake and Telegram only. Then update the instruction files to say so, as part of row 7's MRs. Never let both pick up the same issue |
+| 10 | **Codex/Cursor config, Junie plans, Firebase agent skills** (`skills-lock.json`, `.agents/skills`) | root | keep | Unrelated to delivery. Left as they are |
+| 11 | **Plaintext GitLab token** in root `.cursor/mcp.json`. It is gitignored and was never committed | `.cursor/mcp.json` | decide | Rotate the token and reference an environment variable instead. Agents must not read or copy it |
+| 12 | **Broad pre-approvals** in root `.claude/settings.local.json` (`glab api *`, `git checkout *`) | `.claude/settings.local.json` | keep, then review | The guard still blocks merges, approvals, protected pushes and API writes to merge or protection endpoints. Trim the list if you no longer need it |
+| 13 | **Docs routing markers in your own format** (31 Back-End docs, 1 Front-End doc, about 113 across the workspace). Front-End keeps its docs in `doc/` | `docs/**`, `doc/**` | decide | Keep your format (no `pf docs-map --fix`), or convert one repo at a time on a branch |
+| 14 | **Inconsistency in your own conventions**: Product allows `.codex/…` branches, while the others allow `codex/…` | `.ci/conventions.py` and `GitConventionRules.kt` | decide | Not a factory concern. Worth unifying in a separate change |
+
 ## Step 1 — Install at the workspace root
 
 ```bash
 cd ~/Work/Connect
 pf install project . --no-ai-attribution
 cp ~/Work/ProductFactory/docs/guide/examples/connect.factory.yaml .factory/factory.yaml
+pf install project . --no-ai-attribution     # again, so the guard picks up the branch template
 ```
 
 Open `.factory/factory.yaml` and check every `# verify` line: the product
@@ -103,6 +141,14 @@ rewrite them all in the factory's format. If you want the factory format,
 run `--fix` on a branch in one child, review the diff, and merge it yourself.
 Until then, treat the report as information.
 
+## Step 4b — Apply the adoption plan
+
+In Claude Code at the root, run `/factory adopt`, and approve the rows you want
+from the table above. Descriptor rows are applied directly. Rows 7–9 become one
+`chore` job per child. Each lands as an MR on a `chore/NNN-…` branch with a
+conventional subject and no AI attribution, and you approve it. Re-run
+`pf audit` until no BLOCKER remains.
+
 ## Step 5 — Promote memory
 
 Open Claude Code at `~/Work/Connect` and run:
@@ -145,8 +191,9 @@ Start small, from the root or from inside a child:
 ```
 
 You should see triage pick `module: frontend` and the trivial lane, then a
-worktree at `~/Work/Connect-factory/frontend/001-…`, a code review, a gate, and
-a GitLab MR to Front-End `develop` with no AI attribution. Then try one bug in
+worktree at `~/Work/Connect-factory/frontend/001-…` on branch `docs/001-…`, a code review, a gate, and
+a GitLab MR to Front-End `develop` with no AI attribution. The MR's branch should be `docs/001-…` (Front-End accepts it), and its commit
+subject should be `docs: …`. Then try one bug in
 Back-End (QA reproduces first, and no unit tests are added), and one UI change
 in Client (the designer reads Figma and stops if a frame is missing). Run
 `/factory retro` after each one.

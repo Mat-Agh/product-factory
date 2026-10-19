@@ -43,6 +43,8 @@ the protocol describes). Run the module's gates from the descriptor or
 
 ## Commit
 
+Follow the descriptor's `vcs.commit_convention` (with `conventional`, each subject is
+`<type>(<scope>)?: <lowercase summary>`) and the repo's hooks, which validate it.
 Stage explicit paths, never `git add -A`. Write short one-line messages in the
 repo's `git log` style, one commit per distinct piece. Leave the tree clean
 (`git status --porcelain` empty). Never push. The coordinator pushes.

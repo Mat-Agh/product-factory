@@ -60,7 +60,7 @@ fn split_kv(s: &str) -> Option<(String, String)> {
 /// Parse `{ a: b, c: d }` into prefixed entries.
 fn inline_map(prefix: &str, v: &str, into: &mut Map) -> bool {
     let v = v.trim();
-    if !(v.starts_with('{') && v.ends_with('}')) {
+    if !(v.starts_with('{') && v.ends_with('}') && v.contains(':')) {
         return false;
     }
     for part in v[1..v.len() - 1].split(',') {

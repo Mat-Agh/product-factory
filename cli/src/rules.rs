@@ -38,8 +38,13 @@ When you work on files under `{path}/`:\n\n\
 - `{path}/{agents}` and `{path}/CLAUDE.md` are authoritative for this module. Read them\n  before editing, and follow them over anything general.\n\
 - Owner role: `{owner}`. Gates: {gates}.\n\
 - Unit tests: {tests}.\n\
-- It is its own git repository. Factory jobs branch `factory/<job-id>` from `{base}`\n  in a worktree outside the workspace, and open an {request} on {host} to `{base}`.\n\
+- It is its own git repository. Factory jobs branch `{branch}` from `{base}`\n  in a worktree outside the workspace, and open an {request} on {host} to `{base}`.\n  Commits follow `{commits}` conventions, and this repo's hooks and CI checks always run.\n\
 - Do not edit a sibling module from here. Cross-module work is split into one\n  factory job per module.\n",
+        branch = d
+            .get("vcs.branch_template")
+            .unwrap_or("factory/{job-id}")
+            .replace("{job-id}", "<job-id>"),
+        commits = d.get("vcs.commit_convention").unwrap_or("the repo's"),
         owner = val(m, "owner_role", "engineer"),
         gates = val(m, "gates", "see the module's AGENTS.md"),
     )

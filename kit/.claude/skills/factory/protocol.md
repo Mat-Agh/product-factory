@@ -54,6 +54,9 @@ docs. Never read whole `docs/` trees.
   in the worktree, run `cd <worktree> && pf docs-map --fix` and
   commit the regenerated links together with your change. Never put new docs at
   the repo root.
+- The repo's git hooks, CI checks and conventions are its gates. Pass them; never
+  bypass them (`--no-verify`, `core.hooksPath` overrides, `*SKIP*` or `HUSKY=0`
+  style switches). If a hook fails, fix the cause or write BLOCKED.
 - Evidence beats assertion. When you claim something works, show the command and
   its result, or what the page or device showed.
 - Pages: start the dev server from `AGENTS.md` in the worktree, on the port in

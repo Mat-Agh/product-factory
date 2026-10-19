@@ -4,7 +4,7 @@
 use std::fs;
 use std::path::Path;
 
-use crate::{descriptor, diagrams, docs_map, guard, install, memory, rules, util};
+use crate::{audit, descriptor, diagrams, docs_map, guard, install, memory, rules, util};
 
 #[derive(Default)]
 struct Doc {
@@ -263,6 +263,40 @@ pub fn main(factory: &Path, project: Option<&Path>) -> i32 {
                 }
             }
         }
+        let mut audit_roots = vec![p.clone()];
+        if let Some(desc) = descriptor::find(&p).filter(|x| x.root == p && x.multi_repo()) {
+            audit_roots.extend(
+                desc.modules
+                    .iter()
+                    .filter_map(|m| m.get("path"))
+                    .map(|x| p.join(x)),
+            );
+        }
+        for r in &audit_roots {
+            let (findings, _) = audit::audit(r);
+            let blockers: Vec<&audit::Finding> = findings
+                .iter()
+                .filter(|f| f.severity == audit::Severity::Blocker)
+                .collect();
+            let shown = util::rel(&p, r);
+            d.check(
+                blockers.is_empty(),
+                format!("adoption audit: no blockers ({shown})"),
+                format!(
+                    "adoption audit ({shown}): {} (pf audit {shown})",
+                    blockers
+                        .iter()
+                        .map(|b| b.message.as_str())
+                        .collect::<Vec<_>>()
+                        .join("; ")
+                ),
+            );
+        }
+        d.soft(
+            p.join(".factory/adoption.md").exists(),
+            ".factory/adoption.md records the adoption",
+            "no .factory/adoption.md yet (run /factory adopt on a project that had its own process)",
+        );
         let mem = memory::collect(&p);
         let n = mem["memories"].as_array().map_or(0, |a| a.len());
         d.soft(

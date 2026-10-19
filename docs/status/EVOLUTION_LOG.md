@@ -6,6 +6,35 @@
 Append-only. One dated entry for each factory-level change: what changed, why,
 and its evidence.
 
+## 2026-10-19 — Adopting projects that already have a process (constitution v1.2)
+
+- Added CONSTITUTION §8: adoption means inventory first, preserve everything,
+  follow a precedence order (constitution authority and safety, then the
+  product's own rules, which the factory obeys, then factory defaults),
+  synchronise into the product's other agent surfaces, and record the result in
+  `.factory/adoption.md`.
+- Added `pf audit`, which inventories instructions, rule mirrors, Claude config,
+  git hooks and bypass switches, CI and auto-merge, branch and commit conventions
+  (regexes extracted and tested against the job branch), attribution rules, other
+  automations, secrets (values never printed) and foreign docs markers. Also
+  added `/factory adopt` as step 0 of `/factory init`.
+- Added `vcs.branch_template`, `vcs.branch_kinds` and `vcs.commit_convention`. The
+  guard now reads the project's job-branch shape from the descriptor, and blocks
+  hook-bypass variables and `core.hooksPath` overrides. There are now 80 policy
+  cases.
+- The installer keeps same-named non-factory agents and skills as
+  `*.pre-factory*` instead of overwriting them. `pf doctor` fails on audit
+  blockers.
+- Connect audit (read-only): the branch conventions in all five repos reject
+  `factory/<job-id>`, a BLOCKER, which the Connect descriptor resolves with
+  `{kind}/{job-id}`. Also found: Conventional Commits, no AI attribution,
+  approval-triggered auto-merge (compatible), inactive `.githooks`, bypass
+  switches, three rule mirrors, `CLAUDE.md` files without `.md`, Hermes
+  references, and a gitignored plaintext token. The reconciliation is in
+  `docs/guide/07-workspace-connect.md`.
+- Evidence: 18 cargo tests and clippy clean; a scratch-repo scenario; `pf audit`
+  on the real Connect repos, with no change to them (`git status` clean).
+
 ## 2026-10-19 — Sessions default to the factory; workspaces and memory
 
 - Added the always-on rule `kit/.claude/rules/product-factory.md`, installed in

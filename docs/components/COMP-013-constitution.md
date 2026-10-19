@@ -1,6 +1,6 @@
 # COMP-013 — Constitution
 
-**Status:** Active — v1.1
+**Status:** Active — v1.2
 **Last updated:** 2026-10-19
 **Source:** [`CONSTITUTION.md`](../governance/CONSTITUTION.md)
 
@@ -20,7 +20,8 @@ follows. When any other file disagrees with it, that file is a defect.
 | 5 | Humans own the irreversible: the authority table and the always-escalate list |
 | 6 | Fail closed; preserve work; no secrets; never commit to the base branch |
 | 7 | The factory improves from its own record (retro, evolution log, metrics) |
-| 8 | Voice |
+| 8 | Adopting an existing project: inventory first, preserve, precedence, synchronise, record |
+| 9 | Voice |
 
 ## Where each section is enforced
 
@@ -33,6 +34,7 @@ follows. When any other file disagrees with it, that file is a defect.
 | 5 | Guard hook ([COMP-004](COMP-004-guard-hook.md)); branch protection; gate escalation |
 | 6 | Guard hook (discard and `--no-verify` rules); protocol |
 | 7 | `/factory retro`; [EVOLUTION_LOG](../status/EVOLUTION_LOG.md) |
+| 8 | `pf audit`, `/factory adopt`, installer `*.pre-factory*` preservation, guard project branch policy ([COMP-017](COMP-017-adoption.md)) |
 
 ## Change checklist
 

@@ -14,7 +14,7 @@ there is recorded evidence that it works.
 | Area | State |
 |---|---|
 | Rules, roles, procedure | Implemented, not yet exercised on a real product |
-| Mechanical enforcement | Guard hook (`pf guard`, Rust) passes 73/73 and matches the Python original on 117 inputs; fails closed without `pf`. Branch protection depends on each product |
+| Mechanical enforcement | Guard hook (`pf guard`, Rust) passes 80/80 (the original 73 match the Python guard on 117 inputs); follows the project branch template and blocks hook bypasses; fails closed without `pf`. Branch protection depends on each product |
 | Distribution and portability | `pf install`, `pf doctor`, `pf mirror bundle` (with restore) and `pf export` verified on scratch setups. No second remote yet |
 | Documentation | All docs under `docs/`, one connected tree. `pf docs-map --strict` and `pf diagrams check` pass |
 | Tooling | One Rust CLI (`pf`); no Python, bash scripts or `jq`. 10 cargo tests, clippy clean |
@@ -39,6 +39,7 @@ there is recorded evidence that it works.
 | [COMP-014](../components/COMP-014-diagrams.md) Diagrams | yes | yes | 7 diagrams parse with Mermaid 10.9.8 and 11.17.2; SVGs rendered and checked as `<img>` in Chrome (2026-10-19) | Confirm display on GitHub from the operator's network |
 | [COMP-015](../components/COMP-015-pf-cli.md) `pf` CLI | yes | yes | `cargo test` 10/10, `cargo clippy` 0 warnings, `cargo fmt` clean; every subcommand run end to end (2026-10-19) | Prebuilt binaries (optional, see ADR-009) |
 | [COMP-016](../components/COMP-016-session-integration.md) Session integration and memory | yes | partially | Scratch workspace with two nested repos: workspace and module installs, `pf rules sync`, attribution off, doctor flags missing modules; `pf memory` read the real Connect auto memory (9 entries); 15 cargo tests (2026-10-19) | Observe a live Claude session routing a request through `/factory`; run `/factory memory` on Connect |
+| [COMP-017](../components/COMP-017-adoption.md) Adoption | yes | partially | `pf audit` read-only on real Connect root, Back-End and Front-End (findings match manual review); scratch repo: foreign agent preserved, template cleared the blocker, guard policy verified (2026-10-19) | Run `/factory adopt` on Connect; land the mirror and `CLAUDE.md` MRs |
 | [COMP-013](../components/COMP-013-constitution.md) Constitution | v1 | n/a | — | Revisit after the pilot retro |
 
 ## Open operator actions

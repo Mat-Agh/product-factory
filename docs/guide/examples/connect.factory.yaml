@@ -51,7 +51,9 @@ vcs:
   host: gitlab                    # gitrnd.dariarnd.ir; glab must be logged in to that host
   remote: origin
   base_branch: develop            # factory MRs target each child's develop; humans approve and merge
-  branch_prefix: factory/
+  branch_template: "{kind}/{job-id}"   # Connect hooks and CI accept only GitFlow names: feature/, fix/, docs/, chore/ …
+  branch_kinds: { feature: feature, bug: fix, design: feature, docs: docs, chore: chore, spike: docs, idea: docs, release: chore }
+  commit_convention: conventional   # ciValidateGitConventions: type(scope)!: lowercase subject
   open_pr: true
   human_merge: true
   attribution: none               # workspace AGENTS.md forbids naming AI tools in commits and MRs

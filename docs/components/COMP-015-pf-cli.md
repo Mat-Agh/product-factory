@@ -28,7 +28,7 @@ blocked with the install hint above.
 | Command | Purpose | Contract |
 |---|---|---|
 | `pf guard` | Claude Code PreToolUse hook. Reads hook JSON on stdin; exit 2 blocks | [COMP-004](COMP-004-guard-hook.md) |
-| `pf guard --self-test` | Run the 73 built-in policy cases | [COMP-004](COMP-004-guard-hook.md) |
+| `pf guard --self-test` | Run the 80 built-in policy cases | [COMP-004](COMP-004-guard-hook.md) |
 | `pf docs-map [--fix] [--strict] [--allow <prefix>]` | `docs/` tree, generated README links and map | [COMP-012](COMP-012-docs-gate.md) |
 | `pf diagrams check \| render` | Mermaid sources to committed SVGs | [COMP-014](COMP-014-diagrams.md) |
 | `pf install project <path> [--no-ai-attribution] \| module <path> --workspace <root> \| user [--with-guard] \| all <path>` | Put the factory into a product or a user config | [COMP-007](COMP-007-installer.md) |
@@ -39,6 +39,7 @@ blocked with the install hint above.
 | `pf install module <path> --workspace <root>` | Put the Claude Code kit into one module repo of a workspace | [COMP-016](COMP-016-session-integration.md) |
 | `pf rules sync` | Generate path-scoped `.claude/rules/modules/<area>.md` from the descriptor | [COMP-016](COMP-016-session-integration.md) |
 | `pf memory [--json] [--root <repo>]` | Show the repo's auto memory, for `/factory memory` | [COMP-016](COMP-016-session-integration.md) |
+| `pf audit [path] [--modules] [--json]` | Inventory the existing agentic setup and flag clashes before adoption | [COMP-017](COMP-017-adoption.md) |
 
 `--factory <path>` (global) names the factory checkout for `install`, `doctor`,
 `mirror` and `export`. Without it, `pf` uses `$PRODUCT_FACTORY_HOME`, then an

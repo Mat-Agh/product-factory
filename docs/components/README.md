@@ -28,6 +28,7 @@ source and never restate it. Current delivery status is in
 | [COMP-014](COMP-014-diagrams.md) | Diagrams | `docs/assets/diagrams/*.mmd`, `cli/src/diagrams.rs` |
 | [COMP-015](COMP-015-pf-cli.md) | `pf` CLI | `cli/` |
 | [COMP-016](COMP-016-session-integration.md) | Project session integration and memory | `kit/.claude/rules/product-factory.md`, `cli/src/{rules,memory,install}.rs` |
+| [COMP-017](COMP-017-adoption.md) | Adoption of an existing project | `cli/src/audit.rs`, `/factory adopt` |
 
 Adding a component means adding a `COMP-NNN-*.md` here, a row in this table and
 in `IMPLEMENTATION_STATUS.md`, and a route in the
@@ -55,4 +56,5 @@ in `IMPLEMENTATION_STATUS.md`, and a route in the
   - [COMP-014 — Diagrams](COMP-014-diagrams.md)
   - [COMP-015 — `pf` CLI](COMP-015-pf-cli.md)
   - [COMP-016 — Project session integration and memory](COMP-016-session-integration.md)
+  - [COMP-017 — Adoption of an existing project](COMP-017-adoption.md)
 <!-- documentation-routing:end -->

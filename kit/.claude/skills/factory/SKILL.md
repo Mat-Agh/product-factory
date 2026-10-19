@@ -1,6 +1,6 @@
 ---
 name: factory
-description: Run the Product Factory. Use when the user types /factory followed by a request, or by one of init, idea, issue, next, status, rework, release, retro, memory or clean. The session that runs it becomes the coordinator, which triages the work, spawns the role agents, and moves each job from idea to a reviewed, tested PR that a human merges.
+description: Run the Product Factory. Use when the user types /factory followed by a request, or by one of init, adopt, idea, issue, next, status, rework, release, retro, memory or clean. The session that runs it becomes the coordinator, which triages the work, spawns the role agents, and moves each job from idea to a reviewed, tested PR that a human merges.
 when_to_use: In any repository that has .factory/factory.yaml (or a parent workspace that does), use this whenever the user asks to build, add, change, fix, refactor, document, design, plan, spike, release or ship something, even when they do not type /factory. Do not use it for questions, explanations, code reading or status checks.
 ---
 
@@ -75,7 +75,7 @@ is missing or must change.
 | repro | `tester` | `repro.md` |
 | design | `designer` | `design.md` (+ files under `docs.design_dir` in the worktree) |
 | plan | `tech-lead` | `plan.md` (+ ADR under `docs.adr_dir` in the worktree when needed) |
-| build | `engineer` | `build.md` + commits on `factory/<job-id>` |
+| build | `engineer` | `build.md` + commits on the job branch `<branch>` |
 | review | `reviewer-code`, `reviewer-security`, `reviewer-ux`, `reviewer-ui` | `round-<N>/review-<lens>.md` |
 | qa | `tester` | `qa.md` |
 | gate | `tech-lead` (gate mode) | `gate.md`, `pr.md` |
@@ -107,9 +107,20 @@ name. `.factory/jobs/` is gitignored runtime state. Worktrees always live
 <repo>/.factory/jobs/<job-id>/job.json          state: you are its only writer
 <repo>/.factory/jobs/<job-id>/*.md              artifacts, one owner each
 <repo>/.factory/jobs/<job-id>/round-<N>/        one folder per review round
-<repo>/../<name>-factory/<job-id>/              single-repo: the job's worktree on factory/<job-id>
+<repo>/../<name>-factory/<job-id>/              single-repo: the job's worktree on `<branch>`
 <repo>/../<name>-factory/<area>/<job-id>/       multi-repo: worktree of the owning module's clone
 ```
+
+### Job branch and commits
+
+`<branch>` is `vcs.branch_template` with `{job-id}` replaced by the job id and
+`{kind}` by `vcs.branch_kinds.<type>` (for example `feature/004-org-name` or
+`fix/012-empty-password`). The default template is `factory/{job-id}`. Use exactly
+that name. The guard only lets the factory push branches of this shape. When
+`vcs.commit_convention` is `conventional`, every commit subject is
+`<type>(<scope>)?: <lowercase summary>` (types: feat, fix, docs, test, refactor,
+perf, build, ci, chore, style, revert), short enough for the repo's hooks. The
+repo's own git hooks and CI conventions always run, and nobody bypasses them.
 
 ### job.json
 
@@ -119,7 +130,7 @@ name. `.factory/jobs/` is gitignored runtime state. Worktrees always live
   "lane": ["triage","spec","plan","build","review","qa","gate"],
   "stage": "review", "round": 2, "resumes": 1,
   "reviews": { "code": "PASS", "security": "CHANGES", "ux": "pending", "ui": "skipped" },
-  "branch": "factory/004-org-name-on-tenants",
+  "branch": "<branch>, e.g. factory/004-org-name-on-tenants or feature/004-org-name-on-tenants",
   "worktree": "/abs/path/<name>-factory/004-org-name-on-tenants",
   "source": "chat | backlog | issue:<url>", "pr": null,
   "updated": "2026-10-19T12:00:00Z" }
@@ -132,7 +143,7 @@ the current state. `worktree` is always an absolute path.
 ### Agent prompts
 
 Start every agent prompt with:
-`Job folder: <repo>/.factory/jobs/<job-id>/. Worktree: <worktree>. Branch: factory/<job-id>. Descriptor: <repo>/.factory/factory.yaml.`
+`Job folder: <repo>/.factory/jobs/<job-id>/. Worktree: <worktree>. Branch: <branch>. Descriptor: <repo>/.factory/factory.yaml.`
 After that comes the stage instruction (for example `Build round 1.` or
 `Review round 2.`). For agents that open pages, append
 ` Port: <surfaces.ui.port_base + 10n + k>.`, where `n` is the job number. Use
@@ -140,8 +151,9 @@ After that comes the stage instruction (for example `Build round 1.` or
 
 ## /factory init
 
-Use this for a repo the factory has never run in.
-
+. **Adopt first.** If the repo (or any module) already has agent instructions,
+   IDE rules, git hooks, CI or other automation, run **/factory adopt** before
+   anything else, and configure the descriptor from its findings.
 1. If `.factory/factory.yaml` exists, report its contents and stop.
 2. Inspect the repo: its languages, package managers, modules, CI, docs layout,
    and `AGENTS.md`/`CLAUDE.md`.
@@ -201,9 +213,9 @@ Use this for a repo the factory has never run in.
    one backlog line per piece, run the first, and tell the user. If a blocking
    question exists, set `needs-human` and ask it. Do not guess product intent.
 3. **Worktree.** Every lane ends in a PR, so every job gets a worktree:
-   run `git worktree add -b factory/<job-id> <worktree> <vcs.base_branch>`. In a
+   run `git worktree add -b <branch> <worktree> <vcs.base_branch>`. In a
    `multi-repo` layout, run it from the owning module's clone
-   (`git -C <repo>/<module.path> worktree add -b factory/<job-id> <repo>/../<name>-factory/<area>/<job-id> <base>`),
+   (`git -C <repo>/<module.path> worktree add -b <branch> <repo>/../<name>-factory/<area>/<job-id> <base>`),
    and use the module's `vcs` overrides (host, remote, base branch) when it has
    them. A job that spans modules is split by triage into one job per module. Job state still lives at `<repo>/.factory/jobs/`. Then
    run the fresh-checkout setup from `AGENTS.md` in the worktree. If either
@@ -243,15 +255,15 @@ Use this for a repo the factory has never run in.
 
 ### Open PR
 
-The factory may push its own `factory/*` branch and open a PR. It **never**
+The factory may push its own job branch `<branch>` and open a PR. It **never**
 merges.
 
 1. If `vcs.open_pr` is false or there is no remote, set `stage: needs-human` and
    tell the user the branch is ready locally.
-2. `cd <worktree> && git push -u <vcs.remote> factory/<job-id>`
+2. `cd <worktree> && git push -u <vcs.remote> <branch>`
 3. Create the PR with the body from `pr.md`:
-   - GitHub: `gh pr create --base <base> --head factory/<job-id> --title "<title>" --body-file <job folder>/pr.md` (add `--draft` when ESCALATE).
-   - GitLab: `glab mr create --target-branch <base> --source-branch factory/<job-id> --title … --description "$(cat pr.md)"` (add `--draft` when ESCALATE).
+   - GitHub: `gh pr create --base <base> --head <branch> --title "<title>" --body-file <job folder>/pr.md` (add `--draft` when ESCALATE).
+   - GitLab: `glab mr create --target-branch <base> --source-branch <branch> --title … --description "$(cat pr.md)"` (add `--draft` when ESCALATE).
 4. Record the URL in `job.json` and set `stage: pr-open`. If the job came from an
    issue, comment the PR link on the issue. Tell the user, and quote `gate.md`
    when it escalated.
@@ -315,6 +327,56 @@ docs and to the factory's agents or checklists. Never apply factory changes
 silently. Offer to open a PR against the Product Factory repo (`factory.source`
 in the descriptor) with the proposed edits and a dated evolution-log entry.
 
+## /factory adopt
+
+Use this when the factory takes over a project that already has its own process.
+The constitution (§8) governs it: inventory first, preserve everything, let the
+product's own rules shape the factory's configuration, and align only what
+breaks the constitution's authority or safety rules. You change nothing until the
+operator approves.
+
+1. **Inventory.** Run `pf audit --json` (add `--modules` in a workspace). Then
+   **read every file it lists**: `AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING.md`, every
+   rule in `.cursor/rules`, `.codex/rules` and `.agents/rules`, skills and agents
+   under `.claude/` and `.agents/`, the git hooks, the CI files and scripts the
+   findings name, and any automation docs (for example Hermes). Do not skim.
+2. **Classify** every rule and mechanism into one of:
+   - **keep**: compatible as it is. Most product rules land here (stack
+     conventions, test policy, docs layout, other tools' config).
+   - **configure the factory**: the factory adapts to it, through the descriptor
+     (`vcs.branch_template` and `branch_kinds` to match branch patterns,
+     `vcs.commit_convention`, `vcs.attribution`, `risk.escalate_paths` for its
+     risky paths, `docs.root`) or module rules. This is the default answer to
+     any product process rule.
+   - **align**: it conflicts with the constitution's authority or safety rules,
+     for example it lets agents merge, deploy or push to protected branches,
+     skip hooks, or keep secrets in git. Propose a minimal edit, with the exact
+     diff and the reason.
+   - **synchronise**: the factory rule must appear in the product's other agent
+     surfaces. Propose a mirror of `.claude/rules/product-factory.md` in each
+     rule folder that follows a sync convention, with the same name and that
+     folder's format (for example `.mdc` with frontmatter for Cursor). Also
+     propose one short "Product Factory" line in `AGENTS.md` and `CLAUDE.md`,
+     pointing to it, plus an `.md` import where `CLAUDE.md` lacks one.
+   - **decide**: needs the operator, for example another automation that takes
+     issues (pause it, keep it for intake, or retire it), a plaintext credential
+     (rotate and move it), or foreign docs routing markers (keep them, or convert
+     them on a branch).
+   Never classify anything as "delete". Superseded content is kept, and marked
+   as superseded with a pointer, only after approval.
+3. **Write `.factory/adoption.md`**: one table per repo (finding, evidence path,
+   class, proposed change, status), the descriptor values it implies, and the
+   open decisions. Show it to the operator and ask which rows to apply.
+4. **Apply** only the approved rows:
+   - descriptor values: edit `.factory/factory.yaml` directly, then re-run
+     `pf install` (and `pf install module`) and `pf rules sync`;
+   - align and synchronise edits in a product repo: run them as `chore` or `docs`
+     jobs, one per repo, so they land as reviewed PRs or MRs that obey the repo's
+     own conventions;
+   - decisions: record the operator's answer in `adoption.md`.
+5. Re-run `pf audit`. When no BLOCKER remains, mark `adoption.md` complete. It is
+   committed with the factory setup as the record of how this project was adopted.
+
 ## /factory memory
 
 Promote what Claude learned in auto memory into the repo, where the factory and
@@ -352,7 +414,7 @@ subagents never load it.
 ## /factory clean
 
 For every job in `pr-open` whose PR is merged or closed (`gh pr view <url> --json state`),
-run `git worktree remove <worktree>` and then `git branch -D factory/<job-id>`
+run `git worktree remove <worktree>` and then `git branch -D <branch>`
 only if the PR is merged. Check that the worktree path is under
 `<repo>/../<name>-factory/` and that the branch starts with `factory/` before removing
 anything. Set `stage` to `done` (merged) or `closed`. Never touch other

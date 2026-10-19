@@ -22,6 +22,7 @@ next number. A reversed decision is marked `Superseded by ADR-NNN` and kept.
 | [008](ADR-008-idea-and-release-lanes.md) | Idea and release lanes; launch material is drafts only | Accepted |
 | [009](ADR-009-rust-tooling.md) | All factory tooling is one Rust CLI, `pf`; the hook fails closed without it | Accepted |
 | [010](ADR-010-session-behaviour-and-memory.md) | Sessions default to the factory; auto memory is promoted into git; module kits in workspaces | Accepted |
+| [011](ADR-011-adopt-existing-process.md) | Adopt an existing process: inventory, preserve, configure, then align | Accepted |
 
 ## Template
 
@@ -54,4 +55,5 @@ next number. A reversed decision is marked `Superseded by ADR-NNN` and kept.
   - [ADR-008 — Idea and release lanes; launch material is drafts only](ADR-008-idea-and-release-lanes.md)
   - [ADR-009 — All factory tooling is one Rust CLI](ADR-009-rust-tooling.md)
   - [ADR-010 — Sessions default to the factory; auto memory is promoted into git](ADR-010-session-behaviour-and-memory.md)
+  - [ADR-011 — Adopt an existing process: inventory, preserve, configure, then align](ADR-011-adopt-existing-process.md)
 <!-- documentation-routing:end -->

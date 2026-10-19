@@ -8,6 +8,7 @@
 | **Acceptance criteria** | A numbered list in `spec.md` (copied into `plan.md`) of observable behaviours, each with a way to check it. "Done" means every one has evidence. |
 | **Adapter** | Instructions for running the factory's roles in a tool other than Claude Code (Hermes, Codex, Cursor). See `docs/adapters/`. |
 | **ADR** | Architecture Decision Record: a short document recording one technical decision, its context and its consequences. Products keep theirs under `docs.adr_dir`, and the factory keeps its own in `docs/decisions/`. |
+| **Adoption** | Taking over a project that already has its own process: `pf audit`, then `/factory adopt`, which keeps the existing setup, configures the factory to obey it, and proposes only necessary edits. |
 | **Agent / role agent** | A Claude Code subagent defined by one markdown file in `.claude/agents/`, with its own instructions, tools and model. The factory has ten. |
 | **`AGENTS.md`** | The file at a repo root that tells any AI agent how to work in that repo: setup, commands, conventions. `CLAUDE.md` usually just imports it (`@AGENTS.md`). |
 | **Always-on rule** | `.claude/rules/product-factory.md`, installed in every factory repo and module. It loads into every Claude session and routes change requests through `/factory`. |

@@ -173,7 +173,19 @@ fn install_claude_kit(factory: &Path, root: &Path, attribution_none: bool) -> Re
     let kit = kit(factory);
     let skill = root.join(".claude/skills/factory");
     if skill.exists() {
-        fs::remove_dir_all(&skill).map_err(|e| e.to_string())?;
+        let ours =
+            fs::read_to_string(skill.join("SKILL.md")).is_ok_and(|t| t.contains("Product Factory"));
+        if ours {
+            fs::remove_dir_all(&skill).map_err(|e| e.to_string())?;
+        } else {
+            // Never destroy someone else's skill that happens to share the name.
+            let keep = root.join(".claude/skills/factory.pre-factory");
+            fs::rename(&skill, &keep).map_err(|e| e.to_string())?;
+            warn(format!(
+                "kept an existing non-factory skill as {}",
+                keep.display()
+            ));
+        }
     }
     copy_tree(&kit.join(".claude/skills/factory"), &skill).map_err(|e| e.to_string())?;
     let constitution = skill.join("CONSTITUTION.md");
@@ -183,7 +195,17 @@ fn install_claude_kit(factory: &Path, root: &Path, attribution_none: bool) -> Re
     fs::create_dir_all(&agents_dir).map_err(|e| e.to_string())?;
     let agents = agent_files(factory);
     for a in &agents {
-        fs::copy(a, agents_dir.join(a.file_name().unwrap())).map_err(|e| e.to_string())?;
+        let dst = agents_dir.join(a.file_name().unwrap());
+        let foreign = fs::read_to_string(&dst).is_ok_and(|t| !t.contains("description: Factory"));
+        if foreign {
+            let keep = dst.with_extension("pre-factory.md");
+            fs::rename(&dst, &keep).map_err(|e| e.to_string())?;
+            warn(format!(
+                "kept an existing non-factory agent as {}",
+                keep.display()
+            ));
+        }
+        fs::copy(a, &dst).map_err(|e| e.to_string())?;
     }
     let rules_dir = root.join(".claude/rules");
     fs::create_dir_all(&rules_dir).map_err(|e| e.to_string())?;

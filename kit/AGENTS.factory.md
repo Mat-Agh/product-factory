@@ -22,7 +22,7 @@ Its descriptor is `.factory/factory.yaml`, and its rules are in
 - **Tooling:** the `pf` CLI must be on PATH. The guard hook calls `pf guard` and
   blocks Bash (fail closed) when `pf` is missing. Install it with
   `cargo install --git ssh://git@github.com/Mat-Agh/product-factory.git pf`.
-- **Hard rules:** work on `factory/<job-id>` branches in worktrees. Humans merge,
+- **Hard rules:** work on job branches (`vcs.branch_template`, default `factory/<job-id>`) in worktrees. Follow the repo's branch and commit conventions, and never bypass its hooks. Humans merge,
   tag, release and deploy. Never force-push or use `--no-verify`. Never stash or
   reset work you did not create. Never put secrets in git. Done means the gates
   pass plus recorded acceptance evidence. Compile is not done.

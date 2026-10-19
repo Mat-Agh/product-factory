@@ -1,6 +1,6 @@
 # COMP-004 — Guard hook
 
-**Status:** Implemented in Rust — 73/73 policy cases pass; behaviour identical to the Python original on 117 inputs; not yet observed inside a live Claude Code session
+**Status:** Implemented in Rust — 80/80 policy cases pass (the 73 original cases behave identically to the Python original); project branch template and hook-bypass blocking added; not yet observed inside a live Claude Code session
 **Last updated:** 2026-10-19
 **Source:** [`cli/src/guard.rs`](../../cli/src/guard.rs), wiring in [`kit/.claude/settings.factory.json`](../../kit/.claude/settings.factory.json)
 **Decisions:** [ADR-002](../decisions/ADR-002-human-only-merge.md)
@@ -57,7 +57,7 @@ Malformed hook input is blocked, so the hook fails closed.
 ## Verification
 
 ```bash
-pf guard --self-test                       # 73/73
+pf guard --self-test                       # 80/80
 cd cli && cargo test --release guard       # the same cases as a unit test
 ```
 

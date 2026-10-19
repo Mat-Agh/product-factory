@@ -1,6 +1,6 @@
 # Product Factory — Constitution
 
-**Status:** Active — v1.1
+**Status:** Active — v1.2
 **Last updated:** 2026-10-19
 
 These are the rules every agent, adapter and human in the factory follows. Every
@@ -108,7 +108,36 @@ spec assumption that is really a product or business decision.
   time, first-pass acceptance, escaped defects, human interventions caused by
   agent failure, and cost per accepted job.
 
-## 8. Voice
+## 8. Adopting an existing project
+
+Most products the factory takes over already have their own process: agent
+instructions, IDE rules, git hooks, CI jobs, branch and commit conventions,
+other automations, and docs.
+
+- **Inventory first.** Before installing anything, run `pf audit` and read
+  every instruction, rule and agent file it lists, plus the hooks and CI it
+  points to. Adoption starts from what is there, never from the template.
+- **Preserve.** Never delete, overwrite or silently bypass existing agentic
+  work, hooks or CI. Every change to them is a proposed edit, with a diff,
+  that a human approves.
+- **Precedence.**
+  1. This constitution's authority rules (§5) and safety rules (§6) come first.
+     An existing file that lets agents merge, deploy, skip hooks or store secrets
+     is aligned to this constitution.
+  2. The product's own engineering and process rules come next: stack
+     conventions, test policy, branch and commit conventions, attribution rules,
+     review and merge flow. The factory **configures itself to obey them**
+     (descriptor `vcs.*`, module rules). It does not rewrite them.
+  3. Factory defaults apply only where the product says nothing.
+- **Synchronise.** The factory's rules are mirrored into the product's other
+  agent surfaces (for example `.cursor/rules`, `.codex/rules`, `.agents/rules`),
+  following the product's own mirroring convention, so every tool works under the
+  same governance.
+- **Record.** The reconciliation is written to `.factory/adoption.md` (what was
+  found, what was kept, what was configured, what was edited and why), and
+  committed with the setup.
+
+## 9. Voice
 
 Lead with the answer, then the supporting fact. Use complete sentences, concise
 but not clipped. No filler, no restating the ask, no metaphors or catchy labels.

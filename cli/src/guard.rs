@@ -49,6 +49,109 @@ static API_WRITE: LazyLock<Regex> =
 static API_TARGET: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"/(merge|protection|releases|git/refs|actions/secrets)").unwrap());
 
+static HOOK_BYPASS: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(
+        r"(?:^|[\s;&|(])(?:export\s+|env\s+)?([A-Z][A-Z0-9_]*SKIP[A-Z0-9_]*|HUSKY|LEFTHOOK|SKIP)=",
+    )
+    .unwrap()
+});
+static GIT_WRITE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"\bgit\b[^\n;&|]*\b(commit|push|merge|rebase|am|cherry-pick|revert)\b").unwrap()
+});
+
+/// Which branches count as the factory's own job branches in this project.
+pub struct Policy {
+    pub job_branch: Regex,
+    pub label: String,
+}
+
+impl Default for Policy {
+    fn default() -> Self {
+        Policy {
+            job_branch: Regex::new(r"^factory/").unwrap(),
+            label: "factory/*".into(),
+        }
+    }
+}
+
+impl Policy {
+    /// Build from `vcs.branch_template` (placeholders `{kind}` and `{job-id}`) and
+    /// `vcs.branch_kinds`. A job id is `NNN-slug`.
+    pub fn from_template(template: &str, kinds: &[String]) -> Self {
+        let mut src = String::from("^");
+        let mut rest = template;
+        while !rest.is_empty() {
+            if let Some(r) = rest.strip_prefix("{kind}") {
+                let alts = if kinds.is_empty() {
+                    "[a-z]+".to_string()
+                } else {
+                    format!(
+                        "({})",
+                        kinds
+                            .iter()
+                            .map(|k| regex::escape(k))
+                            .collect::<Vec<_>>()
+                            .join("|")
+                    )
+                };
+                src.push_str(&alts);
+                rest = r;
+            } else if let Some(r) = rest.strip_prefix("{job-id}") {
+                src.push_str("[0-9]{3}-[a-z0-9]+(-[a-z0-9]+)*");
+                rest = r;
+            } else {
+                let c = rest.chars().next().unwrap();
+                src.push_str(&regex::escape(&c.to_string()));
+                rest = &rest[c.len_utf8()..];
+            }
+        }
+        src.push('$');
+        match Regex::new(&src) {
+            Ok(re) => Policy {
+                job_branch: re,
+                label: template.to_string(),
+            },
+            Err(_) => Policy::default(),
+        }
+    }
+
+    pub fn from_descriptor(d: &crate::descriptor::Descriptor) -> Self {
+        let Some(t) = d
+            .get("vcs.branch_template")
+            .filter(|t| *t != "factory/{job-id}")
+        else {
+            return Policy::default();
+        };
+        let mut kinds: Vec<String> = d
+            .values
+            .iter()
+            .filter(|(k, _)| k.starts_with("vcs.branch_kinds."))
+            .map(|(_, v)| v.clone())
+            .collect();
+        kinds.sort();
+        kinds.dedup();
+        Policy::from_template(t, &kinds)
+    }
+
+    /// The project's policy: descriptor from $CLAUDE_PROJECT_DIR, else the payload's cwd.
+    pub fn for_payload(payload: &str) -> Self {
+        let cwd = serde_json::from_str::<serde_json::Value>(payload)
+            .ok()
+            .and_then(|v| {
+                v.get("cwd")
+                    .and_then(|c| c.as_str())
+                    .map(std::path::PathBuf::from)
+            });
+        let start = std::env::var_os("CLAUDE_PROJECT_DIR")
+            .map(std::path::PathBuf::from)
+            .or(cwd);
+        start
+            .and_then(|s| crate::descriptor::find(&s))
+            .map(|d| Policy::from_descriptor(&d))
+            .unwrap_or_default()
+    }
+}
+
 fn is_protected(r: &str) -> bool {
     let r = r.rsplit(':').next().unwrap_or(r).trim_start_matches('+');
     let r = r.strip_prefix("refs/heads/").unwrap_or(r);
@@ -128,8 +231,24 @@ fn has(args: &[String], v: &str) -> bool {
     args.iter().any(|a| a == v)
 }
 
-fn check_git(toks: &[String]) -> Option<String> {
+fn check_git(toks: &[String], pol: &Policy) -> Option<String> {
+    if toks
+        .windows(2)
+        .any(|w| w[0] == "-c" && w[1].to_lowercase().starts_with("core.hookspath"))
+    {
+        return Some("Overriding core.hooksPath bypasses the repo's hooks. Forbidden.".into());
+    }
     let (sub, args) = git_sub(toks)?;
+    if sub == "config"
+        && args
+            .iter()
+            .any(|a| a.eq_ignore_ascii_case("core.hooksPath"))
+        && !args
+            .iter()
+            .any(|a| a == "--get" || a == "--list" || a == "-l")
+    {
+        return Some("Changing core.hooksPath bypasses the repo's hooks. Ask the human.".into());
+    }
     let flags = short_flags(args);
     if has(args, "--no-verify") || (flags.contains('n') && sub == "commit") {
         return Some("Skipping hooks (--no-verify) is forbidden.".into());
@@ -171,15 +290,19 @@ fn check_git(toks: &[String]) -> Option<String> {
             .skip(1)
             .collect();
         if refs.is_empty() {
-            return Some("Name the branch explicitly: git push <remote> factory/<job-id>.".into());
+            return Some(format!(
+                "Name the branch explicitly: git push <remote> <job branch> ({}).",
+                pol.label
+            ));
         }
         for r in refs {
             if is_protected(r) || r.contains("refs/tags/") {
                 return Some(format!("Pushing to protected ref '{r}' is human-only."));
             }
-            if !r.rsplit(':').next().unwrap_or(r).starts_with("factory/") {
+            if !pol.job_branch.is_match(r.rsplit(':').next().unwrap_or(r)) {
                 return Some(format!(
-                    "The factory pushes only factory/* branches, not '{r}'."
+                    "The factory pushes only its job branches ({}), not '{r}'.",
+                    pol.label
                 ));
             }
         }
@@ -211,9 +334,12 @@ fn check_git(toks: &[String]) -> Option<String> {
         && args
             .iter()
             .filter(|a| !a.starts_with('-'))
-            .any(|t| !t.starts_with("factory/"))
+            .any(|t| !pol.job_branch.is_match(t))
     {
-        return Some("Only factory/* branches may be deleted by the factory.".into());
+        return Some(format!(
+            "Only the factory's own job branches ({}) may be deleted by the factory.",
+            pol.label
+        ));
     }
     if matches!(sub, "update-ref" | "filter-branch" | "filter-repo") {
         return Some(format!("git {sub} rewrites refs. Human-only."));
@@ -262,12 +388,20 @@ fn check_glab(toks: &[String]) -> Option<String> {
 }
 
 /// The reason a command is blocked, or None when it is allowed.
-pub fn check(command: &str) -> Option<String> {
+pub fn check(command: &str, pol: &Policy) -> Option<String> {
+    if let Some(c) = HOOK_BYPASS.captures(command)
+        && GIT_WRITE.is_match(command)
+    {
+        return Some(format!(
+            "Setting {} bypasses the repo's hooks or gates. Forbidden.",
+            &c[1]
+        ));
+    }
     for seg in split_segments(command) {
         let toks = tokens_of(&seg);
         let Some(name) = toks.first() else { continue };
         let reason = match name.as_str() {
-            "git" => check_git(&toks),
+            "git" => check_git(&toks, pol),
             "gh" => check_gh(&toks),
             "glab" => check_glab(&toks),
             "rm" if RM_RF.is_match(&seg) && RM_TARGET.is_match(&seg) => {
@@ -283,7 +417,7 @@ pub fn check(command: &str) -> Option<String> {
 }
 
 /// Decide on one hook payload. Returns the process exit code and the stderr message.
-pub fn decide(payload: &str, guard_off: bool) -> (i32, Option<String>) {
+pub fn decide(payload: &str, guard_off: bool, pol: &Policy) -> (i32, Option<String>) {
     if guard_off {
         return (0, None);
     }
@@ -300,7 +434,7 @@ pub fn decide(payload: &str, guard_off: bool) -> (i32, Option<String>) {
         .pointer("/tool_input/command")
         .and_then(|c| c.as_str())
         .unwrap_or("");
-    match check(command) {
+    match check(command, pol) {
         Some(r) => (
             2,
             Some(format!(
@@ -317,7 +451,8 @@ pub fn main() -> i32 {
     let off = std::env::var("FACTORY_GUARD")
         .map(|v| v.eq_ignore_ascii_case("off"))
         .unwrap_or(false);
-    let (code, msg) = decide(&input, off);
+    let pol = Policy::for_payload(&input);
+    let (code, msg) = decide(&input, off, &pol);
     if let Some(m) = msg {
         eprintln!("{m}");
     }
@@ -326,6 +461,11 @@ pub fn main() -> i32 {
 
 /// Commands the guard must block. Shared by `cargo test` and `pf doctor`.
 pub const BLOCK: &[&str] = &[
+    "DARIA_HOOK_SKIP_GRADLE=1 git push origin factory/001-x",
+    "export HUSKY=0; git commit -m x",
+    "git -c core.hooksPath=/dev/null commit -m x",
+    "git config core.hooksPath /dev/null",
+    "SKIP=lint git commit -m x",
     "git merge factory/001-x",
     "git -C /repo merge factory/001-x",
     "cd /w && git merge --no-ff factory/001-x -m 'm'",
@@ -376,6 +516,8 @@ pub const BLOCK: &[&str] = &[
 
 /// Commands the guard must allow.
 pub const ALLOW: &[&str] = &[
+    "git config --get core.hooksPath",
+    "SKIP_TESTS=1 npm test",
     "git status --porcelain",
     "git log --oneline main..HEAD",
     "git diff main...HEAD",
@@ -411,19 +553,19 @@ fn payload(cmd: &str) -> String {
 pub fn self_test() -> (usize, usize, Vec<String>) {
     let mut fails = Vec::new();
     for c in BLOCK {
-        if decide(&payload(c), false).0 != 2 {
+        if decide(&payload(c), false, &Policy::default()).0 != 2 {
             fails.push(format!("should BLOCK: {c:?}"));
         }
     }
     for c in ALLOW {
-        if decide(&payload(c), false).0 != 0 {
+        if decide(&payload(c), false, &Policy::default()).0 != 0 {
             fails.push(format!("should ALLOW: {c:?}"));
         }
     }
-    if decide(&payload("git merge x"), true).0 != 0 {
+    if decide(&payload("git merge x"), true, &Policy::default()).0 != 0 {
         fails.push("FACTORY_GUARD=off should allow".into());
     }
-    if decide("not json", false).0 != 2 {
+    if decide("not json", false, &Policy::default()).0 != 2 {
         fails.push("bad input should fail closed".into());
     }
     let total = BLOCK.len() + ALLOW.len() + 2;
@@ -438,13 +580,39 @@ mod tests {
     fn policy_cases() {
         let (passed, total, fails) = self_test();
         assert!(fails.is_empty(), "{passed}/{total}:\n{}", fails.join("\n"));
-        assert_eq!(total, 73);
+        assert_eq!(total, 80);
+    }
+
+    #[test]
+    fn project_branch_template() {
+        let kinds: Vec<String> = ["chore", "docs", "feature", "fix"]
+            .iter()
+            .map(|s| s.to_string())
+            .collect();
+        let pol = Policy::from_template("{kind}/{job-id}", &kinds);
+        let push = |b: &str| decide(&payload(&format!("git push -u origin {b}")), false, &pol).0;
+        assert_eq!(push("feature/004-org-name"), 0);
+        assert_eq!(push("fix/012-empty-password"), 0);
+        assert_eq!(push("feature/someone-elses-branch"), 2);
+        assert_eq!(push("factory/004-org-name"), 2);
+        assert_eq!(push("develop"), 2);
+        let d = crate::descriptor::parse(
+            "vcs:\n  branch_template: \"{kind}/{job-id}\"\n  branch_kinds: { feature: feature, bug: fix }\n",
+        );
+        let p2 = Policy::from_descriptor(&d);
+        assert!(p2.job_branch.is_match("fix/001-a-b"));
+        assert!(!p2.job_branch.is_match("docs/001-a-b"));
     }
 
     #[test]
     fn non_bash_tools_pass() {
         assert_eq!(
-            decide(r#"{"tool_name":"Read","tool_input":{}}"#, false).0,
+            decide(
+                r#"{"tool_name":"Read","tool_input":{}}"#,
+                false,
+                &Policy::default()
+            )
+            .0,
             0
         );
     }

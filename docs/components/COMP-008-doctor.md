@@ -15,7 +15,7 @@ lines are advice that does not fail the check.
 |---|---|---|
 | Machine | `git` present; `pf` on `PATH` (the hook needs it) | FAIL |
 | Machine | `gh`, `glab`, `claude`, `node` present; `gh` authenticated | note |
-| Machine | guard policy self-test (73 cases) | FAIL |
+| Machine | guard policy self-test (80 cases) | FAIL |
 | Machine | factory docs map current (`--strict --allow kit/`); diagrams match their sources | FAIL |
 | Factory repo | at least 2 remotes (mirrored) | note |
 | Factory repo | clean working tree; upstream set and not behind | note |

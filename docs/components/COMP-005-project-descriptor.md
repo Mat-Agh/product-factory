@@ -33,7 +33,9 @@ Duplicating either one in the other is a defect.
 | `vcs.host` | `github \| gitlab` | github | coordinator | Which CLI opens the PR or MR |
 | `vcs.remote` | string | origin | coordinator | Push target |
 | `vcs.base_branch` | string | main | coordinator, tech-lead | PR target. Never committed to |
-| `vcs.branch_prefix` | string | `factory/` | coordinator, guard | Job branches. The guard allows pushes only to `factory/*` |
+| `vcs.branch_template` | string | `factory/{job-id}` | coordinator, guard, rules | Job branch name. `{kind}/{job-id}` follows GitFlow-style conventions. The guard allows pushes and deletes only to this shape |
+| `vcs.branch_kinds` | inline map | feature→feature, bug→fix, design→feature, docs→docs, chore→chore, spike→docs, idea→docs, release→chore | coordinator, guard | `{kind}` per job type |
+| `vcs.commit_convention` | `none \| conventional` | none | engineer, coordinator | Commit subject style the repo's hooks require |
 | `vcs.open_pr` | bool | true | coordinator | `false` means stop at a local branch |
 | `vcs.human_merge` | bool | true | — | Documentation of the constitutional rule. Not a switch |
 | `vcs.attribution` | `default \| none` | default | `pf install`, coordinator, agents | `none` = no AI trailer or line in commits or PRs; `pf install` writes `"attribution": {"commit": "", "pr": "", "sessionUrl": false}` to `.claude/settings.json` |

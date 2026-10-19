@@ -74,7 +74,7 @@ Changing any first-line format is a **breaking change** to the factory. See
 
 | Resource | Scheme |
 |---|---|
-| Branch | `factory/<job-id>` (`vcs.branch_prefix`) |
+| Branch | `vcs.branch_template` (default `factory/<job-id>`; `{kind}/{job-id}` for GitFlow repos) |
 | Worktree | single repo: `<repo>/../<repo-name>-factory/<job-id>/`; multi-repo: `<workspace>/../<workspace-name>-factory/<area>/<job-id>/`, always outside the workspace |
 | Ports | `surfaces.ui.port_base + 10·n + k`, with k = 0 engineer, 1 ux, 2 ui, 3 tester, and n = the job number |
 | Browser sessions | `<job-id>-<role>` |

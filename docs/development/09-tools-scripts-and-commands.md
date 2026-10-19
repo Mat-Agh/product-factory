@@ -12,7 +12,7 @@ print usage.
 | Command | Purpose | Contract |
 |---|---|---|
 | `pf guard` | Claude Code PreToolUse hook (stdin JSON → exit 0 or 2) | [COMP-004](../components/COMP-004-guard-hook.md) |
-| `pf guard --self-test` | Run the 73 policy cases | [COMP-004](../components/COMP-004-guard-hook.md) |
+| `pf guard --self-test` | Run the 80 policy cases | [COMP-004](../components/COMP-004-guard-hook.md) |
 | `pf docs-map` | Docs tree check and live map generator | [COMP-012](../components/COMP-012-docs-gate.md) |
 | `pf diagrams check \| render` | Mermaid sources to SVG; freshness check | [COMP-014](../components/COMP-014-diagrams.md) |
 | `pf install project \| user \| all` | Put the factory into a product (copy) or a user config (links) | [COMP-007](../components/COMP-007-installer.md) |
@@ -23,6 +23,7 @@ print usage.
 | `pf install module` | Kit for one module repo of a multi-repo workspace | [COMP-016](../components/COMP-016-session-integration.md) |
 | `pf rules sync` | Path-scoped module rules from the descriptor | [COMP-016](../components/COMP-016-session-integration.md) |
 | `pf memory` | Show a repo's auto memory | [COMP-016](../components/COMP-016-session-integration.md) |
+| `pf audit` | Inventory an existing project's agentic setup before adoption | [COMP-017](../components/COMP-017-adoption.md) |
 
 ## Samples
 
@@ -40,6 +41,8 @@ pf install project ~/Work/Connect --no-ai-attribution   # workspace root
 pf install module Daria-Connect-Back-End --workspace ~/Work/Connect
 pf rules sync                           # in the workspace
 pf memory                               # this repo's auto memory
+pf audit ~/Work/Connect/Daria-Connect-Back-End   # adoption inventory (read-only)
+pf audit . --modules --json             # whole workspace
 pf memory --json --root ~/Work/Connect
 CLAUDE_CONFIG_DIR=/tmp/h pf install user
 
