@@ -45,7 +45,7 @@ pf memory                               # this repo's auto memory
 pf audit ~/Work/Connect/Daria-Connect-Back-End   # adoption inventory (read-only)
 pf audit . --modules --json             # whole workspace
 pf knowledge plan --modules             # knowledge gaps per repo
-pf knowledge init --root Daria-Connect-Federation   # create only what is missing
+pf knowledge init --root Daria-Connect-Federation   # import missing files and sections (inside a docs job worktree)
 pf memory --json --root ~/Work/Connect
 CLAUDE_CONFIG_DIR=/tmp/h pf install user
 

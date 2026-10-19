@@ -658,22 +658,24 @@ pub fn audit(root: &Path) -> (Vec<Finding>, Value) {
     // 10. Knowledge structure for the module's stack.
     if let Ok(factory) = util::factory_root(None) {
         let t = crate::knowledge::target(root, None, None);
-        if let Ok(p) = crate::knowledge::plan(&factory, &t)
-            && (!p.missing.is_empty() || !p.conflicts.is_empty())
-        {
-            add(
-                Severity::Warn,
-                "knowledge",
-                format!(
-                    "knowledge structure ({} stack, {}/): {} present, {} missing, {} numbering conflicts",
-                    t.stack,
-                    t.docs_root,
-                    p.present.len(),
-                    p.missing.len(),
-                    p.conflicts.len()
-                ),
-                "Initialize: pf knowledge plan shows the gaps; pf knowledge init creates only missing files; then fill them in a docs job.",
-            );
+        if let Ok(p) = crate::knowledge::plan(&factory, &t) {
+            let gaps = p.present.iter().filter(|x| !x.gaps.is_empty()).count();
+            if !p.missing.is_empty() || !p.conflicts.is_empty() || gaps > 0 {
+                add(
+                    Severity::Warn,
+                    "knowledge",
+                    format!(
+                        "knowledge structure ({} stack, {}/): {} present, {} missing, {} missing sections, {} numbering conflicts",
+                        t.stack,
+                        t.docs_root,
+                        p.present.len(),
+                        p.missing.len(),
+                        gaps,
+                        p.conflicts.len()
+                    ),
+                    "Initialize: pf knowledge plan shows the gaps; pf knowledge init imports missing files and appends missing sections for review (never overwrites); then adapt them in a docs job.",
+                );
+            }
         }
     }
 

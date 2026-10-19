@@ -17,7 +17,7 @@ there is recorded evidence that it works.
 | Mechanical enforcement | Guard hook (`pf guard`, Rust) passes 80/80 (the original 73 match the Python guard on 117 inputs); follows the project branch template and blocks hook bypasses; fails closed without `pf`. Branch protection depends on each product |
 | Distribution and portability | `pf install`, `pf doctor`, `pf mirror bundle` (with restore) and `pf export` verified on scratch setups. No second remote yet |
 | Documentation | All docs under `docs/`, one connected tree. `pf docs-map --strict` and `pf diagrams check` pass |
-| Tooling | One Rust CLI (`pf`); no Python, bash scripts or `jq`. 10 cargo tests, clippy clean |
+| Tooling | One Rust CLI (`pf`); no Python, bash scripts or `jq`. 24 cargo tests, clippy clean |
 | **Phase 1 exit (roadmap)** | **Not met.** No job has run end to end |
 
 ## Components
@@ -40,7 +40,7 @@ there is recorded evidence that it works.
 | [COMP-015](../components/COMP-015-pf-cli.md) `pf` CLI | yes | yes | `cargo test` 10/10, `cargo clippy` 0 warnings, `cargo fmt` clean; every subcommand run end to end (2026-10-19) | Prebuilt binaries (optional, see ADR-009) |
 | [COMP-016](../components/COMP-016-session-integration.md) Session integration and memory | yes | partially | Scratch workspace with two nested repos: workspace and module installs, `pf rules sync`, attribution off, doctor flags missing modules; `pf memory` read the real Connect auto memory (9 entries); 15 cargo tests (2026-10-19) | Observe a live Claude session routing a request through `/factory`; run `/factory memory` on Connect |
 | [COMP-017](../components/COMP-017-adoption.md) Adoption | yes | partially | `pf audit` read-only on real Connect root, Back-End and Front-End (findings match manual review); scratch repo: foreign agent preserved, template cleared the blocker, guard policy verified (2026-10-19) | Run `/factory adopt` on Connect; land the mirror and `CLAUDE.md` MRs |
-| [COMP-018](../components/COMP-018-knowledge-structure.md) Knowledge structure | yes | partially | Templates (base + 4 stacks) distilled from Connect; `pf knowledge plan` read-only on all six Connect repos; init on scratch repos is idempotent, never overwrites, and passes docs-map strict (2026-10-19) | Run `/factory knowledge init` and the fill jobs on Connect; first `refresh` |
+| [COMP-018](../components/COMP-018-knowledge-structure.md) Knowledge structure | yes | partially | Real knowledge packs (base + 4 stacks) distilled from the Connect handbooks; `pf knowledge init` imports missing files and appends missing sections; on copies of the five Connect repos every added link resolved and a rerun changed nothing; 6 knowledge tests incl. a link check of a fresh import per stack (2026-10-19) | Run `/factory knowledge init` and the adapt jobs on Connect itself; first `refresh` |
 | [COMP-013](../components/COMP-013-constitution.md) Constitution | v1 | n/a | — | Revisit after the pilot retro |
 
 ## Open operator actions

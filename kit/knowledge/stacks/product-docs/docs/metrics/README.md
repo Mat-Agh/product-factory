@@ -1,8 +1,13 @@
 # Metrics
 
-**Status:** Template
+**Status:** Active
 **Last updated:** {{DATE}}
 
-<!-- Success metrics and how they are measured. -->
-
 ## Metrics
+
+| Metric | Definition | Target | Source of data | Owner |
+|---|---|---|---|---|
+| `<metric>` | `<exact formula and window>` | | | |
+
+Every metric has an exact definition, a data source that exists, and respects the
+telemetry consent rules. Do not define metrics the product cannot measure.

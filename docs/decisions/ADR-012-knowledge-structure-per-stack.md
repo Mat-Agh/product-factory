@@ -29,9 +29,17 @@ history. New projects had no template at all.
   meaning everywhere.
 - Add a **development history** (`history/DEVELOPMENT_LOG.md`, one entry per
   merged change, written in the change's branch), next to `CURRENT_STATE.md`.
-- `pf knowledge plan|init` installs the structure **only where it is missing**.
-  It recognises equivalents, reports numbering conflicts, and never overwrites.
-  Filling the new files is a reviewed `docs` job.
+- Each stack overlay is a **knowledge pack** with real content: the stack's
+  principles, layers, naming, persistence, messaging, security, cryptography,
+  testing policy, build practice, library stack and code samples, distilled from
+  the Connect handbooks and written generically. Project-state files (current
+  state, history, status, area READMEs) stay **scaffolds**.
+- `pf knowledge plan|init` **imports** the pack: missing files are created with
+  full content, and an existing equivalent knowledge file gets the `##` sections
+  it lacks, appended in a marked block for review. It recognises equivalents,
+  reports numbering conflicts, never overwrites and never edits existing text.
+  Adapting the import to the repo is a reviewed `docs` job. (Amended 2026-10-19:
+  the first version created only missing placeholder files.)
 - Keeping it true is part of every job: the protocol's knowledge-upkeep table,
   enforced by reviewer-code.
 - **Refresh** stack knowledge against upstream releases through
@@ -39,9 +47,15 @@ history. New projects had no template at all.
 
 ## Alternatives considered
 
-- **Generate the docs fully.** Rejected: it would invent commands and principles.
-  The templates hold structure and prompts, and the content comes from the code
-  in a reviewed job.
+- **Generate the docs fully.** Rejected: it would invent commands and facts about
+  the repo. The packs carry stack knowledge that holds for any repo on the stack.
+  Repo facts (commands, canonical sample, state) come from the code in a reviewed
+  job.
+- **Placeholder skeletons only.** Rejected after first use: empty headings teach
+  nothing, and existing docs that lacked a topic stayed without it.
+- **Overwrite or rewrite existing docs to the pack.** Rejected: the product's own
+  docs take precedence (CONSTITUTION §8). Only missing sections are added, marked,
+  and left for review.
 - **Force every repo onto `docs/`.** Rejected for adoption. A product's existing
   layout (`doc/`, `product/`) wins, and `docs_root` maps to it.
 

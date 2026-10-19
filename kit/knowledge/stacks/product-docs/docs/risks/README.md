@@ -1,8 +1,13 @@
 # Risks
 
-**Status:** Template
+**Status:** Active
 **Last updated:** {{DATE}}
 
-<!-- Product, technical, legal and go-to-market risks with owners. -->
-
 ## Register
+
+| Risk | Kind | Likelihood | Impact | Mitigation | Owner | Review |
+|---|---|---|---|---|---|---|
+| `<risk>` | product / technical / legal / market | L/M/H | L/M/H | | | `<date>` |
+
+Review the register at every release gate. Closed risks move to history with the
+reason.

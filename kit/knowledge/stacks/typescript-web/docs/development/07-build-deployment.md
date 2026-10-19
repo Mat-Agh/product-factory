@@ -1,12 +1,35 @@
 # 07 — Build and deployment
 
-**Status:** Template
+**Status:** Active
 **Last updated:** {{DATE}}
+**Source:** Product Factory knowledge pack (typescript-web)
 
-<!-- Package manager, builds, images, release integrity. -->
+## Production artifact
 
-## Builds
+The production build writes a static `out/` directory. Post-build steps write an
+integrity manifest (SHA-384 and byte length for every file) and generate hashes
+for any inline scripts the framework emits, so the CSP needs no `unsafe-inline`.
 
-## Images
+## Container
 
-## Release integrity
+A multi-stage Dockerfile:
+
+1. installs the frozen lockfile with lifecycle scripts disabled;
+2. builds only the target app;
+3. copies `out/` into a hardened web-server image;
+4. runs as a non-root UID on an unprivileged port, compatible with
+   `no-new-privileges` and `cap_drop: ALL`.
+
+The web server applies CSP, HSTS, COOP, Permissions-Policy, no-referrer, nosniff,
+immutable caching for hashed assets, and static-route fallbacks.
+
+```bash
+docker build -f apps/<app>/Dockerfile -t <app>:dev .
+docker run --rm -p 8080:8080 <app>:dev
+```
+
+## Release signing
+
+One release pipeline owns image naming, SBOM and provenance, vulnerability gates,
+signatures and digest pins. Do not add a second signing authority or commit a
+signing key. A locally built image is development evidence only.

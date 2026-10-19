@@ -1,6 +1,6 @@
 # {{MODULE}} development handbook
 
-**Status:** Template
+**Status:** Active
 **Last updated:** {{DATE}}
 
 <!-- Numbering is shared across stacks: 00 principles, 09 tools, 15 samples,
@@ -19,4 +19,12 @@
 
 ## Full index
 
-<!-- One row per chapter: number, file link, scope. The docs map lists files automatically; this table says what each is for. -->
+| # | Document | Scope |
+|---|---|---|
+| 00 | [engineering-principles](00-engineering-principles.md) | Invariants and design discipline |
+| 09 | [tools-scripts-and-commands](09-tools-scripts-and-commands.md) | Every command, with a working sample |
+| 15 | [code-samples-index](15-code-samples-index.md) | Living samples to copy |
+| 16 | [documentation-link-map](16-documentation-link-map.md) | Agent routing |
+| — | [CICD](CICD.md) | Branches, commits, pipeline, human-only steps |
+
+Add a row for every stack chapter you write (free numbers: 01–08, 10–14, 17+).

@@ -461,7 +461,7 @@ fn check(tree: &Tree, files: &[String], o: &Options, r: &mut Report) {
                 continue;
             }
             let resolved = util::normalize(&p.parent().unwrap().join(t));
-            if !resolved.exists() {
+            if !resolved.exists() && !resolves_via_base(&tree.root, f, t) {
                 r.errors.push(format!("{f}: broken link -> {t}"));
             } else if resolved.extension().is_some_and(|e| e == "md") {
                 targets.push(util::rel(&tree.root, &resolved));
@@ -544,6 +544,20 @@ pub fn main(
     }
     println!("{}", r.summary());
     i32::from(!r.errors.is_empty())
+}
+
+/// A knowledge-pack stack template (`kit/knowledge/stacks/<stack>/…`) is overlaid
+/// on `kit/knowledge/base/` at import time, so its links may point at base files.
+fn resolves_via_base(root: &Path, file: &str, target: &str) -> bool {
+    let Some(rest) = file.strip_prefix("kit/knowledge/stacks/") else {
+        return false;
+    };
+    let Some((_, inner)) = rest.split_once('/') else {
+        return false;
+    };
+    let base = root.join("kit/knowledge/base").join(inner);
+    base.parent()
+        .is_some_and(|d| util::normalize(&d.join(target)).exists())
 }
 
 #[cfg(test)]

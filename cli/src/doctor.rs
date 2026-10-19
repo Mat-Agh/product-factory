@@ -298,10 +298,11 @@ pub fn main(factory: &Path, project: Option<&Path>) -> i32 {
             let t = knowledge::target(r, None, None);
             if let Ok(kp) = knowledge::plan(factory, &t) {
                 let shown = util::rel(&p, r);
+                let gaps = kp.present.iter().filter(|x| !x.gaps.is_empty()).count();
                 d.soft(
-                    kp.missing.is_empty() && kp.conflicts.is_empty(),
+                    kp.missing.is_empty() && kp.conflicts.is_empty() && gaps == 0,
                     format!("knowledge structure complete ({shown}, {} stack)", t.stack),
-                    format!("knowledge ({shown}, {} stack): {} missing, {} numbering conflicts (pf knowledge plan --root {shown})", t.stack, kp.missing.len(), kp.conflicts.len()),
+                    format!("knowledge ({shown}, {} stack): {} missing, {gaps} missing sections, {} numbering conflicts (pf knowledge plan --root {shown})", t.stack, kp.missing.len(), kp.conflicts.len()),
                 );
             }
         }

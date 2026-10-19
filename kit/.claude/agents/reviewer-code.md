@@ -42,6 +42,8 @@ Lint only the changed files, and never in a mode that rewrites files.
    orphan docs). Missing knowledge upkeep (protocol table: `CURRENT_STATE.md`, the
    `DEVELOPMENT_LOG.md` entry, the tools, samples and library-stack chapters,
    `IMPLEMENTATION_STATUS.md`) for what this change did is also **CHANGES**.
+   So is a knowledge import left unreviewed: a `pf-knowledge` marker, a `<…>`
+   placeholder, or a merged section that contradicts the repo's own rules.
 8. **Commits**: short messages, nothing stray, tree clean.
 
 ## Write

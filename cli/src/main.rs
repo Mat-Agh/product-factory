@@ -174,7 +174,7 @@ enum InstallCmd {
 enum KnowledgeCmd {
     /// List the available stack templates
     Stacks,
-    /// Compare a repo with its stack template (present, equivalent, missing, numbering conflicts)
+    /// Compare a repo with its stack's knowledge pack: missing files, files missing sections, numbering conflicts
     Plan {
         #[arg(long)]
         root: Option<PathBuf>,
@@ -188,7 +188,7 @@ enum KnowledgeCmd {
         #[arg(long)]
         modules: bool,
     },
-    /// Create the missing knowledge files from the template (never overwrites)
+    /// Import the knowledge pack: create missing files and append missing sections to existing ones (never overwrites)
     Init {
         #[arg(long)]
         root: Option<PathBuf>,
@@ -198,6 +198,9 @@ enum KnowledgeCmd {
         docs: Option<String>,
         #[arg(long)]
         modules: bool,
+        /// Only create missing files; do not append sections to existing files
+        #[arg(long)]
+        files_only: bool,
     },
 }
 
@@ -293,13 +296,14 @@ fn run(cli: Cli) -> Result<i32, i32> {
                     stack,
                     docs,
                     modules,
-                } => knowledge::main_plan(&f, root, stack, docs, modules, false),
+                } => knowledge::main_plan(&f, root, stack, docs, modules, false, false),
                 KnowledgeCmd::Init {
                     root,
                     stack,
                     docs,
                     modules,
-                } => knowledge::main_plan(&f, root, stack, docs, modules, true),
+                    files_only,
+                } => knowledge::main_plan(&f, root, stack, docs, modules, true, files_only),
             }
         }
         Cmd::Memory { root, json } => memory::main(root, json),
@@ -311,6 +315,11 @@ fn run(cli: Cli) -> Result<i32, i32> {
 }
 
 fn main() -> ExitCode {
+    // Exit quietly when stdout is closed early (`pf … | head`) instead of panicking.
+    #[cfg(unix)]
+    unsafe {
+        libc::signal(libc::SIGPIPE, libc::SIG_DFL);
+    }
     let code = run(Cli::parse()).unwrap_or_else(|c| c);
     ExitCode::from(code.clamp(0, 255) as u8)
 }

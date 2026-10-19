@@ -6,6 +6,46 @@
 Append-only. One dated entry for each factory-level change: what changed, why,
 and its evidence.
 
+## 2026-10-19 — Real stack knowledge, imported and merged; gap audit
+
+- **Why.** The first knowledge templates were headings and comments. The operator
+  asked for the stack knowledge itself to be imported where missing, and for
+  existing docs to receive what they lack.
+- **Knowledge packs.** Rewrote every stack overlay with real content distilled
+  from the Connect handbooks, with Connect names removed: Spring/Kotlin (principles,
+  service ownership, Kotlin rules, layers, persistence, outbox/inbox, security,
+  testing policy, build/CI, cryptography by layer, samples, link map, API
+  conventions), KMP/Android (principles, source sets, MVI, data and realtime,
+  library stack with owning facades, Android shell, Gradle, client cryptography,
+  acceptance checklist, setup), TypeScript web (boundaries, architecture,
+  TypeScript, design system, API client, security, testing, build, library stack,
+  review checklist) and product docs (router, documentation handbook with the
+  evidence model, area guides, PRD template). The generic base got real
+  principles, link map, CI/CD and contributing guidance. Project-state files stay
+  scaffolds. A `**Source:** Product Factory knowledge pack` line marks the files
+  that may be merged.
+- **Merge.** `pf knowledge plan` now lists existing files missing pack sections;
+  `pf knowledge init` creates missing files and appends missing `##` sections in a
+  marked `pf-knowledge` block before the routing block, fixing links to the repo's
+  own chapters. It never overwrites or edits existing text (`--files-only` skips
+  merging). Equivalence now also finds flat chapters in the docs root and the same
+  topic under another number; heading coverage matches stems and section numbers.
+- **Workflow.** `/factory knowledge init` runs the import inside a `docs` job
+  worktree, never on the base branch, and the engineer adapts or deletes each
+  merged section. reviewer-code treats leftover markers or placeholders as
+  CHANGES. `pf audit` and `pf doctor` count files missing sections.
+- **Gap audit fixes.** The product-docs pack lacked its own router, handbook README
+  and architecture README (links broke after import); the SKILL ran the import on
+  the checkout; `pf … | head` panicked on a closed pipe (SIGPIPE now default on
+  Unix); COMP-012 still said it needed Python; test counts in the status pages
+  were stale.
+- **Evidence.** 24 cargo tests, clippy clean, fmt clean. Knowledge tests cover
+  equivalence, section matching (stems, numbering, non-ASCII), merge placement,
+  link fixing, idempotence, and a link check of a fresh import for every stack.
+  Plan and import ran on copies of the five Connect repos in a temporary
+  directory: every added link resolved and a second run changed nothing. The
+  originals were not touched.
+
 ## 2026-10-19 — Knowledge structure per stack, distilled from Connect
 
 - Surveyed the docs of all five Connect repos and the workspace root. They

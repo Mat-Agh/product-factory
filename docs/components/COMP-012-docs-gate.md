@@ -45,13 +45,15 @@ markers is never touched.
    error with `--strict`.
 2. Every folder under `docs/` has a `README.md`.
 3. Every routing block and the map match what would be generated now.
-4. Every relative link in every tracked Markdown file resolves.
+4. Every relative link in every tracked Markdown file resolves. A link in a knowledge-pack stack template
+   (`kit/knowledge/stacks/<stack>/…`) may resolve against the matching path in
+   `kit/knowledge/base/`, because the stack is overlaid on the base at import.
 5. Every document under `docs/` is reachable by links from `docs/README.md`.
 6. With `--strict`, every document has a `**Status:**` line.
 
 It considers only git-tracked and untracked-but-not-ignored files, so
 gitignored folders such as `.factory/jobs/` and `.claude-export/` are skipped.
-It uses only the Python 3.8+ standard library.
+It is part of the `pf` binary and needs nothing else installed.
 
 ## Where it runs
 

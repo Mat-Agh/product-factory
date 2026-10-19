@@ -181,7 +181,8 @@ After that comes the stage instruction (for example `Build round 1.` or
    `.claude/settings.json`. Agents and you then add no AI trailer or line.
 8a. **Knowledge.** Set each module's `stack` and `docs_root` in the descriptor (or the
    single repo's first module). Then run `/factory knowledge plan` and offer
-   `/factory knowledge init`, which creates only the missing structure.
+   `/factory knowledge init`, which imports the stack's knowledge pack: missing
+   files with full content, and missing sections appended to existing docs.
 8. **Memory.** Run `/factory memory` once, so knowledge already sitting in this
    repo's auto memory is promoted into the repo or retired.
 9. Check the guard hook is wired in `.claude/settings.json`. Check that the base
@@ -362,8 +363,10 @@ operator approves.
      propose one short "Product Factory" line in `AGENTS.md` and `CLAUDE.md`,
      pointing to it, plus an `.md` import where `CLAUDE.md` lacks one.
    - **initialize**: the knowledge structure of the module's stack is missing
-     parts (`pf knowledge plan`). Propose `pf knowledge init`, which creates only
-     missing files and never overwrites. List each numbering conflict (a
+     files or sections (`pf knowledge plan`). Propose `/factory knowledge init`,
+     which imports the missing files with the pack's content and appends the
+     missing sections to existing docs for review, never overwriting or editing
+     existing text. List each numbering conflict (a
      template chapter whose number the repo already uses for another topic) for
      the operator: renumber one of them, or keep both and record the mapping in
      the handbook README.
@@ -395,15 +398,23 @@ map, CI/CD), architecture, decisions, features and status, cross-project
 routers, and sessions. The templates are in the factory's `kit/knowledge/`
 (`pf knowledge stacks`).
 
-- **plan**: run `pf knowledge plan` (add `--modules` in a workspace). Report what
-  is present, what is covered by an equivalent, what is missing, and any numbering
-  conflicts.
-- **init**: after the operator agrees, run `pf knowledge init`. It creates only
-  missing files, filled with placeholders. Then run a `docs` job to **fill** them
-  from the code and the existing docs: real commands in `09`, the real canonical
-  sample in `15`, the real principles in `00`, the current state in
-  `CURRENT_STATE.md`, and a first `DEVELOPMENT_LOG.md` entry summarising
-  history from `git log`. Never leave a template line in a merged file.
+- **plan**: run `pf knowledge plan` (add `--modules` in a workspace). Report the
+  files to import (`+`), equivalents (`=`), existing files missing sections (`~`,
+  with the headings), and numbering conflicts (`!`). It changes nothing.
+- **init**: after the operator agrees, open one `docs` job per repo. In the job
+  worktree run `pf knowledge init --root <worktree>` (with `--stack`/`--docs` if
+  the descriptor does not set them). It creates the missing files with the pack's
+  real stack knowledge, and appends the missing sections to existing knowledge
+  files inside a `pf-knowledge` block marked for review. It never overwrites or
+  edits existing text. The engineer then **adapts** the import to the repo:
+  - fill the scaffolds from the code: real commands in `09`, the real canonical
+    sample in `15`, the current state in `CURRENT_STATE.md`, and a first
+    `DEVELOPMENT_LOG.md` entry summarising history from `git log`;
+  - for each merged section, keep it, adjust it to the repo (names, paths,
+    commands, the repo's own policy), or delete it where the repo already covers
+    the topic or the rule does not apply; then remove the `pf-knowledge` markers;
+  - leave no `<…>` placeholder or template line in a merged file.
+  The reviewer checks that no merged section contradicts the repo's own rules.
 - **refresh**: keep stack knowledge current with the outside world. For each
   library and tool in the library-stack and tools chapters, check the upstream
   release notes and docs (cite sources) for new versions, deprecations and

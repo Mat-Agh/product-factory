@@ -150,13 +150,35 @@ enum Found {
     NumberTaken(String),
 }
 
+const STOP: &[&str] = &[
+    "and", "the", "for", "with", "how", "our", "via", "from", "into", "md",
+];
+
 fn topic_words(name: &str) -> Vec<String> {
     name.trim_end_matches(".md")
-        .split('-')
+        .split(['-', '_'])
         .skip(1)
-        .filter(|w| w.len() > 3)
         .map(str::to_lowercase)
+        .filter(|w| w.len() >= 3 && !STOP.contains(&w.as_str()))
         .collect()
+}
+
+fn numbered(name: &str) -> Option<&str> {
+    let (num, _) = name.split_once('-')?;
+    (num.len() == 2 && num.chars().all(|c| c.is_ascii_digit())).then_some(num)
+}
+
+fn md_files(dir: &Path) -> Vec<(String, PathBuf)> {
+    let mut v: Vec<_> = fs::read_dir(dir)
+        .into_iter()
+        .flatten()
+        .flatten()
+        .filter(|e| e.path().is_file())
+        .map(|e| (e.file_name().to_string_lossy().into_owned(), e.path()))
+        .filter(|(n, _)| n.ends_with(".md"))
+        .collect();
+    v.sort();
+    v
 }
 
 /// An existing file that plays the role of `wanted`, or one that already uses its chapter number.
@@ -170,23 +192,40 @@ fn equivalent(root: &Path, wanted: &str, docs_root: &str) -> Option<Found> {
         .to_string_lossy()
         .into_owned();
     let dir = Path::new(wanted).parent().unwrap_or(Path::new(""));
-    // Numbered handbook chapter: the same number on the same topic counts; the same
-    // number on another topic is a numbering conflict for the human to resolve.
-    if let Some((num, _)) = name.split_once('-')
-        && num.len() == 2
-        && num.chars().all(|c| c.is_ascii_digit())
-    {
+    // Handbook chapters may sit in the wanted folder or flat in the docs root.
+    let mut dirs = vec![root.join(dir)];
+    if dir != Path::new(docs_root) {
+        dirs.push(root.join(docs_root));
+    }
+    if let Some(num) = numbered(&name) {
         let want = topic_words(&name);
-        for e in fs::read_dir(root.join(dir)).into_iter().flatten().flatten() {
-            let n = e.file_name().to_string_lossy().into_owned();
-            if n.starts_with(&format!("{num}-")) && n.ends_with(".md") {
-                let found = util::rel(root, &e.path());
-                let shared = topic_words(&n).iter().any(|w| want.contains(w));
-                return Some(if shared {
-                    Found::Same(found)
-                } else {
-                    Found::NumberTaken(found)
-                });
+        // The same number on the same topic counts; the same number on another
+        // topic is a numbering conflict for the human to resolve.
+        for d in &dirs {
+            for (n, path) in md_files(d) {
+                if numbered(&n) == Some(num) {
+                    let found = util::rel(root, &path);
+                    let shared = topic_words(&n).iter().any(|w| want.contains(w));
+                    return Some(if shared {
+                        Found::Same(found)
+                    } else {
+                        Found::NumberTaken(found)
+                    });
+                }
+            }
+        }
+        // The same topic under another number (at least two shared topic words,
+        // covering half of the wanted ones) counts as the same chapter.
+        for d in &dirs {
+            for (n, path) in md_files(d) {
+                if numbered(&n).is_none() {
+                    continue;
+                }
+                let have = topic_words(&n);
+                let shared = want.iter().filter(|w| have.contains(w)).count();
+                if shared >= 2 && shared * 2 >= want.len() {
+                    return Some(Found::Same(util::rel(root, &path)));
+                }
             }
         }
     }
@@ -209,8 +248,124 @@ fn equivalent(root: &Path, wanted: &str, docs_root: &str) -> Option<Found> {
     None
 }
 
+/// A template that carries real stack knowledge (not a project-state skeleton).
+/// Only these are merged section by section into existing files.
+const PACK_MARK: &str = "**Source:** Product Factory knowledge pack";
+
+pub fn is_knowledge(text: &str) -> bool {
+    text.contains(PACK_MARK)
+}
+
+/// `## ` sections outside code fences: (heading, full text including the heading line).
+fn sections(text: &str) -> Vec<(String, String)> {
+    let mut out: Vec<(String, String)> = Vec::new();
+    let mut fence = false;
+    for line in text.lines() {
+        let t = line.trim_start();
+        if t.starts_with("```") || t.starts_with("~~~") {
+            fence = !fence;
+        }
+        if !fence && line.starts_with("## ") {
+            out.push((line[3..].trim().to_string(), String::new()));
+        }
+        if let Some(last) = out.last_mut() {
+            last.1.push_str(line);
+            last.1.push('\n');
+        }
+    }
+    out
+}
+
+/// Every `##` and `###` heading outside code fences.
+fn headings(text: &str) -> Vec<String> {
+    let mut fence = false;
+    let mut v = Vec::new();
+    for line in text.lines() {
+        let t = line.trim_start();
+        if t.starts_with("```") || t.starts_with("~~~") {
+            fence = !fence;
+        }
+        if !fence && (line.starts_with("## ") || line.starts_with("### ")) {
+            v.push(line.trim_start_matches('#').trim().to_string());
+        }
+    }
+    v
+}
+
+fn heading_words(h: &str) -> Vec<String> {
+    h.to_lowercase()
+        .split(|c: char| !c.is_alphanumeric())
+        .filter(|w| !w.is_empty() && !w.chars().all(|c| c.is_ascii_digit()))
+        .filter(|w| w.len() >= 3 && !STOP.contains(w))
+        .map(str::to_string)
+        .collect()
+}
+
+/// Words match when equal or when they share a six-letter stem
+/// ("classify" / "classification", "implementing" / "implementation").
+fn same_word(a: &str, b: &str) -> bool {
+    let stem = |w: &str| w.chars().take(6).collect::<String>();
+    a == b || (a.chars().count() >= 6 && b.chars().count() >= 6 && stem(a) == stem(b))
+}
+
+/// The leading section number of a heading ("3." in "3. Clean architecture"), if any.
+fn section_number(h: &str) -> Option<&str> {
+    let n = h.split_whitespace().next()?;
+    (n.ends_with('.')
+        && n[..n.len() - 1]
+            .chars()
+            .all(|c| c.is_ascii_digit() || c == '.'))
+    .then_some(n)
+}
+
+/// A template section counts as covered when the file has a heading with the same
+/// words, a subset or superset of them, at least half of them in common, or the same
+/// section number and a shared word.
+fn covered(template_heading: &str, have: &[String]) -> bool {
+    let want = heading_words(template_heading);
+    if want.is_empty() {
+        return true;
+    }
+    have.iter().any(|h| {
+        let got = heading_words(h);
+        if got.is_empty() {
+            return false;
+        }
+        let shared = want
+            .iter()
+            .filter(|w| got.iter().any(|g| same_word(w, g)))
+            .count();
+        let same_number = section_number(template_heading).is_some()
+            && section_number(template_heading) == section_number(h);
+        shared == want.len()
+            || shared == got.len()
+            || shared * 2 >= want.len().max(got.len())
+            || (same_number && shared > 0)
+    })
+}
+
+const NEVER_MERGE: &[&str] = &["related", "documentation routing"];
+
+/// Template sections the existing file does not cover.
+pub fn missing_sections(template: &str, existing: &str) -> Vec<(String, String)> {
+    let have = headings(existing);
+    sections(template)
+        .into_iter()
+        .filter(|(h, _)| !NEVER_MERGE.contains(&h.to_lowercase().as_str()))
+        .filter(|(h, _)| !covered(h, &have))
+        .collect()
+}
+
+pub struct Present {
+    pub wanted: String,
+    pub found: String,
+    pub src: PathBuf,
+    /// Headings of knowledge-pack sections the existing file lacks.
+    pub gaps: Vec<String>,
+}
+
 pub struct Plan {
-    pub present: Vec<(String, String)>,
+    pub present: Vec<Present>,
     pub missing: Vec<(String, PathBuf)>,
     /// (wanted chapter, existing chapter that already uses its number)
     pub conflicts: Vec<(String, String)>,
@@ -226,7 +381,24 @@ pub fn plan(factory: &Path, t: &Target) -> Result<Plan, String> {
     for (rel, src) in set {
         let dst = map_path(&rel, &t.docs_root);
         match equivalent(&t.root, &dst, &t.docs_root) {
-            Some(Found::Same(found)) => p.present.push((dst, found)),
+            Some(Found::Same(found)) => {
+                let tmpl = fs::read_to_string(&src).unwrap_or_default();
+                let gaps = if is_knowledge(&tmpl) {
+                    let have = fs::read_to_string(t.root.join(&found)).unwrap_or_default();
+                    missing_sections(&tmpl, &have)
+                        .into_iter()
+                        .map(|(h, _)| h)
+                        .collect()
+                } else {
+                    vec![]
+                };
+                p.present.push(Present {
+                    wanted: dst,
+                    found,
+                    src,
+                    gaps,
+                });
+            }
             Some(Found::NumberTaken(found)) => p.conflicts.push((dst, found)),
             None => p.missing.push((dst, src)),
         }
@@ -247,22 +419,135 @@ fn fill(text: &str, t: &Target) -> String {
         .replace("{{DATE}}", &util::today_utc())
 }
 
-pub fn init(factory: &Path, t: &Target) -> Result<Vec<String>, String> {
+/// Point links in imported text at files that exist in this repo: keep a link that
+/// resolves, retarget a handbook chapter to the repo's chapter with the same number,
+/// and turn any other dead relative link into plain text.
+fn fix_links(text: &str, file: &Path) -> String {
+    let re = regex::Regex::new(r"\[([^\]\n]+)\]\(([^)\s]+)\)").expect("link regex");
+    let dir = file.parent().unwrap_or(Path::new("."));
+    let mut fence = false;
+    let mut out = String::with_capacity(text.len());
+    for line in text.split_inclusive('\n') {
+        let t = line.trim_start();
+        if t.starts_with("```") || t.starts_with("~~~") {
+            fence = !fence;
+        }
+        if fence {
+            out.push_str(line);
+            continue;
+        }
+        let fixed = re.replace_all(line, |c: &regex::Captures| {
+            let (label, href) = (&c[1], &c[2]);
+            let (path, anchor) = match href.split_once('#') {
+                Some((p, a)) => (p, format!("#{a}")),
+                None => (href, String::new()),
+            };
+            if path.is_empty() || href.contains("://") || href.starts_with("mailto:") {
+                return c[0].to_string();
+            }
+            let target = dir.join(path);
+            if target.exists() {
+                return c[0].to_string();
+            }
+            let name = Path::new(path)
+                .file_name()
+                .map(|n| n.to_string_lossy().into_owned())
+                .unwrap_or_default();
+            if let (Some(num), Some(tdir)) = (numbered(&name), target.parent())
+                && let Some((n, _)) = md_files(tdir)
+                    .into_iter()
+                    .find(|(n, _)| numbered(n) == Some(num))
+            {
+                let parent = Path::new(path).parent().unwrap_or(Path::new(""));
+                let new = parent.join(&n).to_string_lossy().into_owned();
+                return format!("[{label}]({new}{anchor})");
+            }
+            label.to_string()
+        });
+        out.push_str(&fixed);
+    }
+    out
+}
+
+const ROUTING_START: &str = "<!-- documentation-routing:start -->";
+
+/// Append the missing knowledge-pack sections to an existing file, before its
+/// generated routing block when it has one. Existing text is never changed.
+fn merge_into(path: &Path, sections: &[(String, String)], t: &Target) -> std::io::Result<()> {
+    let existing = fs::read_to_string(path)?;
+    let mut block = format!(
+        "<!-- pf-knowledge:start pack={} date={} -->\n> The sections below were added from the Product Factory `{}` knowledge pack because this file did not cover them. Review them against this repository: keep what applies, adapt names and commands, delete what does not.\n\n",
+        t.stack,
+        util::today_utc(),
+        t.stack
+    );
+    for (_, body) in sections {
+        block.push_str(body.trim_end());
+        block.push_str("\n\n");
+    }
+    block.push_str("<!-- pf-knowledge:end -->\n");
+    let block = fix_links(&fill(&block, t), path);
+    let merged = match existing.find(ROUTING_START) {
+        Some(i) => format!(
+            "{}\n\n{block}\n{}",
+            existing[..i].trim_end(),
+            &existing[i..]
+        ),
+        None => format!("{}\n\n{block}", existing.trim_end()),
+    };
+    fs::write(path, merged)
+}
+
+pub struct Applied {
+    pub created: Vec<String>,
+    /// (file, headings appended)
+    pub merged: Vec<(String, Vec<String>)>,
+}
+
+/// Import the knowledge pack: create every missing file, then append the missing
+/// sections to existing knowledge files (unless `files_only`). Never overwrites.
+pub fn init(factory: &Path, t: &Target, files_only: bool) -> Result<Applied, String> {
     let p = plan(factory, t)?;
-    let mut created = Vec::new();
-    for (dst, src) in p.missing {
-        let out = t.root.join(&dst);
+    let mut a = Applied {
+        created: vec![],
+        merged: vec![],
+    };
+    for (dst, src) in &p.missing {
+        let out = t.root.join(dst);
         if out.exists() {
             continue; // never overwrite
         }
         if let Some(d) = out.parent() {
             fs::create_dir_all(d).map_err(|e| e.to_string())?;
         }
-        let text = fs::read_to_string(&src).map_err(|e| e.to_string())?;
+        let text = fs::read_to_string(src).map_err(|e| e.to_string())?;
         fs::write(&out, fill(&text, t)).map_err(|e| e.to_string())?;
-        created.push(dst);
+        a.created.push(dst.clone());
     }
-    Ok(created)
+    // Links are fixed once every new file exists, so they can point at each other.
+    for dst in &a.created {
+        let out = t.root.join(dst);
+        let text = fs::read_to_string(&out).map_err(|e| e.to_string())?;
+        let fixed = fix_links(&text, &out);
+        if fixed != text {
+            fs::write(&out, fixed).map_err(|e| e.to_string())?;
+        }
+    }
+    if !files_only {
+        for pr in p.present.iter().filter(|pr| !pr.gaps.is_empty()) {
+            let tmpl = fs::read_to_string(&pr.src).map_err(|e| e.to_string())?;
+            let path = t.root.join(&pr.found);
+            let have = fs::read_to_string(&path).map_err(|e| e.to_string())?;
+            let secs = missing_sections(&tmpl, &have);
+            if secs.is_empty() {
+                continue;
+            }
+            merge_into(&path, &secs, t).map_err(|e| e.to_string())?;
+            a.merged
+                .push((pr.found.clone(), secs.into_iter().map(|(h, _)| h).collect()));
+        }
+    }
+    Ok(a)
 }
 
 fn roots(start: &Path, modules: bool) -> Vec<PathBuf> {
@@ -286,6 +571,7 @@ pub fn main_plan(
     docs: Option<String>,
     modules: bool,
     apply: bool,
+    files_only: bool,
 ) -> i32 {
     let start = root.unwrap_or_else(|| std::env::current_dir().unwrap_or_default());
     let mut code = 0;
@@ -295,28 +581,48 @@ pub fn main_plan(
             stack.clone().filter(|_| !modules),
             docs.clone().filter(|_| !modules),
         );
-        let result = if apply {
-            init(factory, &t).map(|c| (c, None))
-        } else {
-            plan(factory, &t).map(|p| (vec![], Some(p)))
-        };
-        match result {
+        let head = format!(
+            "{} (stack {}, docs {}/)",
+            t.root.display(),
+            t.stack,
+            t.docs_root
+        );
+        if apply {
+            match init(factory, &t, files_only) {
+                Err(e) => {
+                    eprintln!("pf: {}: {e}", r.display());
+                    code = 1;
+                }
+                Ok(a) => {
+                    println!(
+                        "Knowledge import {head}: created {} · merged into {}",
+                        a.created.len(),
+                        a.merged.len()
+                    );
+                    for c in &a.created {
+                        println!("  + {c}");
+                    }
+                    for (f, hs) in &a.merged {
+                        println!("  ~ {f}  (+ {})", hs.join(", "));
+                    }
+                    println!();
+                }
+            }
+            continue;
+        }
+        match plan(factory, &t) {
             Err(e) => {
                 eprintln!("pf: {}: {e}", r.display());
                 code = 1;
             }
-            Ok((created, Some(p))) => {
-                let _ = created;
+            Ok(p) => {
+                let gaps = p.present.iter().filter(|x| !x.gaps.is_empty()).count();
+                println!("Knowledge plan {head}");
                 println!(
-                    "Knowledge plan {} (stack {}, docs {}/)",
-                    t.root.display(),
-                    t.stack,
-                    t.docs_root
-                );
-                println!(
-                    "  present {} · missing {} · numbering conflicts {}",
+                    "  present {} · missing {} · files missing sections {} · numbering conflicts {}",
                     p.present.len(),
                     p.missing.len(),
+                    gaps,
                     p.conflicts.len()
                 );
                 for (want, taken) in &p.conflicts {
@@ -324,24 +630,24 @@ pub fn main_plan(
                         "  ! {want}  (number already used by {taken}; renumber one of them, or record the mapping in the handbook README)"
                     );
                 }
-                for (want, found) in p.present.iter().filter(|(w, f)| w != f) {
-                    println!("  = {want}  (covered by {found})");
+                for x in &p.present {
+                    let role = if x.wanted != x.found {
+                        format!("  (plays {})", x.wanted)
+                    } else {
+                        String::new()
+                    };
+                    if !x.gaps.is_empty() {
+                        println!(
+                            "  ~ {}{role}  missing sections: {}",
+                            x.found,
+                            x.gaps.join("; ")
+                        );
+                    } else if !role.is_empty() {
+                        println!("  = {}{role}", x.found);
+                    }
                 }
                 for (m, _) in &p.missing {
                     println!("  + {m}");
-                }
-                println!();
-            }
-            Ok((created, None)) => {
-                println!(
-                    "Knowledge init {} (stack {}, docs {}/): created {}",
-                    t.root.display(),
-                    t.stack,
-                    t.docs_root,
-                    created.len()
-                );
-                for c in &created {
-                    println!("  + {c}");
                 }
                 println!();
             }
@@ -349,7 +655,7 @@ pub fn main_plan(
     }
     if !apply {
         println!(
-            "Create the missing files with: pf knowledge init (never overwrites). Then fill them, and run pf docs-map --fix where the docs use the factory's routing format."
+            "Import with: pf knowledge init. It creates the missing files (+) with the pack's content and appends the missing sections (~) to existing files, marked for review. It never overwrites or edits existing text. Then run pf docs-map --fix where the docs use the factory's routing format."
         );
     }
     code
@@ -377,15 +683,21 @@ mod tests {
         assert!(template_set(&f, "nope").is_err());
     }
 
-    #[test]
-    fn plan_counts_equivalents_and_init_never_overwrites() {
+    fn scratch(tag: &str) -> PathBuf {
         let n = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
             .as_nanos();
-        let d = std::env::temp_dir().join(format!("pf-know-{n}"));
-        fs::create_dir_all(d.join("doc/development")).unwrap();
+        let d = std::env::temp_dir().join(format!("pf-know-{tag}-{n}"));
+        fs::create_dir_all(&d).unwrap();
         assert!(util::run("git", &["init", "-q"], Some(&d)));
+        d
+    }
+
+    #[test]
+    fn plan_counts_equivalents_and_init_never_overwrites() {
+        let d = scratch("eq");
+        fs::create_dir_all(d.join("doc/development")).unwrap();
         fs::write(d.join("CURRENT_STATE.md"), "# mine\n").unwrap();
         fs::write(
             d.join("doc/development/09-platform-shells.md"),
@@ -393,6 +705,12 @@ mod tests {
         )
         .unwrap();
         fs::write(d.join("doc/IMPLEMENTATION_STATUS.md"), "# status\n").unwrap();
+        // A flat chapter in the docs root with the same number and topic.
+        fs::write(
+            d.join("doc/05-security.md"),
+            "# Security\n\n## Threat model and controls\n",
+        )
+        .unwrap();
         let t = target(&d, Some("typescript-web".into()), Some("doc".into()));
         let p = plan(&factory(), &t).unwrap();
         assert!(p.conflicts.iter().any(|(w, f)| w
@@ -401,22 +719,159 @@ mod tests {
         assert!(
             p.present
                 .iter()
-                .any(|(w, f)| w == "doc/features/IMPLEMENTATION_STATUS.md"
-                    && f == "doc/IMPLEMENTATION_STATUS.md")
+                .any(|x| x.wanted == "doc/features/IMPLEMENTATION_STATUS.md"
+                    && x.found == "doc/IMPLEMENTATION_STATUS.md"
+                    && x.gaps.is_empty())
         );
-        let created = init(&factory(), &t).unwrap();
-        assert!(created.contains(&"doc/history/DEVELOPMENT_LOG.md".to_string()));
-        assert!(created.contains(&"doc/development/03-ui-design-system.md".to_string()));
+        assert!(
+            p.present
+                .iter()
+                .any(|x| x.wanted == "doc/development/05-security.md"
+                    && x.found == "doc/05-security.md"
+                    && !x.gaps.is_empty())
+        );
+        let a = init(&factory(), &t, false).unwrap();
+        assert!(
+            a.created
+                .contains(&"doc/history/DEVELOPMENT_LOG.md".to_string())
+        );
+        assert!(
+            a.created
+                .contains(&"doc/development/03-ui-design-system.md".to_string())
+        );
         assert_eq!(
             fs::read_to_string(d.join("CURRENT_STATE.md")).unwrap(),
             "# mine\n"
         );
-        assert!(
-            !fs::read_to_string(d.join("doc/history/DEVELOPMENT_LOG.md"))
-                .unwrap()
-                .contains("{{DATE}}")
-        );
-        assert!(init(&factory(), &t).unwrap().is_empty());
+        let ui = fs::read_to_string(d.join("doc/development/03-ui-design-system.md")).unwrap();
+        assert!(!ui.contains("{{DATE}}") && ui.contains("## Accessibility"));
+        // Existing knowledge files get the missing sections, below the original text.
+        let sec = fs::read_to_string(d.join("doc/05-security.md")).unwrap();
+        assert!(sec.starts_with("# Security\n\n## Threat model and controls\n"));
+        assert!(sec.contains("<!-- pf-knowledge:start pack=typescript-web"));
+        assert!(sec.contains("## Keys and environment variables"));
+        assert_eq!(sec.matches("## Threat model and controls").count(), 1);
+        // A second run changes nothing.
+        let again = init(&factory(), &t, false).unwrap();
+        assert!(again.created.is_empty() && again.merged.is_empty());
         fs::remove_dir_all(&d).ok();
+    }
+
+    #[test]
+    fn section_matching_tolerates_numbering_and_wording() {
+        let tmpl = "# T\n\n## 1. Why this architecture exists\nx\n\n## Types and time\ny\n\n```\n## not a heading\n```\n\n## Related\nz\n";
+        let have = "# Mine\n\n## Why This Architecture Exists\n\n### Types, time\n";
+        assert!(covered(
+            "2. Classify before implementing",
+            &["2. Classification before implementation".into()]
+        ));
+        assert!(covered(
+            "3. Responsibilities by layer",
+            &["3. Clean Architecture responsibilities".into()]
+        ));
+        assert!(!covered("Event envelope", &["Producer pattern".into()]));
+        assert!(!covered("Schéma général", &["معماری سامانه".into()]));
+        assert!(missing_sections(tmpl, have).is_empty());
+        let gaps = missing_sections(tmpl, "# Mine\n");
+        let names: Vec<_> = gaps.iter().map(|(h, _)| h.as_str()).collect();
+        assert_eq!(names, ["1. Why this architecture exists", "Types and time"]);
+        assert!(gaps[1].1.starts_with("## Types and time\ny"));
+    }
+
+    #[test]
+    fn merge_keeps_routing_block_last_and_fixes_links() {
+        let d = scratch("merge");
+        let dev = d.join("docs/development");
+        fs::create_dir_all(&dev).unwrap();
+        fs::write(
+            dev.join("03-spring-clean-architecture-layers.md"),
+            "# Layers\n",
+        )
+        .unwrap();
+        fs::write(
+            dev.join("02-kotlin-language-backend.md"),
+            "# Kotlin\n\n## Style\n\n<!-- documentation-routing:start -->\n## Documentation routing\n<!-- documentation-routing:end -->\n",
+        )
+        .unwrap();
+        let t = target(&d, Some("spring-kotlin-service".into()), None);
+        let p = plan(&factory(), &t).unwrap();
+        // Same number and topic under a different file name.
+        assert!(
+            p.present
+                .iter()
+                .any(|x| x.wanted == "docs/development/02-kotlin-language.md"
+                    && x.found == "docs/development/02-kotlin-language-backend.md")
+        );
+        let a = init(&factory(), &t, false).unwrap();
+        assert!(
+            !a.created
+                .contains(&"docs/development/03-clean-architecture-layers.md".to_string())
+        );
+        let k = fs::read_to_string(dev.join("02-kotlin-language-backend.md")).unwrap();
+        let (body, routing) = k
+            .split_once("<!-- documentation-routing:start -->")
+            .unwrap();
+        assert!(body.contains("## Types and time") && body.contains("<!-- pf-knowledge:end -->"));
+        assert!(routing.contains("## Documentation routing") && !routing.contains("pf-knowledge"));
+        assert_eq!(k.matches("## Style").count(), 1);
+        // A created chapter links to the repo's own chapter 03, not the pack's name.
+        let p0 = fs::read_to_string(dev.join("00-engineering-principles.md")).unwrap();
+        assert!(p0.contains("(03-spring-clean-architecture-layers.md)"));
+        assert!(!p0.contains("(03-clean-architecture-layers.md)"));
+        fs::remove_dir_all(&d).ok();
+    }
+
+    #[test]
+    fn same_topic_under_another_number_is_present() {
+        let d = scratch("topic");
+        let dev = d.join("docs/development");
+        fs::create_dir_all(&dev).unwrap();
+        fs::write(dev.join("17-client-cryptography.md"), "# Crypto\n").unwrap();
+        let t = target(&d, Some("kmp-android-client".into()), None);
+        let p = plan(&factory(), &t).unwrap();
+        assert!(
+            p.present
+                .iter()
+                .any(|x| x.wanted == "docs/development/12-client-cryptography.md"
+                    && x.found == "docs/development/17-client-cryptography.md")
+        );
+        fs::remove_dir_all(&d).ok();
+    }
+
+    #[test]
+    fn every_knowledge_link_resolves_after_a_fresh_import() {
+        for stack in stacks(&factory()) {
+            let d = scratch(&stack);
+            let t = target(&d, Some(stack.clone()), None);
+            init(&factory(), &t, false).unwrap();
+            let re = regex::Regex::new(r"\]\(([^)\s#]+)(#[^)]*)?\)").unwrap();
+            for f in files_under(&d) {
+                if !f.ends_with(".md") || f.starts_with(".git/") {
+                    continue;
+                }
+                let path = d.join(&f);
+                let text = fs::read_to_string(&path).unwrap();
+                let mut fence = false;
+                for line in text.lines() {
+                    if line.trim_start().starts_with("```") {
+                        fence = !fence;
+                    }
+                    if fence {
+                        continue;
+                    }
+                    for c in re.captures_iter(line) {
+                        let href = &c[1];
+                        if href.contains("://") {
+                            continue;
+                        }
+                        assert!(
+                            path.parent().unwrap().join(href).exists(),
+                            "{stack}: {f} links to missing {href}"
+                        );
+                    }
+                }
+            }
+            fs::remove_dir_all(&d).ok();
+        }
     }
 }

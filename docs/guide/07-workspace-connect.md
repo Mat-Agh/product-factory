@@ -156,19 +156,34 @@ Back-End and Federation `spring-kotlin-service`, Client `kmp-android-client`,
 Front-End `typescript-web` in `doc/`, Product `product-docs` in `product/`).
 
 ```bash
-pf knowledge plan --modules           # read-only: present, covered, missing, numbering conflicts
+pf knowledge plan --modules           # changes nothing: + import, = equivalent, ~ missing sections, ! numbering conflict
 ```
 
-The gaps found on 2026-10-19 are listed in
-[COMP-018](../components/COMP-018-knowledge-structure.md#connect-today-read-only-plan-2026-10-19).
-They range from Back-End (6 missing, including the development history) to
-Federation (29 missing, including `CURRENT_STATE.md`). Client already uses `03`
-and `09` for other topics. Decide whether to renumber one of them or record the
-mapping in its handbook README; nothing is created for those two. When you
-agree, run `/factory knowledge init`. It creates only the missing files, then
-runs one `docs` job per child to fill them from the code, with real commands,
-the real canonical sample, and a first history entry from `git log`. Each job
-lands as an MR on a `docs/NNN-…` branch.
+The plan run on copies of the children on 2026-10-19 is in
+[COMP-018](../components/COMP-018-knowledge-structure.md#connect-today-plan-and-import-on-copies-2026-10-19).
+In short:
+- **Back-End** already has most of the handbook. It would get 8 files (history,
+  sessions, architecture overview, templates) and the missing sections of 7
+  existing docs, for example an event-envelope section in `05` and a migrations
+  section in `04`.
+- **Federation** has a thin handbook. It would get 31 files, including
+  `CURRENT_STATE.md` and the full Spring handbook, plus the sections its `00`,
+  `09`, `15` and `16` lack.
+- **Client** would get 12 files and sections in 5 docs. It already uses `03` and
+  `09` for other topics, so nothing is imported for those two numbers; renumber
+  one of each pair or record the mapping in its handbook README.
+- **Front-End** keeps its flat `doc/NN-*.md` chapters; they are recognised where
+  the number and topic match. Four numbers (`02`, `03`, `08`, `09`) are used for
+  other topics and are left to you.
+- **Product** would get 15 files (the product handbook, design, feature matrix,
+  history, templates); no existing doc lacks a pack section.
+
+When you agree, run `/factory knowledge init`. It opens one `docs` job per child.
+In each job worktree it imports the pack, then the engineer adapts it: scaffolds
+filled from the code, merged sections kept, adjusted to Connect (for example the
+Back-End no-test policy) or deleted, and the review markers removed. Each job
+lands as an MR on a `docs/NNN-…` branch. Existing text is never overwritten or
+edited.
 
 ## Step 5 — Promote memory
 

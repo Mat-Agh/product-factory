@@ -1,6 +1,6 @@
 # COMP-018 — Knowledge structure per stack
 
-**Status:** Implemented — templates distilled from the five Connect repositories; `pf knowledge plan` run read-only on all of them; init verified on scratch repos (2026-10-19)
+**Status:** Implemented — real stack knowledge packs distilled from the five Connect repositories; plan and import (files and section merge) verified on copies of all five, never on the originals (2026-10-19)
 **Last updated:** 2026-10-19
 **Source:** [`kit/knowledge/`](../../kit/knowledge/), [`cli/src/knowledge.rs`](../../cli/src/knowledge.rs), `/factory knowledge` in [`SKILL.md`](../../kit/.claude/skills/factory/SKILL.md), knowledge upkeep in [`protocol.md`](../../kit/.claude/skills/factory/protocol.md)
 **Rule:** [CONSTITUTION §1](../governance/CONSTITUTION.md)
@@ -15,9 +15,21 @@ Every repo the factory runs keeps the same kind of knowledge, in the same shape:
   samples;
 - what was decided, and what is built.
 
-The shape is the one already used across Daria Connect. The factory installs
-it wherever it is missing, keeps it true through every job, and refreshes the
-stack knowledge against upstream changes.
+The shape is the one already used across Daria Connect. The factory imports it
+wherever it is missing, adds what an existing doc lacks, keeps it true through
+every job, and refreshes the stack knowledge against upstream changes.
+
+## Two kinds of template
+
+| Kind | Marked by | Examples | On import |
+|---|---|---|---|
+| **Knowledge pack** | A `**Source:** Product Factory knowledge pack (<stack>)` line | Handbook chapters (`00`–`16`), `ANDROID_ACCEPTANCE_TEST.md`, `REVIEW_CHECKLIST.md`, `api/README.md` | Created with the full content when missing. When an equivalent file exists, the sections it lacks are appended |
+| **Scaffold** | No `Source` line | `CURRENT_STATE.md`, `DEVELOPMENT_LOG.md`, `IMPLEMENTATION_STATUS.md`, area READMEs, routers, `CICD.md`, `CONTRIBUTING.md`, ADR/feature/PRD templates | Created when missing, never merged. They describe one project, so the docs job fills them from the code |
+
+The knowledge packs hold real content: the engineering principles, layer rules,
+naming, persistence, outbox/inbox, security, cryptography, testing policy, build
+and CI practice, library stacks and code samples of each stack, written
+generically with Connect-specific names removed.
 
 ## The structure
 
@@ -44,11 +56,11 @@ stack knowledge against upstream changes.
 
 | Stack | From | Adds |
 |---|---|---|
-| `spring-kotlin-service` | Back-End, Federation | `01` service architecture, `02` Kotlin, `03` clean-architecture layers, `04` persistence, `05` events and messaging, `06` security contracts, `07` testing and quality, `08` build and CI, `10` cryptography; `api/` (openapi, asyncapi, schemas), `data/`, `security/`, `operations/`, `deployment/` |
-| `kmp-android-client` | Client | `01` KMP module structure, `02` Kotlin, `03` presentation (MVI), `04` data and realtime, `05` library stack, `07` Android development, `10` testing/performance/security, `11` Gradle build, `12` client cryptography, `ANDROID_ACCEPTANCE_TEST.md`, `DEV_SETUP.md`; `data/`, `integrations/`, UX spec template |
-| `typescript-web` | Front-End | `01` app architecture, `02` TypeScript, `03` UI and design system, `04` API contracts and clients, `05` security, `06` testing, `07` build and deployment, `08` library stack |
-| `product-docs` | Product | `vision/`, `roadmap/`, `prd/` with a PRD template, `feature-matrix/`, `acceptance/`, `delivery/`, `governance/`, `metrics/`, `risks/`, `design/`, `data/` (it excludes the code handbook from the base) |
-| `generic` | — | The base only |
+| `spring-kotlin-service` | Back-End, Federation | Its own `00`, `09`, `15`, `16` and handbook README; `01` service architecture, `02` Kotlin, `03` clean-architecture layers, `04` persistence, `05` events and messaging, `06` security contracts, `07` testing and quality, `08` build and CI, `10` cryptography; `api/` (openapi, asyncapi, schemas), `data/`, `security/`, `operations/`, `deployment/` |
+| `kmp-android-client` | Client | Its own `00`, `09`, `15`, `16` and handbook README; `01` KMP module structure, `02` Kotlin, `03` presentation (MVI), `04` data and realtime, `05` library stack, `07` Android development, `10` testing/performance/security, `11` Gradle build, `12` client cryptography, `ANDROID_ACCEPTANCE_TEST.md`, `DEV_SETUP.md`; `data/`, `integrations/`, UX spec template |
+| `typescript-web` | Front-End | `01` app architecture, `02` TypeScript, `03` UI and design system, `04` API contracts and clients, `05` security, `06` testing, `07` build and deployment, `08` library stack; its own `00`, `09`, `15`, `16`, handbook README and `REVIEW_CHECKLIST.md` |
+| `product-docs` | Product | `vision/`, `roadmap/`, `prd/` with a PRD template, `feature-matrix/`, `acceptance/`, `delivery/`, `governance/`, `metrics/`, `risks/`, `design/`, `data/`; a product router, `development/01-product-documentation.md` (ownership, writing rules, the evidence model) and its own `16` (it excludes the code handbook from the base) |
+| `generic` | — | The base only: generic `00` principles, `16` link map, `CICD.md` and `CONTRIBUTING.md` with real guidance; `09` and `15` stay scaffolds |
 
 The numbers `00`, `09`, `15` and `16` mean the same thing in every stack. Stack
 chapters use the remaining numbers.
@@ -58,24 +70,47 @@ chapters use the remaining numbers.
 ```bash
 pf knowledge stacks
 pf knowledge plan  [--root <repo>] [--stack <s>] [--docs <dir>] [--modules]
-pf knowledge init  [--root <repo>] [--stack <s>] [--docs <dir>] [--modules]   # creates missing files only
+pf knowledge init  [--root <repo>] [--stack <s>] [--docs <dir>] [--modules] [--files-only]
 ```
 
 The stack and docs root come from the descriptor (`modules[].stack`,
-`modules[].docs_root`), and flags override them. `plan` reports four things:
-- **present**: the file exists;
-- **covered by**: an equivalent exists, either the same chapter number on a
-  matching topic or the same file name elsewhere in the docs;
-- **missing**: it would be created;
-- **numbering conflicts**: a template chapter's number is already used for
-  another topic. Nothing is created for these, and the operator decides.
+`modules[].docs_root`), and flags override them. `plan` changes nothing and
+reports:
+- `+` **missing**: no equivalent exists, so the file will be imported;
+- `=` **plays**: an equivalent exists under another name and covers the pack;
+- `~` **missing sections**: an existing (or equivalent) knowledge file lacks some
+  of the pack's `##` sections, listed by heading;
+- `!` **numbering conflicts**: the chapter number is used for another topic.
+  Nothing is imported for these; the operator renumbers or records the mapping.
 
-`init` fills `{{MODULE}}`, `{{PRODUCT}}`, `{{STACK}}` and `{{DATE}}`. It is
-idempotent and never overwrites a file.
+An existing file is **equivalent** when it has the same path, the same chapter
+number on a shared topic word (in the handbook folder or flat in the docs root),
+the same topic under another number (two or more shared topic words covering
+half of them), or the same file name elsewhere in the docs.
 
-`/factory knowledge init` then runs a `docs` job that **fills** the new files
-from the code and the existing docs. That covers the real commands, the real
-canonical sample, the real principles, and a first history entry from `git log`.
+A pack section is **covered** when the file has a `##`/`###` heading with the same
+words, a subset or superset of them, half of them in common, or the same section
+number and a shared word. Words match on a six-letter stem, so "Classify before
+implementing" matches "Classification before implementation". Code fences are
+ignored. `Related` and `Documentation routing` are never merged.
+
+`init` does three things, idempotently:
+1. creates every missing file with its full content, filling `{{MODULE}}`,
+   `{{PRODUCT}}`, `{{STACK}}` and `{{DATE}}`;
+2. appends the missing sections to existing knowledge files, inside
+   `<!-- pf-knowledge:start … -->` / `<!-- pf-knowledge:end -->` with a note asking
+   for review, placed before a generated routing block when there is one;
+3. fixes links in what it wrote: a link that resolves stays, a handbook chapter
+   is pointed at the repo's own chapter with the same number, and any other dead
+   link becomes plain text.
+
+It never overwrites a file and never edits existing text. `--files-only` skips
+step 2.
+
+`/factory knowledge init` then runs a `docs` job that **adapts** the import to
+the repo: real commands, the real canonical sample, scaffolds filled from the
+code, merged sections kept, adjusted or deleted, and a first history entry from
+`git log`.
 `/factory knowledge refresh` checks upstream release notes for every library and
 tool the handbook lists, and proposes updates. Version upgrades go as separate,
 escalated jobs.
@@ -90,22 +125,29 @@ escalated jobs.
 | release-manager | builds release notes from `DEVELOPMENT_LOG.md` |
 | `pf audit`, `pf doctor` | report knowledge gaps per repo |
 
-## Connect today (read-only plan, 2026-10-19)
+## Connect today (plan and import on copies, 2026-10-19)
 
-| Repo | Stack | Present | Missing | Conflicts |
-|---|---|---|---|---|
-| Back-End | spring-kotlin-service | 32 | 6 (history, sessions, OVERVIEW, ADR/feature templates) | 0 |
-| Federation | spring-kotlin-service | 9 | 29 (`CURRENT_STATE.md` and most of the handbook and areas) | 0 |
-| Client | kmp-android-client | 21 | 12 | 2 (`03` and `09` already used for other topics) |
-| Front-End | typescript-web (`doc/`) | 6 | 23 | 0 |
-| Product | product-docs (`product/`) | 16 | 11 | 0 |
-| workspace root | generic | 1 | 20 | 0 |
+Run against copies of the repositories' docs in a temporary directory; the
+originals were not touched.
+
+| Repo | Stack | Present | Missing (imported) | Files missing sections (merged) | Conflicts |
+|---|---|---|---|---|---|
+| Back-End | spring-kotlin-service | 32 | 8 (history, sessions, OVERVIEW, ADR/feature templates) | 7 (`api/README`, `03`, `04`, `05`, `07`, `08`, `09`) | 0 |
+| Federation | spring-kotlin-service | 9 | 31 (`CURRENT_STATE.md`, most of the handbook and areas) | 4 (`00`, `09`, `15`, `16`) | 0 |
+| Client | kmp-android-client | 23 | 12 | 5 (`07`, `15`, `16`, `17`, acceptance) | 2 (`03`, `09` used for other topics) |
+| Front-End | typescript-web (`doc/`, flat) | 9 | 19 | 4 (`01`, `04`, `07`, `16`) | 4 (`02`, `03`, `08`, `09`) |
+| Product | product-docs (`product/`) | 16 | 15 | 0 | 0 |
+
+Every link added by the import resolved, and a second run changed nothing.
 
 ## Known limitations
 
-- Equivalence is by chapter number and topic word, or by file name. A doc with a
-  different name and number is reported missing, and the operator maps it
-  (record the mapping in the handbook README).
+- Equivalence and coverage are heuristics on file names and headings, not on
+  meaning. A section that covers a topic under an unrelated heading is merged
+  again; the review note asks the docs job to delete it. A doc with an unrelated
+  name and number is reported missing, and the operator maps it.
+- Merged sections are generic. They are a starting point for the docs job, not
+  verified facts about the repo.
 - Templates need the factory checkout. `pf` finds it as it does for `install`.
 
 <!-- documentation-routing:start -->
