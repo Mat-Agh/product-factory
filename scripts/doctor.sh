@@ -22,8 +22,11 @@ echo "Factory repo"
 remotes="$(git -C "$FACTORY" remote | wc -l | tr -d ' ')"
 [[ "$remotes" -ge 2 ]] && ok "$remotes remotes (mirrored)" || note "only $remotes remote; add a mirror: scripts/mirror.sh add <name> <url>"
 [[ -z "$(git -C "$FACTORY" status --porcelain)" ]] && ok "clean" || note "uncommitted changes in the factory repo"
-git -C "$FACTORY" fetch -q 2>/dev/null && [[ "$(git -C "$FACTORY" rev-list --count HEAD..@{u} 2>/dev/null || echo 0)" == 0 ]] \
-  && ok "up to date with upstream" || note "behind upstream or no upstream; git pull"
+if git -C "$FACTORY" rev-parse -q --verify @{u} >/dev/null 2>&1; then
+  git -C "$FACTORY" fetch -q 2>/dev/null
+  behind="$(git -C "$FACTORY" rev-list --count HEAD..@{u})"
+  [[ "$behind" == 0 ]] && ok "up to date with upstream" || note "$behind commit(s) behind upstream; git pull"
+else note "no upstream branch set"; fi
 
 H="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 [[ -L "$H/skills/factory" ]] && ok "user-level /factory linked" || note "user-level not linked (scripts/install.sh user)"
@@ -37,7 +40,7 @@ if [[ -n "${1:-}" ]]; then
   grep -qxF '.factory/jobs/' "$P/.gitignore" 2>/dev/null && ok ".factory/jobs/ ignored" || bad ".factory/jobs/ not in .gitignore"
   grep -q 'factory-guard.py' "$P/.claude/settings.json" 2>/dev/null && ok "guard hook wired" || bad "guard hook not in .claude/settings.json"
   grep -q '^## Product Factory' "$P/AGENTS.md" 2>/dev/null && ok "AGENTS.md factory section" || bad "AGENTS.md lacks the Product Factory section"
-  for s in Setup "Dev server" Gates; do grep -qi "$s" "$P/AGENTS.md" 2>/dev/null && ok "AGENTS.md mentions $s" || note "AGENTS.md: no '$s' section found"; done
+  for s in Setup "Dev server" Gates; do grep -qiE "^#+ .*$s" "$P/AGENTS.md" 2>/dev/null && ok "AGENTS.md has a $s heading" || note "AGENTS.md: no '$s' heading yet (the factory needs it)"; done
   drift=0
   for a in "$KIT"/.claude/agents/*.md "$KIT/.claude/skills/factory/SKILL.md" "$KIT/.claude/skills/factory/protocol.md" "$KIT/.claude/hooks/factory-guard.py"; do
     rel="${a#$KIT/}"; cmp -s "$a" "$P/$rel" || { drift=1; note "drift: $rel differs from factory kit"; }
