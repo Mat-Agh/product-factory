@@ -40,6 +40,7 @@ blocked with the install hint above.
 | `pf rules sync` | Generate path-scoped `.claude/rules/modules/<area>.md` from the descriptor | [COMP-016](COMP-016-session-integration.md) |
 | `pf memory [--json] [--root <repo>]` | Show the repo's auto memory, for `/factory memory` | [COMP-016](COMP-016-session-integration.md) |
 | `pf audit [path] [--modules] [--json]` | Inventory the existing agentic setup and flag clashes before adoption | [COMP-017](COMP-017-adoption.md) |
+| `pf knowledge stacks \| plan \| init` | Per-stack knowledge structure: plan the gaps, create only missing files | [COMP-018](COMP-018-knowledge-structure.md) |
 
 `--factory <path>` (global) names the factory checkout for `install`, `doctor`,
 `mirror` and `export`. Without it, `pf` uses `$PRODUCT_FACTORY_HOME`, then an

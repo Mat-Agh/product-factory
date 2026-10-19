@@ -12,6 +12,7 @@ mod docs_map;
 mod doctor;
 mod guard;
 mod install;
+mod knowledge;
 mod memory;
 mod rules;
 mod util;
@@ -97,6 +98,11 @@ enum Cmd {
         #[arg(long)]
         modules: bool,
     },
+    /// The per-stack knowledge structure (state, history, handbook, architecture, decisions, features)
+    Knowledge {
+        #[command(subcommand)]
+        action: KnowledgeCmd,
+    },
     /// Show this repo's Claude Code auto memory (for /factory memory)
     Memory {
         /// Repository to inspect (default: current directory)
@@ -161,6 +167,37 @@ enum InstallCmd {
         path: PathBuf,
         #[arg(long)]
         with_guard: bool,
+    },
+}
+
+#[derive(Subcommand)]
+enum KnowledgeCmd {
+    /// List the available stack templates
+    Stacks,
+    /// Compare a repo with its stack template (present, equivalent, missing, numbering conflicts)
+    Plan {
+        #[arg(long)]
+        root: Option<PathBuf>,
+        /// Override the stack (default: descriptor module `stack`, else generic)
+        #[arg(long)]
+        stack: Option<String>,
+        /// Override the docs root (default: module `docs_root`, else docs)
+        #[arg(long)]
+        docs: Option<String>,
+        /// Also every module of a multi-repo descriptor
+        #[arg(long)]
+        modules: bool,
+    },
+    /// Create the missing knowledge files from the template (never overwrites)
+    Init {
+        #[arg(long)]
+        root: Option<PathBuf>,
+        #[arg(long)]
+        stack: Option<String>,
+        #[arg(long)]
+        docs: Option<String>,
+        #[arg(long)]
+        modules: bool,
     },
 }
 
@@ -242,6 +279,29 @@ fn run(cli: Cli) -> Result<i32, i32> {
             json,
             modules,
         } => audit::main(path, json, modules),
+        Cmd::Knowledge { action } => {
+            let f = factory(&cli.factory)?;
+            match action {
+                KnowledgeCmd::Stacks => {
+                    for s in knowledge::stacks(&f) {
+                        println!("{s}");
+                    }
+                    0
+                }
+                KnowledgeCmd::Plan {
+                    root,
+                    stack,
+                    docs,
+                    modules,
+                } => knowledge::main_plan(&f, root, stack, docs, modules, false),
+                KnowledgeCmd::Init {
+                    root,
+                    stack,
+                    docs,
+                    modules,
+                } => knowledge::main_plan(&f, root, stack, docs, modules, true),
+            }
+        }
         Cmd::Memory { root, json } => memory::main(root, json),
         Cmd::Rules {
             action: RulesCmd::Sync,

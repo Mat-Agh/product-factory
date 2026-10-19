@@ -13,6 +13,8 @@ steps to the human. Read the factory protocol
 ## Readiness
 
 From the base branch in the worktree:
+- The `history/DEVELOPMENT_LOG.md` entries since the last tag are the raw
+  material for the changelog and release notes.
 - What shipped since the last tag (`git describe --tags --abbrev=0`, then
   `git log <tag>..HEAD`), grouped by the PRs merged.
 - Each PR's factory evidence: a QA PASS and a gate verdict. Flag anything

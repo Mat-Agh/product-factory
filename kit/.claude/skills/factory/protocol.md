@@ -54,6 +54,23 @@ docs. Never read whole `docs/` trees.
   in the worktree, run `cd <worktree> && pf docs-map --fix` and
   commit the regenerated links together with your change. Never put new docs at
   the repo root.
+- **Knowledge upkeep.** Every repo keeps the knowledge structure of its stack
+  (`pf knowledge plan`), under the descriptor's `docs_root`. Keep it true in the
+  same branch as your change:
+
+  | When you… | Update |
+  |---|---|
+  | change what the repo contains, ships or depends on | `CURRENT_STATE.md` |
+  | finish any change that will merge | one dated entry at the top of `history/DEVELOPMENT_LOG.md` (date, job id, summary, links) |
+  | add or change a command, script, tool or version | `development/09-tools-scripts-and-commands.md` |
+  | introduce or change a canonical pattern | `development/15-code-samples-index.md` (and the living sample it points to) |
+  | add, upgrade or remove a dependency | the stack's library-stack chapter |
+  | change a convention or invariant | `development/00-engineering-principles.md` and the matching stack chapter |
+  | change a feature's status | `features/IMPLEMENTATION_STATUS.md` (link the evidence) |
+  | make a decision that outlives the job | a new `decisions/ADR-NNN-*.md` |
+  | knowingly deviate from a principle | `architecture/CONFORMANCE_LEDGER.md` |
+  | add, move or rename docs | the area README and the link map (`16-…`); then `pf docs-map --fix` if the repo uses the factory's routing format |
+
 - The repo's git hooks, CI checks and conventions are its gates. Pass them; never
   bypass them (`--no-verify`, `core.hooksPath` overrides, `*SKIP*` or `HUSKY=0`
   style switches). If a hook fails, fix the cause or write BLOCKED.

@@ -35,12 +35,16 @@ const ROOT_ALLOWED: &[&str] = &[
     "LICENSE.md",
     "SECURITY.md",
     "CODE_OF_CONDUCT.md",
+    "CURRENT_STATE.md",
+    "CONTRIBUTING.md",
+    "INSTALL.md",
 ];
 
 static LINK: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r#"!?\[[^\]]*\]\(([^)\s]+)(?:\s+"[^"]*")?\)"#).unwrap());
 static FENCE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?s)```.*?```").unwrap());
 static TICKS: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"`[^`\n]*`").unwrap());
+static COMMENTS: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?s)<!--.*?-->").unwrap());
 static SCHEME: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"^[a-z][a-z0-9+.-]*:").unwrap());
 static STATUS: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"^\*\*Status:\*\*\s*(.+)").unwrap());
 static BLANKS: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\n{3,}").unwrap());
@@ -444,7 +448,7 @@ fn check(tree: &Tree, files: &[String], o: &Options, r: &mut Report) {
         let p = tree.abs(f);
         let text = read(&p);
         let text = TICKS
-            .replace_all(&FENCE.replace_all(&text, ""), "")
+            .replace_all(&FENCE.replace_all(&COMMENTS.replace_all(&text, ""), ""), "")
             .into_owned();
         let mut targets = Vec::new();
         for c in LINK.captures_iter(&text) {

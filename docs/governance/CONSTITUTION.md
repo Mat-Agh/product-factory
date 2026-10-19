@@ -22,6 +22,10 @@ Humans keep the decisions that carry risk.
   folder is scratch space, not a record.
 - Nothing important exists only in a chat, a model's memory or one vendor's
   account. If losing the account would lose it, it must go into git.
+- **Every repo keeps its knowledge** in the structure of its stack: current state,
+  development history, the stack handbook (principles, stack chapters, tools and
+  commands, code samples, link map), architecture, decisions, features and
+  status. Each change keeps it true (`pf knowledge`).
 - **Documentation lives under `docs/`** at the repo root, in one folder per
   area, and each folder has a `README.md`. Only `README.md`, `AGENTS.md`,
   `CLAUDE.md` and tool-required files (`LICENSE`, `CHANGELOG.md`, `SECURITY.md`)

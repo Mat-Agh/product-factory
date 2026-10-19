@@ -24,6 +24,7 @@ print usage.
 | `pf rules sync` | Path-scoped module rules from the descriptor | [COMP-016](../components/COMP-016-session-integration.md) |
 | `pf memory` | Show a repo's auto memory | [COMP-016](../components/COMP-016-session-integration.md) |
 | `pf audit` | Inventory an existing project's agentic setup before adoption | [COMP-017](../components/COMP-017-adoption.md) |
+| `pf knowledge stacks \| plan \| init` | The per-stack knowledge structure (state, history, handbook, areas) | [COMP-018](../components/COMP-018-knowledge-structure.md) |
 
 ## Samples
 
@@ -43,6 +44,8 @@ pf rules sync                           # in the workspace
 pf memory                               # this repo's auto memory
 pf audit ~/Work/Connect/Daria-Connect-Back-End   # adoption inventory (read-only)
 pf audit . --modules --json             # whole workspace
+pf knowledge plan --modules             # knowledge gaps per repo
+pf knowledge init --root Daria-Connect-Federation   # create only what is missing
 pf memory --json --root ~/Work/Connect
 CLAUDE_CONFIG_DIR=/tmp/h pf install user
 

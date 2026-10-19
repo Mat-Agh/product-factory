@@ -149,6 +149,27 @@ from the table above. Descriptor rows are applied directly. Rows 7–9 become on
 conventional subject and no AI attribution, and you approve it. Re-run
 `pf audit` until no BLOCKER remains.
 
+## Step 4c — Knowledge structure
+
+Each child gets the knowledge structure of its stack (set in the descriptor:
+Back-End and Federation `spring-kotlin-service`, Client `kmp-android-client`,
+Front-End `typescript-web` in `doc/`, Product `product-docs` in `product/`).
+
+```bash
+pf knowledge plan --modules           # read-only: present, covered, missing, numbering conflicts
+```
+
+The gaps found on 2026-10-19 are listed in
+[COMP-018](../components/COMP-018-knowledge-structure.md#connect-today-read-only-plan-2026-10-19).
+They range from Back-End (6 missing, including the development history) to
+Federation (29 missing, including `CURRENT_STATE.md`). Client already uses `03`
+and `09` for other topics. Decide whether to renumber one of them or record the
+mapping in its handbook README; nothing is created for those two. When you
+agree, run `/factory knowledge init`. It creates only the missing files, then
+runs one `docs` job per child to fill them from the code, with real commands,
+the real canonical sample, and a first history entry from `git log`. Each job
+lands as an MR on a `docs/NNN-…` branch.
+
 ## Step 5 — Promote memory
 
 Open Claude Code at `~/Work/Connect` and run:

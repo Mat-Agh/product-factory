@@ -655,7 +655,29 @@ pub fn audit(root: &Path) -> (Vec<Finding>, Value) {
         }
     }
 
-    // 10. Factory state.
+    // 10. Knowledge structure for the module's stack.
+    if let Ok(factory) = util::factory_root(None) {
+        let t = crate::knowledge::target(root, None, None);
+        if let Ok(p) = crate::knowledge::plan(&factory, &t)
+            && (!p.missing.is_empty() || !p.conflicts.is_empty())
+        {
+            add(
+                Severity::Warn,
+                "knowledge",
+                format!(
+                    "knowledge structure ({} stack, {}/): {} present, {} missing, {} numbering conflicts",
+                    t.stack,
+                    t.docs_root,
+                    p.present.len(),
+                    p.missing.len(),
+                    p.conflicts.len()
+                ),
+                "Initialize: pf knowledge plan shows the gaps; pf knowledge init creates only missing files; then fill them in a docs job.",
+            );
+        }
+    }
+
+    // 11. Factory state.
     let installed = root.join(".factory/installed.lock").exists()
         || root.join(".claude/rules/product-factory.md").exists();
     add(

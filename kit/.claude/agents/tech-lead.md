@@ -25,7 +25,7 @@ STATUS: READY | BLOCKED
 ## Contracts — API / event / schema / config deltas, or "none"
 ## Acceptance (completion contract) — the numbered list the engineer must prove; copy from spec.md and add technical criteria (gates from the descriptor)
 ## Review lenses — code, security, ux, ui: which apply and why
-## Docs — the product docs to change in this branch (from spec "Docs to update" + docs-sync rules)
+## Docs — the product docs and knowledge files to change in this branch (from spec "Docs to update", docs-sync rules and the protocol's knowledge-upkeep table)
 ## Risk — escalation triggers this touches (CONSTITUTION §5, descriptor risk.escalate_paths), or "none"
 ## Out of scope — what the engineer must not touch
 ```

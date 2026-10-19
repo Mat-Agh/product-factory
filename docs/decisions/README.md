@@ -23,6 +23,7 @@ next number. A reversed decision is marked `Superseded by ADR-NNN` and kept.
 | [009](ADR-009-rust-tooling.md) | All factory tooling is one Rust CLI, `pf`; the hook fails closed without it | Accepted |
 | [010](ADR-010-session-behaviour-and-memory.md) | Sessions default to the factory; auto memory is promoted into git; module kits in workspaces | Accepted |
 | [011](ADR-011-adopt-existing-process.md) | Adopt an existing process: inventory, preserve, configure, then align | Accepted |
+| [012](ADR-012-knowledge-structure-per-stack.md) | One knowledge structure per stack, distilled from Connect | Accepted |
 
 ## Template
 
@@ -56,4 +57,5 @@ next number. A reversed decision is marked `Superseded by ADR-NNN` and kept.
   - [ADR-009 — All factory tooling is one Rust CLI](ADR-009-rust-tooling.md)
   - [ADR-010 — Sessions default to the factory; auto memory is promoted into git](ADR-010-session-behaviour-and-memory.md)
   - [ADR-011 — Adopt an existing process: inventory, preserve, configure, then align](ADR-011-adopt-existing-process.md)
+  - [ADR-012 — One knowledge structure per stack, distilled from Connect](ADR-012-knowledge-structure-per-stack.md)
 <!-- documentation-routing:end -->

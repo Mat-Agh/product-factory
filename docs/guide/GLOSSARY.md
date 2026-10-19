@@ -30,6 +30,7 @@
 | **`job.json`** | The machine-readable state of a job. Only the coordinator writes it, and the dashboard reads it. |
 | **Lane** | The ordered list of stages a job goes through. Triage picks it from type, tier and surface. |
 | **Lens** | One reviewer's angle: code, security, UX or UI. Lenses run in parallel. |
+| **Knowledge structure** | The per-stack set of docs every repo keeps: current state, development history, numbered handbook (00 principles, 09 tools, 15 samples, 16 link map, stack chapters), architecture, decisions, features and status. Created by `pf knowledge init`. |
 | **Living sample** | Existing code in the repo that new code should copy in structure, instead of inventing a new pattern. |
 | **Module** | One repository or area of a product. A single-repo product has one, and multi-repo products (like Daria Connect) have several. |
 | **Module install** | `pf install module`: the Claude Code part of the kit, put into one child repo of a workspace so sessions opened there use the workspace factory. |

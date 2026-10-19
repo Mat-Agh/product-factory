@@ -1,6 +1,6 @@
 ---
 name: factory
-description: Run the Product Factory. Use when the user types /factory followed by a request, or by one of init, adopt, idea, issue, next, status, rework, release, retro, memory or clean. The session that runs it becomes the coordinator, which triages the work, spawns the role agents, and moves each job from idea to a reviewed, tested PR that a human merges.
+description: Run the Product Factory. Use when the user types /factory followed by a request, or by one of init, adopt, knowledge, idea, issue, next, status, rework, release, retro, memory or clean. The session that runs it becomes the coordinator, which triages the work, spawns the role agents, and moves each job from idea to a reviewed, tested PR that a human merges.
 when_to_use: In any repository that has .factory/factory.yaml (or a parent workspace that does), use this whenever the user asks to build, add, change, fix, refactor, document, design, plan, spike, release or ship something, even when they do not type /factory. Do not use it for questions, explanations, code reading or status checks.
 ---
 
@@ -179,6 +179,9 @@ After that comes the stage instruction (for example `Build round 1.` or
    `pf install project .` (and `pf install module` for each module). This
    writes `"attribution": {"commit": "", "pr": "", "sessionUrl": false}` into
    `.claude/settings.json`. Agents and you then add no AI trailer or line.
+8a. **Knowledge.** Set each module's `stack` and `docs_root` in the descriptor (or the
+   single repo's first module). Then run `/factory knowledge plan` and offer
+   `/factory knowledge init`, which creates only the missing structure.
 8. **Memory.** Run `/factory memory` once, so knowledge already sitting in this
    repo's auto memory is promoted into the repo or retired.
 9. Check the guard hook is wired in `.claude/settings.json`. Check that the base
@@ -358,6 +361,12 @@ operator approves.
      folder's format (for example `.mdc` with frontmatter for Cursor). Also
      propose one short "Product Factory" line in `AGENTS.md` and `CLAUDE.md`,
      pointing to it, plus an `.md` import where `CLAUDE.md` lacks one.
+   - **initialize**: the knowledge structure of the module's stack is missing
+     parts (`pf knowledge plan`). Propose `pf knowledge init`, which creates only
+     missing files and never overwrites. List each numbering conflict (a
+     template chapter whose number the repo already uses for another topic) for
+     the operator: renumber one of them, or keep both and record the mapping in
+     the handbook README.
    - **decide**: needs the operator, for example another automation that takes
      issues (pause it, keep it for intake, or retire it), a plaintext credential
      (rotate and move it), or foreign docs routing markers (keep them, or convert
@@ -376,6 +385,31 @@ operator approves.
    - decisions: record the operator's answer in `adoption.md`.
 5. Re-run `pf audit`. When no BLOCKER remains, mark `adoption.md` complete. It is
    committed with the factory setup as the record of how this project was adopted.
+
+## /factory knowledge [plan|init|refresh]
+
+Every repo keeps the knowledge structure of its stack: `CURRENT_STATE.md`, the
+development history (`history/DEVELOPMENT_LOG.md`), the stack handbook (`00`
+principles, stack chapters, `09` tools and commands, `15` code samples, `16` link
+map, CI/CD), architecture, decisions, features and status, cross-project
+routers, and sessions. The templates are in the factory's `kit/knowledge/`
+(`pf knowledge stacks`).
+
+- **plan**: run `pf knowledge plan` (add `--modules` in a workspace). Report what
+  is present, what is covered by an equivalent, what is missing, and any numbering
+  conflicts.
+- **init**: after the operator agrees, run `pf knowledge init`. It creates only
+  missing files, filled with placeholders. Then run a `docs` job to **fill** them
+  from the code and the existing docs: real commands in `09`, the real canonical
+  sample in `15`, the real principles in `00`, the current state in
+  `CURRENT_STATE.md`, and a first `DEVELOPMENT_LOG.md` entry summarising
+  history from `git log`. Never leave a template line in a merged file.
+- **refresh**: keep stack knowledge current with the outside world. For each
+  library and tool in the library-stack and tools chapters, check the upstream
+  release notes and docs (cite sources) for new versions, deprecations and
+  breaking changes. Check each code sample in `15` still matches the living code.
+  Propose the updates as a `docs` job (and dependency upgrades as separate,
+  escalated `chore` jobs). Never upgrade silently.
 
 ## /factory memory
 

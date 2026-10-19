@@ -6,6 +6,30 @@
 Append-only. One dated entry for each factory-level change: what changed, why,
 and its evidence.
 
+## 2026-10-19 — Knowledge structure per stack, distilled from Connect
+
+- Surveyed the docs of all five Connect repos and the workspace root. They
+  share a shape: `CURRENT_STATE.md`, a docs router, a numbered handbook (`00`
+  principles, `09` tools, `15` samples, `16` link map, plus stack chapters),
+  architecture with a conformance ledger, ADRs, features with
+  `IMPLEMENTATION_STATUS.md`, cross-project routers and sessions. Front-End
+  (`doc/`) and Product (`product/`) use their own roots, and no repo had a
+  running development history.
+- Added `kit/knowledge/`: a base for every repo (including
+  `history/DEVELOPMENT_LOG.md`), plus overlays `spring-kotlin-service`,
+  `kmp-android-client`, `typescript-web` and `product-docs`, and `generic`.
+- Added `pf knowledge stacks|plan|init`. Plan reports present, covered by an
+  equivalent, missing, and numbering conflicts. Init creates only missing files
+  and never overwrites.
+- Added descriptor keys `modules[].stack` and `docs_root`; `/factory knowledge
+  plan|init|refresh`; `init` step 8a and the adopt class **initialize**; and a
+  knowledge-upkeep table in the protocol, enforced by reviewer-code, with
+  history entries by the engineer and release notes built from history.
+- `pf docs-map` now ignores HTML comments, and allows `CURRENT_STATE.md`,
+  `CONTRIBUTING.md` and `INSTALL.md` at the root (the Connect convention).
+- Evidence: 20 cargo tests; the read-only plan on Connect is recorded in
+  COMP-018; scratch init passes `docs-map --strict`.
+
 ## 2026-10-19 — Adopting projects that already have a process (constitution v1.2)
 
 - Added CONSTITUTION §8: adoption means inventory first, preserve everything,

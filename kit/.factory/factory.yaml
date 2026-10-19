@@ -23,6 +23,8 @@ modules:
     path: .
     owner_role: engineer
     agents_md: AGENTS.md        # the module's live instructions
+    stack: generic              # knowledge template: spring-kotlin-service | kmp-android-client | typescript-web | product-docs | generic (pf knowledge stacks)
+    docs_root: docs             # where this module keeps its docs (e.g. doc, product)
     gates: see AGENTS.md        # or a list: ["npm run lint", "npm test", "npm run build"]
     tests: yes                  # no = the module forbids unit tests; QA uses documented manual acceptance
     # vcs: { host: gitlab, base_branch: develop }   # multi-repo: per-module override of the vcs block

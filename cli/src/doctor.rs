@@ -4,7 +4,9 @@
 use std::fs;
 use std::path::Path;
 
-use crate::{audit, descriptor, diagrams, docs_map, guard, install, memory, rules, util};
+use crate::{
+    audit, descriptor, diagrams, docs_map, guard, install, knowledge, memory, rules, util,
+};
 
 #[derive(Default)]
 struct Doc {
@@ -291,6 +293,17 @@ pub fn main(factory: &Path, project: Option<&Path>) -> i32 {
                         .join("; ")
                 ),
             );
+        }
+        for r in &audit_roots {
+            let t = knowledge::target(r, None, None);
+            if let Ok(kp) = knowledge::plan(factory, &t) {
+                let shown = util::rel(&p, r);
+                d.soft(
+                    kp.missing.is_empty() && kp.conflicts.is_empty(),
+                    format!("knowledge structure complete ({shown}, {} stack)", t.stack),
+                    format!("knowledge ({shown}, {} stack): {} missing, {} numbering conflicts (pf knowledge plan --root {shown})", t.stack, kp.missing.len(), kp.conflicts.len()),
+                );
+            }
         }
         d.soft(
             p.join(".factory/adoption.md").exists(),

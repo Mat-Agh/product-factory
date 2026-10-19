@@ -36,6 +36,10 @@ in a parent folder.
   `/factory memory`.
 - Personal, machine-local preferences go in `CLAUDE.local.md`, which is
   gitignored.
+- Each repo keeps the knowledge structure of its stack: `CURRENT_STATE.md`,
+  `history/DEVELOPMENT_LOG.md`, the numbered handbook (`00`, `09`, `15`, `16` and
+  stack chapters), architecture, decisions, features and status. Keep it true in
+  every change (protocol: knowledge upkeep), and use `/factory knowledge`.
 - Documentation lives under `docs/`, one folder per area, each with a README.
   After adding or moving a doc, run `pf docs-map --fix`.
 

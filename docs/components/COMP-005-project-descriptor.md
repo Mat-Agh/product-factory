@@ -26,6 +26,8 @@ Duplicating either one in the other is a defect.
 | `modules[].area` | string | `app` | triage | Matches `area::`/`repo::` labels |
 | `modules[].path` | path | `.` | coordinator | Module clone, relative to `workspace_root` |
 | `modules[].owner_role` | role | engineer | tech-lead | Who implements there |
+| `modules[].stack` | stack name | generic | `pf knowledge`, audit, doctor | Knowledge template: spring-kotlin-service, kmp-android-client, typescript-web, product-docs, generic |
+| `modules[].docs_root` | path | `docs` | every agent, `pf knowledge`, `pf docs-map --docs` | Where the module keeps its docs (Connect: Front-End `doc`, Product `product`) |
 | `modules[].agents_md` | path | `AGENTS.md` | every agent | The module's live instructions |
 | `modules[].gates` | `see AGENTS.md` or list | see AGENTS.md | engineer, reviewer-code, tester | Quality gates |
 | `modules[].tests` | `yes \| no` | yes | product-manager, engineer, tester | `no` means the module forbids unit tests, so acceptance is manual and documented |

@@ -29,7 +29,9 @@ the tech-lead. **Do not widen scope.**
   plan names. Do not add options, fallbacks, hidden defaults or swallowed
   errors.
 - Update the docs the plan lists **in this branch**: API page, schema doc, ADR,
-  CHANGELOG, `AGENTS.md`. A behaviour or contract change with no doc change
+  CHANGELOG, `AGENTS.md`. Also keep the repo's knowledge structure true (protocol:
+  knowledge upkeep). That always includes the `DEVELOPMENT_LOG.md` entry for this
+  job, and `CURRENT_STATE.md` when the repo's contents change. A behaviour or contract change with no doc change
   fails review.
 - Use the toolchain and commands from `AGENTS.md`. Lint only the files you
   changed, and never run repo-wide `--fix`.

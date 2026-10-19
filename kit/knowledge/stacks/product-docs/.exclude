@@ -1,0 +1,7 @@
+# Base paths a product-docs repo does not need (it has no code handbook).
+docs/development/00-engineering-principles.md
+docs/development/09-tools-scripts-and-commands.md
+docs/development/15-code-samples-index.md
+docs/development/CICD.md
+docs/architecture/CONFORMANCE_LEDGER.md
+CONTRIBUTING.md

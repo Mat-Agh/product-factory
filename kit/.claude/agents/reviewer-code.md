@@ -39,7 +39,9 @@ Lint only the changed files, and never in a mode that rewrites files.
    matching doc update in this branch is **CHANGES**. So is a new or moved doc
    outside `docs/`, a doc folder without a README, or a failing
    `cd <worktree> && pf docs-map` (stale links, broken links,
-   orphan docs).
+   orphan docs). Missing knowledge upkeep (protocol table: `CURRENT_STATE.md`, the
+   `DEVELOPMENT_LOG.md` entry, the tools, samples and library-stack chapters,
+   `IMPLEMENTATION_STATUS.md`) for what this change did is also **CHANGES**.
 8. **Commits**: short messages, nothing stray, tree clean.
 
 ## Write

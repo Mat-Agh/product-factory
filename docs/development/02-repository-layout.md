@@ -21,6 +21,7 @@ product-factory/
 │       ├── factory.yaml          descriptor template (COMP-005)
 │       ├── backlog.md            backlog template (COMP-006)
 │       └── dashboard.html        dashboard (COMP-006)
+│   └── knowledge/                per-stack knowledge templates: base/ + stacks/<name>/ (COMP-018)
 ├── cli/                          ── the `pf` Rust CLI (COMP-015) ──
 │   ├── Cargo.toml, Cargo.lock
 │   └── src/                      main, guard, docs_map, diagrams, install, doctor, backup, dashboard, descriptor, rules, memory, util

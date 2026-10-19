@@ -29,6 +29,7 @@ source and never restate it. Current delivery status is in
 | [COMP-015](COMP-015-pf-cli.md) | `pf` CLI | `cli/` |
 | [COMP-016](COMP-016-session-integration.md) | Project session integration and memory | `kit/.claude/rules/product-factory.md`, `cli/src/{rules,memory,install}.rs` |
 | [COMP-017](COMP-017-adoption.md) | Adoption of an existing project | `cli/src/audit.rs`, `/factory adopt` |
+| [COMP-018](COMP-018-knowledge-structure.md) | Knowledge structure per stack | `kit/knowledge/`, `cli/src/knowledge.rs` |
 
 Adding a component means adding a `COMP-NNN-*.md` here, a row in this table and
 in `IMPLEMENTATION_STATUS.md`, and a route in the
@@ -57,4 +58,5 @@ in `IMPLEMENTATION_STATUS.md`, and a route in the
   - [COMP-015 — `pf` CLI](COMP-015-pf-cli.md)
   - [COMP-016 — Project session integration and memory](COMP-016-session-integration.md)
   - [COMP-017 — Adoption of an existing project](COMP-017-adoption.md)
+  - [COMP-018 — Knowledge structure per stack](COMP-018-knowledge-structure.md)
 <!-- documentation-routing:end -->
