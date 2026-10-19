@@ -14,7 +14,7 @@ and the factory does not move to the next phase until that criterion is met.
 - Set up mirror remotes and the first offline bundle.
 
 **Exit:** 7 jobs reach a PR with no manual state repair. Every PR has acceptance
-evidence. `doctor.sh` is clean on two machines.
+evidence. `pf doctor` is clean on two machines.
 
 ## Phase 2 — Product front end
 

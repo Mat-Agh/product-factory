@@ -1,8 +1,8 @@
 # COMP-012 — Docs map
 
-**Status:** Implemented — verified on this repo (2026-10-19)
+**Status:** Implemented in Rust — byte-identical output to the Python original; verified on this repo (2026-10-19)
 **Last updated:** 2026-10-19
-**Source:** [`kit/.factory/docs-map.py`](../../kit/.factory/docs-map.py)
+**Source:** [`cli/src/docs_map.rs`](../../cli/src/docs_map.rs) (`pf docs-map`)
 **Rule:** CONSTITUTION §1, documentation structure ([CONSTITUTION](../governance/CONSTITUTION.md))
 
 ## Purpose
@@ -11,19 +11,19 @@ This tool keeps a repository's documentation in one connected tree under
 `docs/`, with every README linked to its parent, its documents and its
 subfolders, and a map of the whole tree in `docs/README.md`. The links are
 **generated**, so they cannot drift, and **checked**, so a stale or broken map
-fails the gate. The same tool runs on this repo and, installed as
-`.factory/docs-map.py`, on every product.
+fails the gate. The same command runs on this repo and on every product. It
+needs only `pf` on the PATH.
 
 ## Interface
 
 ```bash
-python3 .factory/docs-map.py                    # check (exit 1 on failure)
-python3 .factory/docs-map.py --fix              # create missing READMEs, regenerate routing blocks and the map, then check
-python3 .factory/docs-map.py --strict           # also: **Status:** header in every doc; no docs outside docs/
+pf docs-map                    # check (exit 1 on failure)
+pf docs-map --fix              # create missing READMEs, regenerate routing blocks and the map, then check
+pf docs-map --strict           # also: **Status:** header in every doc; no docs outside docs/
   --root <repo>   --docs <dir> (default docs)   --allow <prefix> (Markdown outside docs/ that is not documentation)
 ```
 
-This repo runs it as `python3 kit/.factory/docs-map.py --strict --allow kit/`
+This repo runs it as `pf docs-map --strict --allow kit/`
 (the kit's agent and skill files are payload, not docs).
 
 ## What it generates
@@ -57,16 +57,16 @@ It uses only the Python 3.8+ standard library.
 
 | Who | When |
 |---|---|
-| Factory developers | before every commit (a gate in `AGENTS.md`) and inside `scripts/doctor.sh` |
+| Factory developers | before every commit (a gate in `AGENTS.md`) and inside `pf doctor` |
 | Every agent that adds, moves or renames a product doc | `--fix` in the worktree, committed with the change (protocol) |
 | reviewer-code | a check failure is `CHANGES` (docs-sync gate) |
 | `/factory init` | reports docs outside `docs/` and missing READMEs, and offers the move |
-| `scripts/doctor.sh <product>` | reports the product's map status |
+| `pf doctor <product>` | reports the product's map status |
 
 ## Known limitations
 
 - It does not validate `#anchor` fragments or external URLs. Diagrams are
-  validated by `scripts/render-diagrams.sh` ([COMP-014](COMP-014-diagrams.md)).
+  validated by `pf diagrams render` ([COMP-014](COMP-014-diagrams.md)).
 - Folder README titles come from their first `# ` heading, so keep headings
   meaningful.
 

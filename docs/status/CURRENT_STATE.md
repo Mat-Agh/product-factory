@@ -12,23 +12,26 @@ It contains:
 
 - **Rules:** [`CONSTITUTION.md`](../governance/CONSTITUTION.md) (v1).
 - **The kit** installed into products: the `/factory` coordinator skill, the
-  shared agent protocol, ten role agents, a guard hook that blocks merges,
+  shared agent protocol, ten role agents, wiring for the `pf guard` hook that blocks merges,
   tags, releases, force-pushes and discarding work, a project descriptor
   template, a backlog and a local dashboard.
 - **The operator profile** (`docs/operator/USER.md`), which keeps preferences out of
   vendor memory.
 - **Adapters** for running the same roles in Hermes, Codex, Cursor and other
   agents.
-- **Tooling:** installer (project copy or user symlinks), doctor, mirror and
-  bundle backups, memory export, and the docs gate.
+- **Tooling:** one Rust CLI, `pf` (`cli/`). It covers the guard hook, docs map,
+  diagrams, installer (project copy or user symlinks), doctor, mirror and bundle
+  backups, memory export, and the dashboard server. There is no Python and no
+  bash script.
 - **Documentation:** everything is under `docs/`, one connected tree generated
-  and checked by `docs-map.py`. It covers governance, the operator guide,
+  and checked by `pf docs-map`. It covers governance, the operator guide,
   architecture, component contracts, the development handbook, ADRs, status
   (this page, implementation status, roadmap, evolution log), adapters and the
   operator profile. Diagrams are committed SVGs rendered from Mermaid sources.
 
-**Verification state:** the guard hook unit tests (73/73), the installer and
-doctor on a scratch repo, and the docs gate all pass. **No job has run end to end
+**Verification state:** `pf` passes its 10 cargo tests (including the 73 guard
+policy cases) and matches the Python tools it replaced. Every subcommand has
+run end to end on scratch setups. The docs map and diagram checks pass. **No job has run end to end
 on a real product yet.** That is the Phase 1 exit criterion. Details:
 [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md).
 

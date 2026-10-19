@@ -4,7 +4,7 @@
 **Last updated:** 2026-10-19
 
 This file is account-independent memory about the person who runs the factory.
-`scripts/install.sh user` imports it into `~/.claude/CLAUDE.md` with an `@`
+`pf install user` imports it into `~/.claude/CLAUDE.md` with an `@`
 line. Other agents read it from `AGENTS.md`. Edit it here, in git, and never
 only in a vendor's memory.
 

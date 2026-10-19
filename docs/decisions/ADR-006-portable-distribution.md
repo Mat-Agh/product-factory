@@ -14,11 +14,11 @@ Code stores skills, agents and memory under `~/.claude`, on one machine.
 ## Decision
 
 - The factory is a git repository, mirrored to several remotes and to offline
-  bundles (`scripts/mirror.sh`).
-- **Products get a copy** of the kit (`install.sh project`), committed in the
+  bundles (`pf mirror`).
+- **Products get a copy** of the kit (`pf install project`), committed in the
   product. Anyone who clones the product has a working factory, with
   `installed.lock` recording its source revision.
-- **Machines get symlinks** (`install.sh user`), so `git pull` updates every
+- **Machines get symlinks** (`pf install user`), so `git pull` updates every
   project on that machine that uses the user install.
 - Operator preferences live in `docs/operator/USER.md`, imported into Claude Code
   through `CLAUDE.md`. Vendor memory is exported for review, never treated as
@@ -35,8 +35,8 @@ Code stores skills, agents and memory under `~/.claude`, on one machine.
 
 ## Consequences
 
-Project copies can drift from the factory. `doctor.sh` reports drift, and
-updating is an explicit `install.sh project` followed by review.
+Project copies can drift from the factory. `pf doctor` reports drift, and
+updating is an explicit `pf install project` followed by review.
 
 <!-- documentation-routing:start -->
 ## Documentation routing

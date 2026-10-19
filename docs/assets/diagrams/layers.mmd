@@ -20,8 +20,8 @@ flowchart TB
     BR["factory/* branches"]
     PRS["PRs / MRs · issues · branch protection"]
   end
-  K -- "install.sh project (copy)" --> KC
-  K -- "install.sh user (symlink)" --> U
+  K -- "pf install project (copy)" --> KC
+  K -- "pf install user (symlink)" --> U
   O --> U
   U --> R
   KC --> R

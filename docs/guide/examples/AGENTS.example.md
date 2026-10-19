@@ -55,7 +55,7 @@ Compile alone is not done.
 | Design system | docs/design/README.md, src/styles/tokens.css |
 
 ## Product Factory
-(appended by scripts/install.sh — keep it)
+(appended by pf install — keep it)
 ```
 
 ---

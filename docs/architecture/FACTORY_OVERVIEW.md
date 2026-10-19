@@ -7,7 +7,7 @@
 
 ![Factory layers: factory repo, machine, product repo, git host](../assets/diagrams/layers.svg)
 
-<sub>Diagram source: [`layers.mmd`](../assets/diagrams/layers.mmd) · re-render with `scripts/render-diagrams.sh`</sub>
+<sub>Diagram source: [`layers.mmd`](../assets/diagrams/layers.mmd) · re-render with `pf diagrams render`</sub>
 
 | Layer | Holds | Lifetime | Lost if… |
 |---|---|---|---|
@@ -21,7 +21,7 @@
 
 ![Runtime sequence of one job](../assets/diagrams/job-sequence.svg)
 
-<sub>Diagram source: [`job-sequence.mmd`](../assets/diagrams/job-sequence.mmd) · re-render with `scripts/render-diagrams.sh`</sub>
+<sub>Diagram source: [`job-sequence.mmd`](../assets/diagrams/job-sequence.mmd) · re-render with `pf diagrams render`</sub>
 
 ## Contracts between components
 
@@ -70,7 +70,7 @@ Codex review lens) is on the roadmap.
 
 The guard is a second line of defence, not a sandbox. A determined process with a
 shell can still write files. Branch protection on the base branch is the control
-that holds, and `doctor.sh` checks for it.
+that holds, and `pf doctor` checks for it.
 
 <!-- documentation-routing:start -->
 ## Documentation routing

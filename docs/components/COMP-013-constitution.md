@@ -26,7 +26,7 @@ follows. When any other file disagrees with it, that file is a defect.
 
 | § | Enforcement |
 |---|---|
-| 1 | `docs-sync` check in reviewer-code; installer layout; [ADR-007](../decisions/ADR-007-truth-in-product-repo.md); docs tree and map by `docs-map.py` ([COMP-012](COMP-012-docs-gate.md)) |
+| 1 | `docs-sync` check in reviewer-code; installer layout; [ADR-007](../decisions/ADR-007-truth-in-product-repo.md); docs tree and map by `pf docs-map` ([COMP-012](COMP-012-docs-gate.md)) |
 | 2 | Lanes in [COMP-001](COMP-001-coordinator-skill.md); role tools and instructions in [COMP-003](COMP-003-role-agents.md) |
 | 3 | Protocol ([COMP-002](COMP-002-agent-protocol.md)); the coordinator stops on a bad verdict |
 | 4 | Gate rules in tech-lead; `max_resumes` |

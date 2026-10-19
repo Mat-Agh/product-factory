@@ -20,7 +20,7 @@
 | **Escalate** | The gate's verdict that a human must decide. It happens for risky areas, product decisions, exhausted review rounds, or missing evidence. |
 | **Evidence** | Proof attached to an acceptance criterion: the command run and its output, or what a page or device showed. A compile is not evidence. |
 | **Gate** | The final check by the tech-lead before a PR opens. Its verdict is READY or ESCALATE. |
-| **Guard hook** | `factory-guard.py`, a Claude Code `PreToolUse` hook that blocks forbidden git, gh and glab commands. See [COMP-004](../components/COMP-004-guard-hook.md). |
+| **Guard hook** | `pf guard`, a Claude Code `PreToolUse` hook that blocks forbidden git, gh and glab commands. See [COMP-004](../components/COMP-004-guard-hook.md). |
 | **Hook** | A command Claude Code runs automatically around tool calls. Configured in `.claude/settings.json`. |
 | **Idea lane** | The path for a product idea: discovery → PRD → design concept → architecture → roadmap, ending in a docs PR. |
 | **Job / job id** | One request moving through the pipeline. Its id is a number plus a slug: `004-tenant-org-name`. |
@@ -32,6 +32,7 @@
 | **`needs-human`** | The stage a job enters when it cannot continue without you. The coordinator quotes the reason. |
 | **Operator** | You: the person who runs the factory and makes the decisions it escalates. Described in `docs/operator/USER.md`. |
 | **PR / MR** | Pull request (GitHub) or merge request (GitLab): a proposed set of changes on a branch, which a human reviews and merges. |
+| **`pf`** | The Product Factory's Rust command-line tool: guard hook, docs map, diagrams, install, doctor, backups, dashboard. See [COMP-015](../components/COMP-015-pf-cli.md). |
 | **PRD** | Product Requirements Document: what a product or feature must do, and why. |
 | **Protocol** | `.claude/skills/factory/protocol.md`, the rules every agent reads first. |
 | **Resume** | Sending the same engineer back to fix review or QA findings. The number of resumes is capped by `limits.max_resumes` (default 2). |

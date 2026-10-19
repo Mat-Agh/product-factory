@@ -24,17 +24,17 @@ Tagging is human-only, here as everywhere.
 2. IMPLEMENTATION_STATUS is current. The evolution log has an entry headed with
    the version.
 3. A human tags and pushes: `git tag -s vX.Y.Z -m "Product Factory vX.Y.Z" && git push origin vX.Y.Z`.
-4. Run `scripts/mirror.sh push` so the tag reaches every mirror, then
-   `scripts/mirror.sh bundle`.
+4. Run `pf mirror push` so the tag reaches every mirror, then
+   `pf mirror bundle`.
 
 ## Updating products
 
 Each product records the factory revision it runs in `.factory/installed.lock`.
 
 ```bash
-cd ~/Work/ProductFactory && git pull
-scripts/doctor.sh ~/Work/MyApp            # shows drift
-scripts/install.sh project ~/Work/MyApp   # keeps factory.yaml and backlog.md
+cd ~/Work/ProductFactory && git pull && cargo install --path cli
+pf doctor ~/Work/MyApp            # shows drift
+pf install project ~/Work/MyApp   # keeps factory.yaml and backlog.md
 cd ~/Work/MyApp && git diff               # review, then commit
 ```
 

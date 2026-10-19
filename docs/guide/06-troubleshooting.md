@@ -3,19 +3,20 @@
 **Status:** Active
 **Last updated:** 2026-10-19
 
-Start with `scripts/doctor.sh <product>`. It catches most setup problems. Then
+Start with `pf doctor <product>`. It catches most setup problems. Then
 find your symptom below.
 
 ## Setup
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| `/factory` is not recognised, or Claude answers without running the pipeline | The skill is not installed where this session looks, or the session started before installation | Run `scripts/install.sh user` or `project <path>`, then **start a new Claude Code session**. Skills and agents load at session start. |
+| `/factory` is not recognised, or Claude answers without running the pipeline | The skill is not installed where this session looks, or the session started before installation | Run `pf install user` or `project <path>`, then **start a new Claude Code session**. Skills and agents load at session start. |
 | "Agent type 'engineer' not found" | Agents are missing from `.claude/agents/` and `~/.claude/agents/` | Re-run the installer, and start a new session |
 | `git clone git@github.com:…` fails with `Permission denied (publickey)` | No SSH key on GitHub | Run `gh auth login` and choose SSH, or `gh ssh-key add ~/.ssh/id_ed25519.pub` |
-| The installer prints "jq not found" | `jq` missing | Install it (see getting started), then re-run. Or paste the printed hook block into `.claude/settings.json` yourself |
+| Every Bash call is blocked: "the pf CLI is not installed, so Bash is blocked (fail closed)" | `pf` is not on the PATH Claude Code sees | `cargo install --path cli` in the factory checkout (or the `--git` form). Make sure `~/.cargo/bin` is on PATH, then restart the session |
+| `cargo install` fails with "linker cc not found" | No C toolchain | Ubuntu: `sudo apt install build-essential`. macOS: `xcode-select --install` |
 | The installer says "<path> is not a git repo" | Target folder is not a repository | Run `git init` there first, or point at the repository root |
-| `doctor.sh`: "drift: … differs from factory kit" | The project copy is older (or newer, if edited) than the factory | Review the diff (`git diff --no-index`), then re-run `install.sh project`. Edit the factory, not the copy |
+| `pf doctor`: "drift: … differs from factory kit" | The project copy is older (or newer, if edited) than the factory | Review the diff (`git diff --no-index`), then re-run `pf install project`. Edit the factory, not the copy |
 
 ## Guard hook
 
@@ -23,8 +24,8 @@ find your symptom below.
 |---|---|---|
 | `factory-guard: Merging is human-only…` when **you** asked Claude to merge | The guard applies to every session in a project that has the kit | Merge in the GitHub/GitLab UI or your own terminal. For a deliberate human session, start Claude with `FACTORY_GUARD=off claude`. Never set it for factory runs |
 | `factory-guard: The factory pushes only factory/* branches` | Something tried to push another branch | Intended. If a job did this, it is a bug, so report it via `/factory retro` |
-| `factory-guard: unreadable hook input; blocking to fail closed` | Claude Code sent malformed hook input, or the hook ran with the wrong interpreter | Check that `python3 --version` works in the shell Claude uses. Run `python3 tests/guard_test.py` in the factory repo |
-| The hook never fires (merge commands go through) | Not wired in `.claude/settings.json`, or settings changed mid-session | Run `doctor.sh <product>`, check `/hooks` in an interactive `claude` session, and restart the session |
+| `factory-guard: unreadable hook input; blocking to fail closed` | Claude Code sent malformed hook input | Run `pf guard --self-test`, update Claude Code and `pf`, and report it via `/factory retro` if it persists |
+| The hook never fires (merge commands go through) | Not wired in `.claude/settings.json`, or settings changed mid-session | Run `pf doctor <product>`, check `/hooks` in an interactive `claude` session, and restart the session |
 
 ## Jobs
 
@@ -52,7 +53,8 @@ find your symptom below.
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| The dashboard is empty | The server was started in the wrong folder | Run `python3 -m http.server` **inside `.factory/`**, not the repo root |
+| `pf dashboard`: "no dashboard.html in .factory" | Run from the wrong folder | Run `pf dashboard` from the product repo root, or pass `--dir <path to .factory>` |
+| The dashboard is empty | No jobs yet, or another `.factory/` was served | Check the folder `pf dashboard` printed |
 | Opening `dashboard.html` as a file shows nothing | Browsers block `fetch` from `file://` | Use the HTTP server |
 
 <!-- documentation-routing:start -->

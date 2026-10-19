@@ -9,28 +9,29 @@ The factory has three levels of verification. Record every result in
 ## 1. Static and unit (every commit)
 
 ```bash
-python3 tests/guard_test.py        # guard policy: 73 cases as of 2026-10-19
-bash -n scripts/*.sh               # script syntax
-scripts/render-diagrams.sh --check # diagrams match their sources
-python3 kit/.factory/docs-map.py --strict --allow kit/   # docs tree, links, map
-scripts/doctor.sh                  # machine + factory repo health
+(cd cli && cargo test --release && cargo clippy --release && cargo fmt --check)   # unit tests incl. 73 guard cases
+pf guard --self-test                 # the installed pf agrees with the source
+pf docs-map --strict --allow kit/    # docs tree, links, map
+pf diagrams check                    # diagrams match their sources
+pf doctor                            # machine + factory repo health
 ```
 
-All five must pass before a commit.
+All five must pass before a commit. After changing `cli/`, reinstall with
+`cargo install --path cli` so the installed `pf` matches the source.
 
 ## 2. Installer smoke test
 
-Run it whenever `install.sh`, `doctor.sh` or the kit layout changes.
+Run it whenever `cli/src/install.rs`, `cli/src/doctor.rs` or the kit layout changes.
 
 ```bash
 T=$(mktemp -d); mkdir "$T/app" && cd "$T/app" && git init -q -b main \
   && echo "# App" > AGENTS.md && git add -A && git -c user.email=t@t -c user.name=t commit -qm init && cd -
-scripts/install.sh project "$T/app"            # first install
-scripts/install.sh project "$T/app"            # re-install: must keep descriptor/backlog, not duplicate hook or AGENTS section
-CLAUDE_CONFIG_DIR="$T/home" scripts/install.sh user
-CLAUDE_CONFIG_DIR="$T/home" scripts/doctor.sh "$T/app"   # expect 0 failures
+pf install project "$T/app"            # first install
+pf install project "$T/app"            # re-install: must keep descriptor/backlog, not duplicate hook or AGENTS section
+CLAUDE_CONFIG_DIR="$T/home" pf install user
+CLAUDE_CONFIG_DIR="$T/home" pf doctor "$T/app"   # expect 0 failures
 grep -c '^## Product Factory' "$T/app/AGENTS.md"          # expect 1
-jq '.hooks.PreToolUse | length' "$T/app/.claude/settings.json"   # expect 1
+grep -c 'pf guard' "$T/app/.claude/settings.json"         # expect 1 (one hook entry)
 rm -rf "$T"
 ```
 

@@ -17,8 +17,11 @@ Its descriptor is `.factory/factory.yaml`, and its rules are in
   `release-manager`. Job state lives in `.factory/jobs/<job-id>/`.
 - **Documentation:** all docs live under `docs/`, one folder per area, each
   with a `README.md`. After adding or moving a doc, run
-  `python3 .factory/docs-map.py --fix`, which regenerates the README links and
+  `pf docs-map --fix`, which regenerates the README links and
   the map in `docs/README.md`.
+- **Tooling:** the `pf` CLI must be on PATH. The guard hook calls `pf guard` and
+  blocks Bash (fail closed) when `pf` is missing. Install it with
+  `cargo install --git ssh://git@github.com/Mat-Agh/product-factory.git pf`.
 - **Hard rules:** work on `factory/<job-id>` branches in worktrees. Humans merge,
   tag, release and deploy. Never force-push or use `--no-verify`. Never stash or
   reset work you did not create. Never put secrets in git. Done means the gates

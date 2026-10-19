@@ -5,7 +5,7 @@
 
 1. **Install the kit** into the product repo:
    ```bash
-   ~/Work/ProductFactory/scripts/install.sh project ~/Work/MyApp
+   pf install project ~/Work/MyApp
    ```
    This copies `.claude/skills/factory`, `.claude/agents/*`, the guard hook,
    `.factory/{factory.yaml,backlog.md,dashboard.html}`, adds `.factory/jobs/` to
@@ -29,7 +29,7 @@
 
 5. **Check and commit:**
    ```bash
-   ~/Work/ProductFactory/scripts/doctor.sh ~/Work/MyApp
+   pf doctor ~/Work/MyApp
    ```
    Then commit `.claude/`, `.factory/` (without `jobs/`), `AGENTS.md` and
    `CLAUDE.md` in the product repo yourself. A filled example of the `AGENTS.md`
@@ -54,8 +54,8 @@ that child repo.
 
 ```bash
 cd ~/Work/ProductFactory && git pull
-scripts/doctor.sh ~/Work/MyApp        # shows drift
-scripts/install.sh project ~/Work/MyApp
+pf doctor ~/Work/MyApp        # shows drift
+pf install project ~/Work/MyApp
 ```
 Your `factory.yaml` and `backlog.md` are kept. Review the diff in the product
 repo and commit it.

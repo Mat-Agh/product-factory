@@ -20,6 +20,7 @@ next number. A reversed decision is marked `Superseded by ADR-NNN` and kept.
 | [006](ADR-006-portable-distribution.md) | Copied project kit, symlinked user install, mirrors: no account dependency | Accepted |
 | [007](ADR-007-truth-in-product-repo.md) | Product truth stays in the product repo; descriptor versus `AGENTS.md` split | Accepted |
 | [008](ADR-008-idea-and-release-lanes.md) | Idea and release lanes; launch material is drafts only | Accepted |
+| [009](ADR-009-rust-tooling.md) | All factory tooling is one Rust CLI, `pf`; the hook fails closed without it | Accepted |
 
 ## Template
 
@@ -50,4 +51,5 @@ next number. A reversed decision is marked `Superseded by ADR-NNN` and kept.
   - [ADR-006 — Portable distribution with no account dependency](ADR-006-portable-distribution.md)
   - [ADR-007 — Product truth stays in the product repo](ADR-007-truth-in-product-repo.md)
   - [ADR-008 — Idea and release lanes; launch material is drafts only](ADR-008-idea-and-release-lanes.md)
+  - [ADR-009 — All factory tooling is one Rust CLI](ADR-009-rust-tooling.md)
 <!-- documentation-routing:end -->

@@ -45,7 +45,7 @@ and not read the whole handbook for ordinary work.
   - [03 — Changing the factory](03-changing-the-factory.md)
   - [04 — Testing and verification](04-testing-and-verification.md)
   - [05 — Releases and versioning](05-releases-and-versioning.md)
-  - [09 — Tools, scripts and commands](09-tools-scripts-and-commands.md)
+  - [09 — Tools and commands](09-tools-scripts-and-commands.md)
   - [16 — Documentation link map](16-documentation-link-map.md)
   - [Contributing to the Product Factory](CONTRIBUTING.md)
 <!-- documentation-routing:end -->

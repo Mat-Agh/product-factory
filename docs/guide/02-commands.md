@@ -25,7 +25,7 @@ how to use them.
 
 ## `/factory init`
 
-Run it once per product repo, after `scripts/install.sh project`.
+Run it once per product repo, after `pf install project`.
 
 - **What happens:** the coordinator reads the repo (languages, package
   managers, CI, docs, `AGENTS.md`) and writes `.factory/factory.yaml`,
@@ -140,11 +140,11 @@ deletes the branch only if the PR was merged, and marks the job `done` or
 
 | Command | Purpose |
 |---|---|
-| `scripts/install.sh user \| project <path> \| all <path>` | Install the factory |
-| `scripts/doctor.sh [project]` | Health check |
-| `scripts/mirror.sh add \| push \| bundle` | Backups |
-| `scripts/export-claude.sh` | Save Claude Code memory for review |
-| `python3 -m http.server` in `.factory/` | Dashboard |
+| `pf install user \| project <path> \| all <path>` | Install the factory |
+| `pf doctor [project]` | Health check |
+| `pf mirror add \| push \| bundle` | Backups |
+| `pf export` | Save Claude Code memory for review |
+| `pf dashboard` in the product repo | Dashboard |
 
 Details: [development/09-tools-scripts-and-commands.md](../development/09-tools-scripts-and-commands.md).
 

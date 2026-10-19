@@ -1,60 +1,67 @@
-# 09 — Tools, scripts and commands
+# 09 — Tools and commands
 
 **Status:** Active
 **Last updated:** 2026-10-19
 
-Use these before inventing ad-hoc commands. Each script prints its usage when
-run without arguments.
+All factory tooling is one Rust binary, `pf` ([COMP-015](../components/COMP-015-pf-cli.md)).
+Use it before inventing ad-hoc commands. `pf --help` and `pf <command> --help`
+print usage.
 
-## Scripts
+## Subcommands
 
-| Script | Purpose | Contract |
+| Command | Purpose | Contract |
 |---|---|---|
-| `scripts/install.sh` | Install the factory into a product (copy) or a user profile (symlinks) | [COMP-007](../components/COMP-007-installer.md) |
-| `scripts/doctor.sh` | Health check. Exit code = number of failures | [COMP-008](../components/COMP-008-doctor.md) |
-| `scripts/mirror.sh` | Backup remotes and offline bundles | [COMP-009](../components/COMP-009-backup-tools.md) |
-| `scripts/export-claude.sh` | Copy Claude Code memory into the repo for review | [COMP-009](../components/COMP-009-backup-tools.md) |
-| `kit/.factory/docs-map.py` | Docs tree check and live map generator (also installed into products) | [COMP-012](../components/COMP-012-docs-gate.md) |
-| `scripts/render-diagrams.sh` | Render Mermaid sources to SVG; `--check` for freshness | [COMP-014](../components/COMP-014-diagrams.md) |
-| `tests/guard_test.py` | Guard hook policy tests | [COMP-004](../components/COMP-004-guard-hook.md) |
+| `pf guard` | Claude Code PreToolUse hook (stdin JSON → exit 0 or 2) | [COMP-004](../components/COMP-004-guard-hook.md) |
+| `pf guard --self-test` | Run the 73 policy cases | [COMP-004](../components/COMP-004-guard-hook.md) |
+| `pf docs-map` | Docs tree check and live map generator | [COMP-012](../components/COMP-012-docs-gate.md) |
+| `pf diagrams check \| render` | Mermaid sources to SVG; freshness check | [COMP-014](../components/COMP-014-diagrams.md) |
+| `pf install project \| user \| all` | Put the factory into a product (copy) or a user config (links) | [COMP-007](../components/COMP-007-installer.md) |
+| `pf doctor [project]` | Health check; exit code = failures | [COMP-008](../components/COMP-008-doctor.md) |
+| `pf mirror add \| push \| bundle` | Backup remotes and offline bundles | [COMP-009](../components/COMP-009-backup-tools.md) |
+| `pf export` | Copy Claude Code memory into the repo for review | [COMP-009](../components/COMP-009-backup-tools.md) |
+| `pf dashboard` | Serve a product's `.factory/` on loopback | [COMP-006](../components/COMP-006-backlog-and-dashboard.md) |
 
 ## Samples
 
 ```bash
-# Install
-scripts/install.sh user
-scripts/install.sh project ~/Work/MyApp
-scripts/install.sh all ~/Work/MyApp
-WITH_USER_GUARD=1 scripts/install.sh user          # guard in every project on this machine
-CLAUDE_CONFIG_DIR=/tmp/h scripts/install.sh user   # install into another Claude config dir
+# Build and install pf
+cargo install --path cli
+cargo install --git ssh://git@github.com/Mat-Agh/product-factory.git pf
+
+# Install the factory
+pf install user
+pf install user --with-guard           # also guard every project on this machine
+pf install project ~/Work/MyApp
+pf install all ~/Work/MyApp
+CLAUDE_CONFIG_DIR=/tmp/h pf install user
 
 # Health
-scripts/doctor.sh
-scripts/doctor.sh ~/Work/MyApp
+pf doctor
+pf doctor ~/Work/MyApp
 
 # Backups
-scripts/mirror.sh add gitlab git@gitlab.com:<you>/product-factory.git
-scripts/mirror.sh push
-scripts/mirror.sh bundle ~/Backups/product-factory
+pf mirror add gitlab git@gitlab.com:<you>/product-factory.git
+pf mirror push
+pf mirror bundle ~/Backups/product-factory
 
 # Memory
-scripts/export-claude.sh        # then review .claude-export/<date>/ and delete it
+pf export                               # then review .claude-export/<date>/ and delete it
 
-# Gates
-python3 tests/guard_test.py
-python3 kit/.factory/docs-map.py --strict --allow kit/
-python3 kit/.factory/docs-map.py --fix --strict --allow kit/
-bash -n scripts/*.sh
-scripts/render-diagrams.sh --check
-scripts/render-diagrams.sh          # after editing a .mmd
+# Gates (factory repo)
+cd cli && cargo test --release && cargo clippy --release && cd ..
+pf guard --self-test
+pf docs-map --strict --allow kit/
+pf docs-map --fix --strict --allow kit/
+pf diagrams check
+pf diagrams render                      # after editing a .mmd
 
 # Try the guard by hand
-echo '{"tool_name":"Bash","tool_input":{"command":"git merge main"}}' \
-  | python3 kit/.claude/hooks/factory-guard.py; echo "exit=$?"   # exit=2 with reason
+echo '{"tool_name":"Bash","tool_input":{"command":"git merge main"}}' | pf guard; echo "exit=$?"   # exit=2 with reason
 
-# Inspect a job in a product
+# In a product
+pf docs-map --fix
+pf dashboard                            # http://127.0.0.1:8000/dashboard.html
 head -n1 .factory/jobs/<id>/*.md .factory/jobs/<id>/round-*/*.md
-jq . .factory/jobs/<id>/job.json
 git worktree list
 ```
 
@@ -62,11 +69,10 @@ git worktree list
 
 | Variable | Read by | Effect |
 |---|---|---|
-| `CLAUDE_CONFIG_DIR` | install.sh, doctor.sh, export-claude.sh | The Claude config dir (default `~/.claude`) |
-| `WITH_USER_GUARD=1` | install.sh user | Also wire the guard in the user `settings.json` |
-| `FACTORY_GUARD=off` | factory-guard.py | Disable the guard for a human-driven session (set before starting `claude`) |
-| `CLAUDE_PROJECT_DIR` | hook command | Set by Claude Code. Locates the project guard script |
-| `MMDC`, `MERMAID_CHROME` | render-diagrams.sh | Mermaid CLI binary and Chrome binary to use |
+| `PRODUCT_FACTORY_HOME` | `pf install`, `doctor`, `mirror`, `export` | Factory checkout (or pass `--factory <path>`) |
+| `CLAUDE_CONFIG_DIR` | `pf install user`, `doctor`, `export` | Claude config dir (default `~/.claude`) |
+| `FACTORY_GUARD=off` | `pf guard` | Disable the guard for a human-driven session (set before starting `claude`) |
+| `MMDC`, `MERMAID_CHROME` | `pf diagrams render` | Mermaid CLI binary and Chrome binary to use |
 
 <!-- documentation-routing:start -->
 ## Documentation routing

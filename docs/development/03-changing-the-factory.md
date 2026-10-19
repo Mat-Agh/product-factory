@@ -19,12 +19,12 @@ a dated entry in [EVOLUTION_LOG](../status/EVOLUTION_LOG.md) and the affected ro
 | An artifact's name or verdict line | **breaking**: SKILL verdict table, JOB_LIFECYCLE artifact table, [guide/03](../guide/03-reading-a-job.md), dashboard `KNOWN` |
 | Add or remove an agent | SKILL roles table, COMP-003, [GLOSSARY](../guide/GLOSSARY.md) if it introduces a term, `kit/AGENTS.factory.md` role list, [adapters/hermes.md](../adapters/hermes.md) mapping |
 | A descriptor key | template `kit/.factory/factory.yaml`, [COMP-005](../components/COMP-005-project-descriptor.md) schema table, every agent that reads it |
-| The guard hook | `tests/guard_test.py` first, then [COMP-004](../components/COMP-004-guard-hook.md) policy table |
-| `install.sh` | [COMP-007](../components/COMP-007-installer.md), [guide/01](../guide/01-getting-started.md), [guide/04](../guide/04-add-a-project.md) |
-| `doctor.sh` | [COMP-008](../components/COMP-008-doctor.md) check table, [guide/06](../guide/06-troubleshooting.md) if a new failure mode appears |
-| Any script's flags | [09-tools-scripts-and-commands](09-tools-scripts-and-commands.md) |
-| A new, moved or renamed document | put it under `docs/<area>/`; run `python3 kit/.factory/docs-map.py --fix --strict --allow kit/`; describe it in the area README's own text; add a route in the [link map](16-documentation-link-map.md) if agents need it |
-| A diagram | edit `docs/assets/diagrams/<name>.mmd`, run `scripts/render-diagrams.sh`, commit both files ([COMP-014](../components/COMP-014-diagrams.md)) |
+| The guard hook | add the case to `BLOCK`/`ALLOW` in `cli/src/guard.rs` first, then [COMP-004](../components/COMP-004-guard-hook.md) policy table |
+| `pf install` (`cli/src/install.rs`) | [COMP-007](../components/COMP-007-installer.md), [guide/01](../guide/01-getting-started.md), [guide/04](../guide/04-add-a-project.md) |
+| `pf doctor` (`cli/src/doctor.rs`) | [COMP-008](../components/COMP-008-doctor.md) check table, [guide/06](../guide/06-troubleshooting.md) if a new failure mode appears |
+| Any `pf` subcommand or flag | [09-tools-scripts-and-commands](09-tools-scripts-and-commands.md), [COMP-015](../components/COMP-015-pf-cli.md), and the matching component |
+| A new, moved or renamed document | put it under `docs/<area>/`; run `pf docs-map --fix --strict --allow kit/`; describe it in the area README's own text; add a route in the [link map](16-documentation-link-map.md) if agents need it |
+| A diagram | edit `docs/assets/diagrams/<name>.mmd`, run `pf diagrams render`, commit both files ([COMP-014](../components/COMP-014-diagrams.md)) |
 | A design decision | a new `decisions/ADR-NNN-*.md` and the [decisions index](../decisions/README.md) |
 
 ## Procedures
@@ -33,7 +33,7 @@ a dated entry in [EVOLUTION_LOG](../status/EVOLUTION_LOG.md) and the affected ro
 
 1. Edit `kit/.claude/skills/factory/SKILL.md`.
 2. Update the docs per the map.
-3. Observe the change in the sandbox: `install.sh project ~/Work/factory-sandbox`,
+3. Observe the change in the sandbox: `pf install project ~/Work/factory-sandbox`,
    start a **new** Claude Code session there, and run a job through the changed
    path.
 4. Record the evidence in IMPLEMENTATION_STATUS.
@@ -72,7 +72,7 @@ each one:
    affected.
 2. Add an ADR explaining the change and the migration.
 3. Add an evolution-log entry with **migration steps** for installed products,
-   such as "re-run `install.sh project`; rename key X to Y in factory.yaml".
+   such as "re-run `pf install project`; rename key X to Y in factory.yaml".
 4. Finish or abandon in-flight jobs before updating a product.
 
 <!-- documentation-routing:start -->

@@ -2,7 +2,7 @@
 
 **Status:** Implemented — dashboard not yet viewed against live jobs
 **Last updated:** 2026-10-19
-**Source:** [`kit/.factory/backlog.md`](../../kit/.factory/backlog.md), [`kit/.factory/dashboard.html`](../../kit/.factory/dashboard.html)
+**Source:** [`kit/.factory/backlog.md`](../../kit/.factory/backlog.md), [`kit/.factory/dashboard.html`](../../kit/.factory/dashboard.html), [`cli/src/dashboard.rs`](../../cli/src/dashboard.rs)
 
 ## Backlog
 
@@ -18,10 +18,11 @@
 
 - **File:** `.factory/dashboard.html`, a single self-contained page. It is
   overwritten on every install, so do not edit the project copy.
-- **Run:** `cd .factory && python3 -m http.server`, then open
-  `http://localhost:8000/dashboard.html`.
+- **Run:** `pf dashboard` from the product repo root, then open
+  `http://127.0.0.1:8000/dashboard.html`. The server binds loopback only, answers
+  GET only, and refuses paths outside `.factory/`.
 - **How it reads state:** it parses the `jobs/` directory listing that
-  `http.server` serves, fetches each `jobs/<id>/job.json`, and lists each job's
+  `pf dashboard` serves, fetches each `jobs/<id>/job.json`, and lists each job's
   files from the job folder's own listing. There is no build step, no
   dependencies and no writes. It refreshes every 3 seconds.
 - **View:** six columns (Product, Plan, Build, Review & QA, Gate/PR, Human & done),
@@ -31,8 +32,8 @@
 
 ## Known limitations
 
-- It depends on directory listings, so it works with `python3 -m http.server`
-  but not with a server that disables indexes.
+- It depends on directory listings, which `pf dashboard` provides. A static
+  server without indexes will not work.
 - It is read-only. Commands run in Claude Code, not from the page.
 - It is local only. A remote dashboard waits for phase 4 (observability).
 

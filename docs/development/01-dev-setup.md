@@ -3,20 +3,18 @@
 **Status:** Active
 **Last verified:** 2026-10-19 (Ubuntu, Linux 7.0)
 
-The factory is markdown, bash and Python 3 standard library. It has no build
-step and no package dependencies.
+The factory is markdown plus one Rust CLI, `pf`, in `cli/`. Build and install it
+with `cargo install --path cli`.
 
 ## Toolchain
 
 | Tool | Version | Role |
 |---|---|---|
 | git | 2.40+ | worktrees, `merge-tree --write-tree` |
-| bash | 3.2+ (the macOS default works) | scripts |
-| python3 | 3.9+ | guard hook, tests, docs gate |
-| jq | 1.6+ | installer settings merge |
+| Rust (cargo) | 1.85+ (edition 2024) | builds `pf`, the only factory tool |
 | gh / glab | current | PR and MR operations, doctor checks |
 | Claude Code | current | running and observing the factory |
-| shellcheck | optional | lint scripts (`shellcheck scripts/*.sh`) |
+| Node.js | 18+, optional | `pf diagrams render` (Mermaid CLI) |
 
 Install commands per OS are in [guide/01-getting-started.md](../guide/01-getting-started.md#install-them).
 
@@ -25,12 +23,13 @@ Install commands per OS are in [guide/01-getting-started.md](../guide/01-getting
 ```bash
 git clone git@github.com:Mat-Agh/product-factory.git "$HOME/Work/ProductFactory"
 cd "$HOME/Work/ProductFactory"
-scripts/install.sh user      # your ~/.claude now points at this working tree
+cargo install --path cli   # builds and installs pf
+pf install user           # your ~/.claude now points at this working tree
 ```
 
 Because the user install uses symlinks, edits to `kit/` take effect in the
 **next** Claude Code session on this machine. Projects that hold a copied kit
-only change when you re-run `install.sh project`.
+only change when you re-run `pf install project`.
 
 ## A scratch product for testing
 
@@ -40,17 +39,17 @@ Keep a throwaway repo for observing changes before they reach real products:
 mkdir -p ~/Work/factory-sandbox && cd ~/Work/factory-sandbox
 git init -b main && printf '# Sandbox\n\n## Setup\nnone\n\n## Dev server\nnone\n\n## Gates\nnone\n' > AGENTS.md
 git add -A && git commit -m init
-~/Work/ProductFactory/scripts/install.sh project .
+pf install project .
 ```
 
 ## Gates before every commit
 
 ```bash
-python3 tests/guard_test.py
-bash -n scripts/*.sh
-python3 kit/.factory/docs-map.py --strict --allow kit/
-scripts/render-diagrams.sh --check
-scripts/doctor.sh
+(cd cli && cargo test --release && cargo clippy --release && cargo fmt --check)
+pf guard --self-test
+pf docs-map --strict --allow kit/
+pf diagrams check
+pf doctor
 ```
 
 <!-- documentation-routing:start -->

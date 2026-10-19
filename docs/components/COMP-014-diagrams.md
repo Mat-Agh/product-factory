@@ -2,7 +2,7 @@
 
 **Status:** Implemented — all 7 diagrams validated with Mermaid 10.9 and 11.17 and rendered (2026-10-19)
 **Last updated:** 2026-10-19
-**Source:** [`scripts/render-diagrams.sh`](../../scripts/render-diagrams.sh), [`docs/assets/diagrams/`](../assets/diagrams/)
+**Source:** [`cli/src/diagrams.rs`](../../cli/src/diagrams.rs) (`pf diagrams`), [`docs/assets/diagrams/`](../assets/diagrams/)
 
 ## Purpose
 
@@ -33,8 +33,8 @@ images**, rendered from Mermaid sources.
 ## Interface
 
 ```bash
-scripts/render-diagrams.sh            # render every .mmd (needs Node; uses system Chrome when present)
-scripts/render-diagrams.sh --check    # every .svg exists and matches its .mmd hash (no browser needed)
+pf diagrams render    # render every .mmd (needs Node; uses system Chrome when present), then check
+pf diagrams check     # every .svg exists and matches its .mmd hash (no browser needed)
 ```
 
 Rendering uses `@mermaid-js/mermaid-cli` 11 (`$MMDC`, `mmdc` on the PATH, or
@@ -45,13 +45,13 @@ in dark mode. A source with a syntax error fails the render.
 
 - No inline ` ```mermaid ` blocks in docs. Add a `.mmd`, render it, and embed
   the SVG.
-- Commit the `.mmd` and the `.svg` together. `--check` is a gate (`AGENTS.md`,
-  `scripts/doctor.sh`).
+- Commit the `.mmd` and the `.svg` together. `pf diagrams check` is a gate (`AGENTS.md`,
+  `pf doctor`).
 
 ## Known limitations
 
 Rendering needs Node.js and a Chrome or Chromium binary (or Puppeteer's
-download). Checking needs only Python.
+download). Checking needs only `pf`.
 
 <!-- documentation-routing:start -->
 ## Documentation routing

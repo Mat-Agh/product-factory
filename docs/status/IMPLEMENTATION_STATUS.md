@@ -14,9 +14,10 @@ there is recorded evidence that it works.
 | Area | State |
 |---|---|
 | Rules, roles, procedure | Implemented, not yet exercised on a real product |
-| Mechanical enforcement | Guard hook implemented and unit-tested. Branch protection depends on each product |
-| Distribution and portability | Installer and doctor verified on a scratch repo. Mirrors and bundles not yet set up |
-| Documentation | All docs under `docs/`, one connected tree. `docs-map.py --strict` and `render-diagrams.sh --check` pass |
+| Mechanical enforcement | Guard hook (`pf guard`, Rust) passes 73/73 and matches the Python original on 117 inputs; fails closed without `pf`. Branch protection depends on each product |
+| Distribution and portability | `pf install`, `pf doctor`, `pf mirror bundle` (with restore) and `pf export` verified on scratch setups. No second remote yet |
+| Documentation | All docs under `docs/`, one connected tree. `pf docs-map --strict` and `pf diagrams check` pass |
+| Tooling | One Rust CLI (`pf`); no Python, bash scripts or `jq`. 10 cargo tests, clippy clean |
 | **Phase 1 exit (roadmap)** | **Not met.** No job has run end to end |
 
 ## Components
@@ -26,16 +27,17 @@ there is recorded evidence that it works.
 | [COMP-001](../components/COMP-001-coordinator-skill.md) Coordinator skill | yes | no | — | End-to-end pilot: trivial, standard, bug, idea, release lanes; multi-repo worktrees; `SendMessage` resume |
 | [COMP-002](../components/COMP-002-agent-protocol.md) Agent protocol | yes | no | — | Observe in the pilot |
 | [COMP-003](../components/COMP-003-role-agents.md) Role agents | yes | partially | Frontmatter follows the Claude Code subagent format | Observe each role in the pilot; confirm they appear in `/agents` |
-| [COMP-004](../components/COMP-004-guard-hook.md) Guard hook | yes | unit | `tests/guard_test.py` 73/73 (2026-10-19) | Observe it blocking inside a live Claude Code session |
+| [COMP-004](../components/COMP-004-guard-hook.md) Guard hook | yes (Rust) | unit + differential | `cargo test`: 73 policy cases; identical decisions and messages to the Python guard on 117 inputs; the exact hook command tested with and without `pf` on PATH (2026-10-19) | Observe it blocking inside a live Claude Code session |
 | [COMP-005](../components/COMP-005-project-descriptor.md) Descriptor | yes (schema v1) | no | — | `/factory init` on a real repo; schema validator (optional) |
-| [COMP-006](../components/COMP-006-backlog-and-dashboard.md) Backlog and dashboard | yes | no | — | Claim race with two sessions; view the dashboard against live jobs |
-| [COMP-007](../components/COMP-007-installer.md) Installer | yes | yes (scratch) | Install, re-install and user link on a scratch repo, doctor 0 failures (2026-10-19) | Install on a real product |
-| [COMP-008](../components/COMP-008-doctor.md) Doctor | yes | yes | Machine and scratch-project runs (2026-10-19) | — |
-| [COMP-009](../components/COMP-009-backup-tools.md) Mirror and export | yes | syntax only | `bash -n` | Add the first mirror remote; write and restore a bundle |
+| [COMP-006](../components/COMP-006-backlog-and-dashboard.md) Backlog and dashboard | yes | partially | `pf dashboard` served a job listing and `job.json` and refused `../../` escapes (2026-10-19) | Claim race with two sessions; view the dashboard against live jobs |
+| [COMP-007](../components/COMP-007-installer.md) Installer | yes (Rust) | yes (scratch) | Fresh install, idempotent re-install, migration of a legacy Python install, user link with `--with-guard`; settings-merge unit test (2026-10-19) | Install on a real product |
+| [COMP-008](../components/COMP-008-doctor.md) Doctor | yes (Rust) | yes | Machine, factory and scratch-project runs (2026-10-19) | — |
+| [COMP-009](../components/COMP-009-backup-tools.md) Mirror and export | yes (Rust) | yes (local) | Bundle written, verified and cloned back; export against a scratch config (2026-10-19) | Add the first second-host mirror |
 | [COMP-010](../components/COMP-010-operator-profile.md) Operator profile | yes | n/a | Distilled from Hermes `USER.md`/`SOUL.md` | Keep current |
 | [COMP-011](../components/COMP-011-adapters.md) Adapters | documented | no | — | Run one role from Codex; map to Hermes profiles |
-| [COMP-012](../components/COMP-012-docs-gate.md) Docs map | yes | yes | `docs-map.py --fix --strict` on this repo: 62 docs, every folder has a README, every doc is reachable from `docs/README.md` (2026-10-19) | Run on a real product (`/factory init`) |
+| [COMP-012](../components/COMP-012-docs-gate.md) Docs map | yes | yes | `pf docs-map --fix --strict` on this repo: 62 docs, every folder has a README, every doc is reachable from `docs/README.md` (2026-10-19) | Run on a real product (`/factory init`) |
 | [COMP-014](../components/COMP-014-diagrams.md) Diagrams | yes | yes | 7 diagrams parse with Mermaid 10.9.8 and 11.17.2; SVGs rendered and checked as `<img>` in Chrome (2026-10-19) | Confirm display on GitHub from the operator's network |
+| [COMP-015](../components/COMP-015-pf-cli.md) `pf` CLI | yes | yes | `cargo test` 10/10, `cargo clippy` 0 warnings, `cargo fmt` clean; every subcommand run end to end (2026-10-19) | Prebuilt binaries (optional, see ADR-009) |
 | [COMP-013](../components/COMP-013-constitution.md) Constitution | v1 | n/a | — | Revisit after the pilot retro |
 
 ## Open operator actions

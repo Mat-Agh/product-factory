@@ -11,7 +11,7 @@ tag, release and publish. Those steps are always yours.**
 
 ![From idea to market](../assets/diagrams/idea-to-market.svg)
 
-<sub>Diagram source: [`idea-to-market.mmd`](../assets/diagrams/idea-to-market.mmd) · re-render with `scripts/render-diagrams.sh`</sub>
+<sub>Diagram source: [`idea-to-market.mmd`](../assets/diagrams/idea-to-market.mmd) · re-render with `pf diagrams render`</sub>
 
 ## Lanes: the crew depends on the work
 

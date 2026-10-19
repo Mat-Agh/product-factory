@@ -60,7 +60,7 @@ cd .factory/jobs/004-tenant-org-name && head -n1 *.md round-*/*.md
 
 ![Job stages, simplified](../assets/diagrams/job-stages.svg)
 
-<sub>Diagram source: [`job-stages.mmd`](../assets/diagrams/job-stages.mmd) · re-render with `scripts/render-diagrams.sh`</sub>
+<sub>Diagram source: [`job-stages.mmd`](../assets/diagrams/job-stages.mmd) · re-render with `pf diagrams render`</sub>
 
 The full state machine and its guards are in
 [architecture/JOB_LIFECYCLE.md](../architecture/JOB_LIFECYCLE.md).
@@ -68,7 +68,7 @@ The full state machine and its guards are in
 ## The dashboard
 
 ```bash
-cd .factory && python3 -m http.server     # then open http://localhost:8000/dashboard.html
+pf dashboard     # then open http://127.0.0.1:8000/dashboard.html
 ```
 
 Jobs appear as cards in six columns: Product, Plan, Build, Review & QA, Gate/PR,

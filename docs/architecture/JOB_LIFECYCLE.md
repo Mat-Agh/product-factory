@@ -15,7 +15,7 @@ only after reading an artifact's verdict.
 
 ![Job state machine with guards](../assets/diagrams/job-state-machine.svg)
 
-<sub>Diagram source: [`job-state-machine.mmd`](../assets/diagrams/job-state-machine.mmd) · re-render with `scripts/render-diagrams.sh`</sub>
+<sub>Diagram source: [`job-state-machine.mmd`](../assets/diagrams/job-state-machine.mmd) · re-render with `pf diagrams render`</sub>
 
 ## Guards
 

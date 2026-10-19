@@ -1,8 +1,8 @@
 # COMP-008 — Doctor
 
-**Status:** Implemented — verified on this machine and a scratch project on 2026-10-19
+**Status:** Implemented in Rust — verified on this machine and a scratch product (2026-10-19)
 **Last updated:** 2026-10-19
-**Source:** [`scripts/doctor.sh`](../../scripts/doctor.sh)
+**Source:** [`cli/src/doctor.rs`](../../cli/src/doctor.rs)
 
 ## Purpose
 
@@ -13,23 +13,25 @@ lines are advice that does not fail the check.
 
 | Group | Check | Level |
 |---|---|---|
-| Machine | `git`, `python3` present | FAIL |
-| Machine | `gh`, `glab`, `jq`, `claude` present; `gh` authenticated | note |
-| Machine | guard tests pass (`tests/guard_test.py`) | FAIL |
+| Machine | `git` present; `pf` on `PATH` (the hook needs it) | FAIL |
+| Machine | `gh`, `glab`, `claude`, `node` present; `gh` authenticated | note |
+| Machine | guard policy self-test (73 cases) | FAIL |
+| Machine | factory docs map current (`--strict --allow kit/`); diagrams match their sources | FAIL |
 | Factory repo | at least 2 remotes (mirrored) | note |
 | Factory repo | clean working tree; upstream set and not behind | note |
 | Factory repo | user-level `/factory` symlinked | note |
-| Project | descriptor, backlog, skill, guard, `AGENTS.md` exist | FAIL |
-| Project | `.factory/jobs/` ignored; guard wired in `.claude/settings.json`; `## Product Factory` section | FAIL |
+| Project | descriptor, backlog, skill, constitution and `AGENTS.md` exist | FAIL |
+| Project | `.factory/jobs/` ignored; `pf guard` wired; no legacy Python guard; `## Product Factory` section | FAIL |
 | Project | `AGENTS.md` has Setup, Dev server and Gates headings | note |
-| Project | agent, skill, protocol and guard copies identical to the kit (drift) | note |
+| Project | agents, skill, protocol, constitution and dashboard copies identical to the kit (drift) | note |
+| Project | product docs map status | note |
 | Project | base branch protected on GitHub | note |
 
 ## Usage
 
 ```bash
-scripts/doctor.sh                 # machine + factory repo
-scripts/doctor.sh ~/Work/MyApp    # + project
+pf doctor                  # machine + factory repo
+pf doctor ~/Work/MyApp     # + project
 ```
 
 ## Known limitations

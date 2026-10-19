@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/factory-guard.py\""
+            "command": "command -v pf >/dev/null 2>&1 || { echo 'factory-guard: the pf CLI is not installed, so Bash is blocked (fail closed). Install it: cargo install --git ssh://git@github.com/Mat-Agh/product-factory.git pf' >&2; exit 2; }; pf guard"
           }
         ]
       }

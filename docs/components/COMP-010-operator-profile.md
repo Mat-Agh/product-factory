@@ -12,7 +12,7 @@ the durable record. Vendor memory is a cache.
 
 ## Interface
 
-- **Claude Code:** `install.sh user` adds `@<factory>/docs/operator/USER.md` to
+- **Claude Code:** `pf install user` adds `@<factory>/docs/operator/USER.md` to
   `~/.claude/CLAUDE.md`, so it loads in every session.
 - **Other agents:** reference it from their global instructions, or paste it in.
 - **Sources:** distilled on 2026-10-19 from the Hermes `USER.md` and `SOUL.md`

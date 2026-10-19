@@ -15,19 +15,14 @@ product-factory/
 │   │   │   ├── protocol.md       shared agent rules (COMP-002)
 │   │   │   └── CONSTITUTION.md   → link to docs/governance/CONSTITUTION.md (copied as a file on install)
 │   │   ├── agents/*.md           10 role agents (COMP-003)
-│   │   ├── hooks/factory-guard.py  guard hook (COMP-004)
-│   │   └── settings.factory.json hook wiring snippet
+│   │   └── settings.factory.json `pf guard` hook wiring (COMP-004)
 │   └── .factory/
 │       ├── factory.yaml          descriptor template (COMP-005)
 │       ├── backlog.md            backlog template (COMP-006)
-│       ├── dashboard.html        dashboard (COMP-006)
-│       └── docs-map.py           docs tree + live map tool (COMP-012)
-├── scripts/
-│   ├── install.sh                COMP-007
-│   ├── doctor.sh                 COMP-008
-│   ├── mirror.sh, export-claude.sh  COMP-009
-│   └── render-diagrams.sh        COMP-014
-├── tests/guard_test.py           guard hook tests
+│       └── dashboard.html        dashboard (COMP-006)
+├── cli/                          ── the `pf` Rust CLI (COMP-015) ──
+│   ├── Cargo.toml, Cargo.lock
+│   └── src/                      main, guard, docs_map, diagrams, install, doctor, backup, dashboard, util
 └── docs/                         ── all documentation ──
     ├── README.md                 home: start here, areas, rules, generated map
     ├── governance/               CONSTITUTION (COMP-013)
@@ -42,7 +37,7 @@ product-factory/
     └── operator/                 USER.md operator profile (COMP-010)
 ```
 
-Every folder under `docs/` has a README, and `docs-map.py` generates the links
+Every folder under `docs/` has a README, and `pf docs-map` generates the links
 between them. See [COMP-012](../components/COMP-012-docs-gate.md).
 
 ## In a product after installation
@@ -54,7 +49,7 @@ between them. See [COMP-012](../components/COMP-012-docs-gate.md).
 ├── CLAUDE.md                     @AGENTS.md
 ├── .claude/{skills/factory, agents, hooks, settings.json}   copied kit (commit it)
 └── .factory/
-    ├── factory.yaml, backlog.md, dashboard.html, docs-map.py, installed.lock   (commit them)
+    ├── factory.yaml, backlog.md, dashboard.html, installed.lock   (commit them)
     └── jobs/                     runtime state (gitignored)
 <product>/../<product>-factory/<job-id>/   worktrees on factory/<job-id>
 ```

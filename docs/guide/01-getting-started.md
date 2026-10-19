@@ -19,8 +19,8 @@ depending on its size.
 | A GitHub (or GitLab) account | Hosts the factory repo and your product, and receives the PRs | — |
 | `git` 2.40+ | Branches and worktrees | `git --version` |
 | `gh` (GitHub CLI), or `glab` for GitLab | Opens PRs and reads issues | `gh --version` |
-| `python3` 3.9+ | Guard hook, docs check, dashboard server | `python3 --version` |
-| `jq` | The installer merges hook settings safely | `jq --version` |
+| Rust toolchain (`cargo`) 1.85+ | Builds `pf`, the factory's one tool (guard hook, docs map, installer, doctor, dashboard) | `cargo --version` |
+| A C linker (`build-essential` on Ubuntu, Xcode tools on macOS) | Needed by `cargo` to build `pf` | `cc --version` |
 | Node.js 18+ (only if you install Claude Code with npm, or your product is a web app) | Claude Code, dev servers | `node --version` |
 | A browser-automation CLI (optional, for products with pages) | Lets the UX/UI reviewers and QA look at the running app | see step 2 |
 
@@ -29,7 +29,9 @@ depending on its size.
 **Ubuntu / Debian**
 
 ```bash
-sudo apt update && sudo apt install -y git python3 jq gh
+sudo apt update && sudo apt install -y git gh build-essential curl
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y   # Rust, via rustup
+source "$HOME/.cargo/env"
 ```
 
 On older releases where `apt` has no `gh` package, follow
@@ -38,11 +40,13 @@ On older releases where `apt` has no `gh` package, follow
 **macOS** (with [Homebrew](https://brew.sh))
 
 ```bash
-brew install git python jq gh
+xcode-select --install          # C toolchain, once
+brew install git gh rustup
+rustup-init -y && source "$HOME/.cargo/env"
 ```
 
 **Windows:** use WSL2 (`wsl --install` in an administrator PowerShell, then
-reboot), and follow the Ubuntu steps inside WSL. The factory's scripts are bash.
+reboot), and follow the Ubuntu steps inside WSL. The factory's CLI builds and runs there.
 
 **Claude Code** (any OS; see <https://docs.claude.com/en/docs/claude-code/setup>
 for the current method):
@@ -72,18 +76,23 @@ following its README. Playwright works too (`npx playwright install`).
 ```bash
 git clone git@github.com:Mat-Agh/product-factory.git "$HOME/Work/ProductFactory"
 cd "$HOME/Work/ProductFactory"
-scripts/install.sh user
+cargo install --path cli     # builds pf and puts it in ~/.cargo/bin (about a minute the first time)
+pf --version                 # expect: pf 0.2.0
+pf install user
 ```
 
 You should see:
 
 ```
 Linking Product Factory @ <commit> into /home/<you>/.claude
-  linked /factory skill, agents and guard (they follow 'git pull' in /home/<you>/Work/ProductFactory)
+  linked /factory skill and agents (they follow 'git pull' in /home/<you>/Work/ProductFactory)
   imported docs/operator/USER.md into /home/<you>/.claude/CLAUDE.md
-  user-wide guard hook not enabled (set WITH_USER_GUARD=1 to apply it in every project)
+  user-wide guard hook not enabled (pass --with-guard to apply it in every project)
 Done.
 ```
+
+`pf` must stay on your `PATH` (`~/.cargo/bin`). The guard hook in every factory
+project calls it, and it blocks Bash on purpose when `pf` is missing.
 
 `/factory` and the ten role agents are now available in every Claude Code
 session on this machine. Your working preferences (`docs/operator/USER.md`) load into
@@ -92,7 +101,7 @@ every session.
 ## 4. Check the machine
 
 ```bash
-scripts/doctor.sh
+pf doctor
 ```
 
 Every line should say `ok` or `note`. A `FAIL` line names what is missing. Fix
@@ -113,7 +122,7 @@ gh repo create hello-factory --private --source . --remote origin --push
 Install the kit into it:
 
 ```bash
-~/Work/ProductFactory/scripts/install.sh project ~/Work/hello-factory
+pf install project ~/Work/hello-factory
 ```
 
 The installer copies `.claude/` (skill, agents, guard hook) and `.factory/`
@@ -143,7 +152,7 @@ Claude inspects the repo, fills `.factory/factory.yaml`, marks guesses with
 quit Claude and run:
 
 ```bash
-~/Work/ProductFactory/scripts/doctor.sh ~/Work/hello-factory
+pf doctor ~/Work/hello-factory
 git add -A && git commit -m "Install Product Factory" && git push
 ```
 
@@ -174,10 +183,10 @@ Open the PR, read the summary and evidence, and merge it yourself if you agree.
 To watch jobs as they run, open a second terminal:
 
 ```bash
-cd ~/Work/hello-factory/.factory && python3 -m http.server
+cd ~/Work/hello-factory && pf dashboard
 ```
 
-Then open <http://localhost:8000/dashboard.html>.
+Then open <http://127.0.0.1:8000/dashboard.html>.
 
 ## 8. Next steps
 

@@ -15,17 +15,18 @@ source and never restate it. Current delivery status is in
 | [COMP-001](COMP-001-coordinator-skill.md) | `/factory` coordinator skill | `kit/.claude/skills/factory/SKILL.md` |
 | [COMP-002](COMP-002-agent-protocol.md) | Agent protocol | `kit/.claude/skills/factory/protocol.md` |
 | [COMP-003](COMP-003-role-agents.md) | Role agents (10) | `kit/.claude/agents/*.md` |
-| [COMP-004](COMP-004-guard-hook.md) | Guard hook | `kit/.claude/hooks/factory-guard.py`, `kit/.claude/settings.factory.json` |
+| [COMP-004](COMP-004-guard-hook.md) | Guard hook | `cli/src/guard.rs`, `kit/.claude/settings.factory.json` |
 | [COMP-005](COMP-005-project-descriptor.md) | Project descriptor | `kit/.factory/factory.yaml` |
-| [COMP-006](COMP-006-backlog-and-dashboard.md) | Backlog and dashboard | `kit/.factory/backlog.md`, `kit/.factory/dashboard.html` |
-| [COMP-007](COMP-007-installer.md) | Installer | `scripts/install.sh`, `kit/AGENTS.factory.md` |
-| [COMP-008](COMP-008-doctor.md) | Doctor | `scripts/doctor.sh` |
-| [COMP-009](COMP-009-backup-tools.md) | Mirror and memory export | `scripts/mirror.sh`, `scripts/export-claude.sh` |
+| [COMP-006](COMP-006-backlog-and-dashboard.md) | Backlog and dashboard | `kit/.factory/backlog.md`, `kit/.factory/dashboard.html`, `cli/src/dashboard.rs` |
+| [COMP-007](COMP-007-installer.md) | Installer | `cli/src/install.rs`, `kit/AGENTS.factory.md` |
+| [COMP-008](COMP-008-doctor.md) | Doctor | `cli/src/doctor.rs` |
+| [COMP-009](COMP-009-backup-tools.md) | Mirror and memory export | `cli/src/backup.rs` |
 | [COMP-010](COMP-010-operator-profile.md) | Operator profile | `docs/operator/USER.md` |
 | [COMP-011](COMP-011-adapters.md) | Adapters | `docs/adapters/*.md` |
-| [COMP-012](COMP-012-docs-gate.md) | Docs map (structure and live links) | `kit/.factory/docs-map.py` |
+| [COMP-012](COMP-012-docs-gate.md) | Docs map (structure and live links) | `cli/src/docs_map.rs` |
 | [COMP-013](COMP-013-constitution.md) | Constitution | `docs/governance/CONSTITUTION.md` |
-| [COMP-014](COMP-014-diagrams.md) | Diagrams | `docs/assets/diagrams/*.mmd`, `scripts/render-diagrams.sh` |
+| [COMP-014](COMP-014-diagrams.md) | Diagrams | `docs/assets/diagrams/*.mmd`, `cli/src/diagrams.rs` |
+| [COMP-015](COMP-015-pf-cli.md) | `pf` CLI | `cli/` |
 
 Adding a component means adding a `COMP-NNN-*.md` here, a row in this table and
 in `IMPLEMENTATION_STATUS.md`, and a route in the
@@ -51,4 +52,5 @@ in `IMPLEMENTATION_STATUS.md`, and a route in the
   - [COMP-012 — Docs map](COMP-012-docs-gate.md)
   - [COMP-013 — Constitution](COMP-013-constitution.md)
   - [COMP-014 — Diagrams](COMP-014-diagrams.md)
+  - [COMP-015 — `pf` CLI](COMP-015-pf-cli.md)
 <!-- documentation-routing:end -->

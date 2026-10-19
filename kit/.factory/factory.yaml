@@ -36,7 +36,7 @@ vcs:
   human_merge: true             # not configurable in practice: the constitution requires it
 
 docs:
-  root: docs                    # all documentation lives here (CONSTITUTION §1); checked by .factory/docs-map.py
+  root: docs                    # all documentation lives here (CONSTITUTION §1); checked by `pf docs-map`
   prd_dir: docs/product         # PRDs and discovery outputs land here (in the branch)
   adr_dir: docs/adr
   design_dir: docs/design

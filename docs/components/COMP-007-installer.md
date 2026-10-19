@@ -1,53 +1,55 @@
 # COMP-007 — Installer
 
-**Status:** Implemented — smoke-tested on a scratch repo (install, re-install, user link) on 2026-10-19
+**Status:** Implemented in Rust — fresh install, re-install, legacy-Python migration and user link verified on a scratch repo (2026-10-19)
 **Last updated:** 2026-10-19
-**Source:** [`scripts/install.sh`](../../scripts/install.sh), [`kit/AGENTS.factory.md`](../../kit/AGENTS.factory.md)
+**Source:** [`cli/src/install.rs`](../../cli/src/install.rs), [`kit/AGENTS.factory.md`](../../kit/AGENTS.factory.md)
 **Decisions:** [ADR-006](../decisions/ADR-006-portable-distribution.md)
 
 ## Modes
 
 | Command | Effect | Idempotent |
 |---|---|---|
-| `install.sh project <path>` | **Copies** the kit into a product repo for you to commit there | yes |
-| `install.sh user` | **Symlinks** the kit into `${CLAUDE_CONFIG_DIR:-~/.claude}`, so it follows `git pull` | yes |
-| `install.sh all <path>` | both | yes |
+| `pf install project <path>` | **Copies** the kit into a product repo, for you to commit there | yes |
+| `pf install user [--with-guard]` | **Symlinks** the kit into `${CLAUDE_CONFIG_DIR:-~/.claude}`, so it follows `git pull` | yes |
+| `pf install all <path>` | Both | yes |
 
 ## `project` writes
 
 | Path in product | Action |
 |---|---|
-| `.claude/skills/factory/` | replaced from the kit |
-| `.claude/agents/*.md` | the ten agents overwritten. Other agents are untouched |
-| `.claude/hooks/factory-guard.py` | overwritten and made executable |
-| `.claude/settings.json` | guard entry **merged** with `jq`. The file is never overwritten. Without `jq`, the snippet is printed |
-| `.factory/factory.yaml`, `.factory/backlog.md` | created only if missing |
-| `.factory/dashboard.html` | overwritten |
-| `.factory/installed.lock` | source URL, factory revision, timestamp |
-| `.gitignore` | `.factory/jobs/` appended if absent |
-| `AGENTS.md` | Product Factory section appended once (detected by its `## Product Factory` heading) |
-| `CLAUDE.md` | created as `@AGENTS.md` only if missing |
+| `.claude/skills/factory/` | Replaced from the kit. The constitution is copied as a file, with the factory-repo routing block stripped because its links resolve only in the factory repo |
+| `.claude/agents/*.md` | The ten agents are overwritten. Other agents are untouched |
+| `.claude/settings.json` | The `pf guard` hook entry is **merged**. The file is never overwritten, other settings are preserved, and legacy `factory-guard.py` entries are removed |
+| `.claude/hooks/factory-guard.py`, `.factory/docs-map.py` | Legacy Python files are removed if present |
+| `.factory/factory.yaml`, `.factory/backlog.md` | Created only if missing |
+| `.factory/dashboard.html` | Overwritten |
+| `.factory/installed.lock` | Source URL, factory revision, UTC timestamp |
+| `.gitignore` | `.factory/jobs/` is appended if absent |
+| `AGENTS.md` | The Product Factory section is appended once, detected by its `## Product Factory` heading |
+| `CLAUDE.md` | Created as `@AGENTS.md` only if missing |
 
 It never commits, never pushes, and refuses a target that is not a git repo.
+It warns when `pf` is not on `PATH`, because the hook would then block Bash.
 
 ## `user` writes
 
-Symlinks for `skills/factory`, each agent and the guard script. It appends an
-`@<factory>/docs/operator/USER.md` import to `CLAUDE.md` once. It leaves alone any
-existing non-symlink file of the same name, and warns. A user-wide guard hook
-is opt-in (`WITH_USER_GUARD=1`).
+- Symlinks for `skills/factory` and for each agent.
+- An `@<factory>/docs/operator/USER.md` import in `CLAUDE.md`, added once.
+- With `--with-guard`, or when a legacy Python guard is already wired, the `pf
+  guard` hook is merged into the user `settings.json`.
+
+An existing file that is not a symlink is left alone, with a warning.
 
 ## Verification
 
-Run on 2026-10-19 against a scratch git repo: a first install, then a re-install
-(which kept the descriptor and backlog, did not duplicate the hook, and did not
-duplicate the AGENTS section), then a user install into a temporary
-`CLAUDE_CONFIG_DIR`, then `doctor.sh` with 0 failures. The procedure is in
-[development/04-testing-and-verification.md](../development/04-testing-and-verification.md#2-installer-smoke-test).
+The installer smoke test is in
+[04-testing-and-verification](../development/04-testing-and-verification.md#2-installer-smoke-test).
+It was last run on 2026-10-19, and the settings merge has a unit test
+(`merge_hook_is_idempotent_and_replaces_legacy`).
 
 ## Known limitations
 
-- Bash only (Linux, macOS, WSL). There is no native Windows PowerShell port.
+- The user install needs symlinks (Linux, macOS or WSL).
 - Project and user installs can both exist. Project agents take precedence in
   that project, which is intended.
 

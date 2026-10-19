@@ -3,3 +3,4 @@
 .claude-export/
 __pycache__/
 .factory/jobs/
+/cli/target/

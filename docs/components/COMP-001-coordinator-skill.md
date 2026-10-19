@@ -48,7 +48,7 @@ coordination.
 ## Verification
 
 - Static: the skill is a markdown procedure, with no code.
-  `python3 kit/.factory/docs-map.py --strict --allow kit/` checks its links.
+  `pf docs-map --strict --allow kit/` checks its links.
 - Behaviour: the end-to-end pilot procedure in
   [development/04-testing-and-verification.md](../development/04-testing-and-verification.md#3-end-to-end-pilot).
   **It has not been run yet** (see [IMPLEMENTATION_STATUS.md](../status/IMPLEMENTATION_STATUS.md)).

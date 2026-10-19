@@ -30,7 +30,7 @@ name both paths.
 ## Verification
 
 Covered by review of agent behaviour during the pilot. There is no automated
-test. `scripts/doctor.sh <project>` reports drift between the project copy and
+test. `pf doctor <project>` reports drift between the project copy and
 the kit.
 
 ## Change checklist

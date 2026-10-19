@@ -6,7 +6,7 @@ request. **You merge.**
 
 ![The Product Factory pipeline: idea to human merge, release and retro](docs/assets/diagrams/pipeline.svg)
 
-<sub>Diagram source: [`pipeline.mmd`](docs/assets/diagrams/pipeline.mmd) · re-render with `scripts/render-diagrams.sh`</sub>
+<sub>Diagram source: [`pipeline.mmd`](docs/assets/diagrams/pipeline.mmd) · re-render with `pf diagrams render`</sub>
 
 It merges two designs. The first is the Hermes factory (`Mat-Agh/Hermes`): roles,
 triage, bounded plans, evidence-based done, human merge, and truth that lives in
@@ -30,9 +30,10 @@ expected output. Terms are explained in the
 ```bash
 git clone git@github.com:Mat-Agh/product-factory.git "$HOME/Work/ProductFactory"
 cd "$HOME/Work/ProductFactory"
-scripts/install.sh user                  # /factory + agents in every project, your operator profile imported
-scripts/install.sh project ~/Work/MyApp  # put the kit inside a product repo (commit it there)
-scripts/doctor.sh ~/Work/MyApp           # verify
+cargo install --path cli         # builds pf, the factory's Rust CLI (needs a Rust toolchain)
+pf install user                  # /factory + agents in every project, your operator profile imported
+pf install project ~/Work/MyApp  # put the kit inside a product repo (commit it there)
+pf doctor ~/Work/MyApp           # verify
 ```
 
 Then, in Claude Code inside the product repo:
@@ -50,8 +51,8 @@ Then, in Claude Code inside the product repo:
 /factory clean                      remove worktrees of merged/closed jobs
 ```
 
-The dashboard is `cd .factory && python3 -m http.server`, then open
-<http://localhost:8000/dashboard.html>.
+The dashboard is `pf dashboard`, then open
+<http://127.0.0.1:8000/dashboard.html>.
 
 Codex, Cursor, Gemini or Hermes can run the same roles. See
 [docs/adapters/](docs/adapters/README.md).
@@ -65,9 +66,8 @@ Codex, Cursor, Gemini or Hermes can run the same roles. See
 | [docs/guide/](docs/guide/README.md) | Operator handbook, from zero to the first PR |
 | [docs/status/](docs/status/README.md) | Current state, implementation status, roadmap, evolution log |
 | [docs/development/](docs/development/README.md) | How to change the factory, including [CONTRIBUTING](docs/development/CONTRIBUTING.md) |
-| [kit/](kit/) | Payload installed into a product repo: the `/factory` skill, 10 role agents, the guard hook, the descriptor template, backlog, dashboard, `docs-map.py`, and the `AGENTS.md` section |
-| [scripts/](scripts/) | `install.sh`, `doctor.sh`, `mirror.sh`, `export-claude.sh`, `render-diagrams.sh` |
-| [tests/](tests/) | Guard hook tests (`python3 tests/guard_test.py`) |
+| [kit/](kit/) | Payload installed into a product repo: the `/factory` skill, 10 role agents, the `pf guard` hook wiring, the descriptor template, backlog, dashboard, and the `AGENTS.md` section |
+| [cli/](cli/) | `pf`, the factory's single Rust CLI: guard, docs map, diagrams, install, doctor, mirror, export, dashboard ([COMP-015](docs/components/COMP-015-pf-cli.md)) |
 
 ## Survives losing this account
 

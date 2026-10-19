@@ -20,11 +20,11 @@ AI-authored commits carry a `Co-Authored-By` trailer. Never use `--no-verify`.
    The docs the change affects are updated in the same commit.
 2. Run the gates:
    ```bash
-   python3 tests/guard_test.py
-   bash -n scripts/*.sh
-   python3 kit/.factory/docs-map.py --strict --allow kit/
-   scripts/render-diagrams.sh --check
-   scripts/doctor.sh
+   (cd cli && cargo test --release && cargo clippy --release && cargo fmt --check)
+   pf guard --self-test
+   pf docs-map --strict --allow kit/
+   pf diagrams check
+   pf doctor
    ```
 3. Behavioural changes to the skill, protocol or agents need evidence from a
    sandbox or pilot job ([04-testing-and-verification](04-testing-and-verification.md)).
@@ -44,7 +44,7 @@ and docs completeness.
 ## Releases
 
 Tags (`vX.Y.Z`) are human-only. See [05-releases-and-versioning](05-releases-and-versioning.md).
-After tagging, run `scripts/mirror.sh push` and `scripts/mirror.sh bundle`.
+After tagging, run `pf mirror push` and `pf mirror bundle`.
 
 <!-- documentation-routing:start -->
 ## Documentation routing

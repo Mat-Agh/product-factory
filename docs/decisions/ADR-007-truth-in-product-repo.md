@@ -25,7 +25,7 @@ descriptor. The video's agents also carry nothing repo-specific and read
 ## Consequences
 
 - The factory is only as good as the product's `AGENTS.md`. `/factory init` and
-  `doctor.sh` report the gaps, and
+  `pf doctor` report the gaps, and
   [AGENTS.example.md](../guide/examples/AGENTS.example.md) shows the target.
 - Losing a machine loses only the job notes, never product knowledge.
 

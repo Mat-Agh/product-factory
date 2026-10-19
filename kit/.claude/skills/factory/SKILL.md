@@ -144,7 +144,7 @@ Use this for a repo the factory has never run in.
 4. Check that `AGENTS.md` states the fresh-checkout setup, the dev-server command
    and port flag, and the lint, build and test commands. List each missing item
    for the user, and offer to draft it. Do not invent commands.
-5. Run `python3 .factory/docs-map.py`. If it reports documentation outside
+5. Run `pf docs-map`. If it reports documentation outside
    `docs/`, missing folder READMEs or a stale map, list the problems for the
    user and offer the fix: move the files with `git mv`, then run `--fix`. Do
    not move anything without the user's yes.

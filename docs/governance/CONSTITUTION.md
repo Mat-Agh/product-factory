@@ -28,7 +28,7 @@ Humans keep the decisions that carry risk.
   stay at the root. READMEs link to their parent, their documents and their
   subfolders, every document links back to its folder README, and `docs/README.md`
   carries a map of the whole tree. Together these form one connected map with
-  no orphan documents. `docs-map.py` generates and checks these links. Never
+  no orphan documents. `pf docs-map` generates and checks these links. Never
   maintain them by hand.
 
 ## 2. Separate roles, bounded scope
@@ -78,7 +78,7 @@ Humans keep the decisions that carry risk.
 | Change credentials, secrets, connector scopes, production data | **Human only** |
 | Force-push, `--no-verify`, rewrite or discard someone else's work | **Never** |
 
-The guard hook (`kit/.claude/hooks/factory-guard.py`) enforces what it can
+The guard hook (`pf guard` (`cli/src/guard.rs`)) enforces what it can
 mechanically. Branch protection on the remote enforces the rest. The prose rule
 applies even where neither one can enforce it.
 
