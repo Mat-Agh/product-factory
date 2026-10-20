@@ -17,7 +17,7 @@ there is recorded evidence that it works.
 | Mechanical enforcement | Guard hook (`pf guard`, Rust) passes 80/80 (the original 73 match the Python guard on 117 inputs); follows the project branch template and blocks hook bypasses; fails closed without `pf`. Branch protection depends on each product |
 | Distribution and portability | `pf install`, `pf doctor`, `pf mirror bundle` (with restore) and `pf export` verified on scratch setups. No second remote yet |
 | Documentation | All docs under `docs/`, one connected tree. `pf docs-map --strict` and `pf diagrams check` pass |
-| Tooling | One Rust CLI (`pf`); no Python, bash scripts or `jq`. 27 cargo tests, clippy clean |
+| Tooling | One Rust CLI (`pf`); no Python, bash scripts or `jq`. 28 cargo tests, clippy clean |
 | **Phase 1 exit (roadmap)** | **Not met.** No job has run end to end |
 
 ## Components
@@ -36,7 +36,7 @@ there is recorded evidence that it works.
 | [COMP-010](../components/COMP-010-operator-profile.md) Operator profile | yes | n/a | Distilled from Hermes `USER.md`/`SOUL.md` | Keep current |
 | [COMP-011](../components/COMP-011-adapters.md) Adapters | documented | no | — | Run one role from Codex; map to Hermes profiles |
 | [COMP-012](../components/COMP-012-docs-gate.md) Docs map | yes | yes | `pf docs-map --fix --strict` on this repo: 62 docs, every folder has a README, every doc is reachable from `docs/README.md` (2026-10-19) | Run on a real product (`/factory init`) |
-| [COMP-014](../components/COMP-014-diagrams.md) Diagrams | yes | yes | 7 diagrams parse with Mermaid 10.9.8 and 11.17.2; SVGs rendered and checked as `<img>` in Chrome (2026-10-19) | Confirm display on GitHub from the operator's network |
+| [COMP-014](../components/COMP-014-diagrams.md) Diagrams | yes | yes | 29 inline Mermaid blocks lint clean and parse with Mermaid CLI 11; `validate` reports a broken block with file and line (2026-10-20) | Confirm live rendering on GitHub and in IntelliJ with the Mermaid extension |
 | [COMP-015](../components/COMP-015-pf-cli.md) `pf` CLI | yes | yes | `cargo test` 10/10, `cargo clippy` 0 warnings, `cargo fmt` clean; every subcommand run end to end (2026-10-19) | Prebuilt binaries (optional, see ADR-009) |
 | [COMP-016](../components/COMP-016-session-integration.md) Session integration and memory | yes | partially | Scratch workspace with two nested repos: workspace and module installs, `pf rules sync`, attribution off, doctor flags missing modules; `pf memory` read the real Connect auto memory (9 entries); 15 cargo tests (2026-10-19) | Observe a live Claude session routing a request through `/factory`; run `/factory memory` on Connect |
 | [COMP-017](../components/COMP-017-adoption.md) Adoption | yes | partially | `pf audit` read-only on real Connect root, Back-End and Front-End (findings match manual review); scratch repo: foreign agent preserved, template cleared the blocker, guard policy verified (2026-10-19) | Run `/factory adopt` on Connect; land the mirror and `CLAUDE.md` MRs |

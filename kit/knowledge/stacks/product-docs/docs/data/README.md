@@ -15,5 +15,5 @@ Engineering schemas implement it and link here.
 ## Relations
 
 Describe cardinality and lifecycle (who creates, who deletes, what cascades) and
-keep a diagram source with a rendered image. Record retention and deletion rules
+keep an inline Mermaid diagram (`erDiagram` or `flowchart`). Record retention and deletion rules
 per entity; privacy policies depend on them.

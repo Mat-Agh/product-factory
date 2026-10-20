@@ -16,6 +16,13 @@ backups; never point two flavors at shared state.
 
 ## Channels
 
+```mermaid
+flowchart LR
+  Local["Local development stack"] -. "never promoted" .-> Stage
+  Main["main merged by a human"] --> Stage["Stage: own Compose project and directory"]
+  Tag["Tag pushed by a human"] --> Prod["Customer or production: signed installer or rollout"]
+```
+
 | Channel | Trigger | Who |
 |---|---|---|
 | Local development | Developer | Developer; development Compose is not the installer |

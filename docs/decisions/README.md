@@ -59,4 +59,5 @@ next number. A reversed decision is marked `Superseded by ADR-NNN` and kept.
   - [ADR-011 — Adopt an existing process: inventory, preserve, configure, then align](ADR-011-adopt-existing-process.md)
   - [ADR-012 — One knowledge structure per stack, distilled from Connect](ADR-012-knowledge-structure-per-stack.md)
   - [ADR-013 — One development knowledge library, imported through stack packs](ADR-013-development-knowledge-library.md)
+  - [ADR-014 — Inline Mermaid diagrams instead of rendered images](ADR-014-inline-mermaid-diagrams.md)
 <!-- documentation-routing:end -->

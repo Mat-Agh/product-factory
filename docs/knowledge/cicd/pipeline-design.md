@@ -17,6 +17,14 @@ static web apps, a product-docs repo) on self-hosted GitLab.
 
 ## What runs where
 
+```mermaid
+flowchart LR
+  MR["Merge request"] --> Validate["Validate: conventions, static gates, compile, tests, assemblies"]
+  Dev["develop"] --> Package["Package, scan, sign JVM images"]
+  Main["main"] --> Stage["The same, plus stage deploy"]
+  Tag["Protected tag"] --> Native["Native build, signed release, notes"]
+```
+
 | Trigger | Runs | Does not run |
 |---|---|---|
 | Merge request | Conventions, static gates, compile, tests per policy, docs checks, debug and release assemblies for apps | Image builds, signing, deploys |

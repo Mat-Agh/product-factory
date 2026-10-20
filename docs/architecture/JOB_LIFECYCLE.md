@@ -13,9 +13,50 @@ procedure deterministic.
 `job.json.stage` is the state. Only the coordinator changes it, and it does so
 only after reading an artifact's verdict.
 
-![Job state machine with guards](../assets/diagrams/job-state-machine.svg)
-
-<sub>Diagram source: [`job-state-machine.mmd`](../assets/diagrams/job-state-machine.mmd) · re-render with `pf diagrams render`</sub>
+```mermaid
+stateDiagram-v2
+  direction TB
+  [*] --> triage: claim job folder
+  triage --> needs_human: blocking question or duplicate
+  triage --> first: lane chosen, worktree created
+  state "first stage of the lane" as first
+  first --> discovery
+  first --> repro
+  first --> spec
+  first --> design
+  first --> plan
+  first --> build
+  first --> release
+  discovery --> spec: READY
+  spec --> design: READY, UI surface, design needed
+  spec --> plan: READY
+  design --> spec: design-change lane
+  design --> plan: READY
+  repro --> plan: REPRODUCED
+  plan --> build: READY
+  plan --> gate: spike, ADR only
+  release --> gate: READY
+  build --> review: READY
+  review --> build: CHANGES, resumes below max
+  review --> qa: all PASS, lane has QA
+  review --> gate: all PASS, no QA
+  review --> needs_human: CHANGES, resumes at max
+  qa --> build: FAIL, resumes below max
+  qa --> gate: PASS
+  qa --> needs_human: FAIL, resumes at max
+  gate --> pr_open: READY opens PR, ESCALATE opens draft
+  gate --> needs_human: no PR allowed or no remote
+  discovery --> needs_human: BLOCKED
+  spec --> needs_human: BLOCKED
+  design --> needs_human: BLOCKED
+  plan --> needs_human: BLOCKED
+  build --> needs_human: BLOCKED
+  repro --> needs_human: NOT REPRODUCED
+  needs_human --> build: rework, resumes reset
+  pr_open --> build: rework
+  pr_open --> done: merged, then clean
+  pr_open --> closed: closed, then clean
+```
 
 ## Guards
 

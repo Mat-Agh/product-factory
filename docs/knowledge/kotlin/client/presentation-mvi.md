@@ -48,6 +48,16 @@ fun onScreenAction(action: LoginScreenAction) {
 }
 ```
 
+```mermaid
+flowchart LR
+  Screen["Screen"] -- "Action" --> VM["ViewModel"]
+  VM -- "invoke" --> UC["Use case"]
+  UC -- "domain result" --> VM
+  VM -- "new State" --> Screen
+  VM -- "Event: navigate, error" --> Handler["Event handler"]
+  Handler --> Screen
+```
+
 ## Navigation
 
 - Each feature owns typed navigation keys under `presentation/navigation/` and

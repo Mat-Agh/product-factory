@@ -8,19 +8,13 @@ mandatory `di`.
 
 ## Layout
 
-```
-┌─────────────────────────────────────────────┐
-│  presentation/                              │
-│  Controllers + DTOs + extension mappers     │
-├─────────────────────────────────────────────┤
-│  domain/                                    │
-│  Models + repositories + outbound ports     │
-├─────────────────────────────────────────────┤
-│  data/                                      │
-│  Entities + *JpaSource + repository impls   │
-└─────────────────────────────────────────────┘
-         ↑
-    di/ wires beans (@Configuration / @Bean)
+```mermaid
+flowchart TB
+  Presentation["presentation/: controllers, DTOs, extension mappers"] --> Domain["domain/: models, repositories, outbound ports, use cases"]
+  Data["data/: entities, *JpaSource, repository and port implementations"] --> Domain
+  DI["di/: @Configuration and @Bean wiring"] -. "constructs" .-> Presentation
+  DI -. "constructs" .-> Data
+  DI -. "constructs" .-> Domain
 ```
 
 | Layer | Folder | Owns |

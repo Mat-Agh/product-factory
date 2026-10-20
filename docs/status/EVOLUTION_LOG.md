@@ -6,6 +6,26 @@
 Append-only. One dated entry for each factory-level change: what changed, why,
 and its evidence.
 
+## 2026-10-20 — Inline Mermaid diagrams, Connect style
+
+- **Why.** Rendered SVGs were static, not resizable, partly dropped by IntelliJ, and
+  unreadable to agents. The operator asked for proper inline Mermaid as in the
+  Connect docs ([ADR-014](../decisions/ADR-014-inline-mermaid-diagrams.md)).
+- **Change.** The seven factory diagrams are inline blocks again, rewritten without
+  the constructs that broke GitHub's renderer (HTML-like labels, `<br/>`, `&`
+  chaining); the pipeline is now top-down. `docs/assets/diagrams/` and
+  `pf diagrams render` are removed. `pf diagrams check` lints every block (type,
+  init directives, HTML, chaining, quotes, size) and `pf diagrams validate` parses
+  every block with the Mermaid CLI. The knowledge library's ASCII sketches became
+  Mermaid, and 15 diagrams were added (layers, service topology, outbox and inbox,
+  key hierarchy, client architecture and MVI, auth and realtime sequences, web
+  runtime, GitFlow, approval flow, pipeline, deployment channels, authorization,
+  events, contract direction, agent workflow). Diagram style rules are in
+  `knowledge/principles/documentation.md`.
+- **Evidence.** 29 blocks lint clean and parse with Mermaid CLI 11; `validate`
+  fails a deliberately broken block with `file:line`; 28 cargo tests; docs map OK.
+  Not yet seen on GitHub or in IntelliJ.
+
 ## 2026-10-20 — Diagrams render in IDE Markdown previews
 
 - **Why.** In IntelliJ IDEA's Markdown preview, six of the seven diagrams did not

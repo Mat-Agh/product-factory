@@ -68,7 +68,7 @@ It is part of the `pf` binary and needs nothing else installed.
 ## Known limitations
 
 - It does not validate `#anchor` fragments or external URLs. Diagrams are
-  validated by `pf diagrams render` ([COMP-014](COMP-014-diagrams.md)).
+  checked by `pf diagrams check` and `validate` ([COMP-014](COMP-014-diagrams.md)).
 - Folder README titles come from their first `# ` heading, so keep headings
   meaningful.
 

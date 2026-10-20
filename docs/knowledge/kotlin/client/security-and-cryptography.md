@@ -38,6 +38,23 @@ push encryption solve different threats; none of them is E2EE.
   DPoP proofs and realtime hellos. DPoP proofs bind method, URL, token hash, time
   and a unique ID; retry at most once for a server nonce, then refresh single-flight.
 
+```mermaid
+sequenceDiagram
+  participant App as Feature through the network facade
+  participant Env as Auth envelope
+  participant Keys as Server key endpoint
+  participant Dpop as Installation key (DPoP)
+  participant Api as Backend
+  App->>Env: sensitive auth call
+  Env->>Keys: fetch current encryption key
+  Env->>Api: compact JWE request, no plaintext JSON
+  Api-->>Env: signed and encrypted response
+  Env-->>App: logical status from the signed response
+  App->>Dpop: normal API call
+  Dpop->>Api: DPoP access token plus a fresh proof
+  Api-->>Dpop: resource, or one nonce retry
+```
+
 ## Local encryption
 
 - Auth state and approved settings pass through the encrypted datastore and the

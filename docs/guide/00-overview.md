@@ -9,9 +9,33 @@ tag, release and publish. Those steps are always yours.**
 
 ## From idea to market
 
-![From idea to market](../assets/diagrams/idea-to-market.svg)
-
-<sub>Diagram source: [`idea-to-market.mmd`](../assets/diagrams/idea-to-market.mmd) · re-render with `pf diagrams render`</sub>
+```mermaid
+flowchart LR
+  subgraph Discover["Discover"]
+    Idea["/factory idea"] --> Discovery["discovery.md: problem, users, market, metrics"]
+    Discovery --> PRD["PRD"]
+    PRD --> Concept["Design concept"]
+    Concept --> ADR["Architecture ADR"]
+    ADR --> Roadmap["Roadmap"]
+  end
+  subgraph Build["Build, per backlog item"]
+    Next["/factory next"] --> Spec["Spec"]
+    Spec --> Design["Design"]
+    Design --> Plan["Plan"]
+    Plan --> Code["Build"]
+    Code --> Review["Four reviews"]
+    Review --> QA["QA"]
+    QA --> Gate["Gate and PR"]
+  end
+  subgraph Ship["Ship"]
+    Release["/factory release"] --> Kit["Changelog, notes, listing, docs, announcement drafts"]
+  end
+  Roadmap -- "you pick items" --> Next
+  Gate -- "you merge" --> Release
+  Kit -- "you tag and publish" --> Market(["Market"])
+  Market -- "feedback becomes issues" --> Next
+  Gate -. "/factory retro" .-> Improve["The factory improves"]
+```
 
 ## Lanes: the crew depends on the work
 

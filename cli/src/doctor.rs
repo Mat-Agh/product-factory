@@ -77,8 +77,8 @@ pub fn main(factory: &Path, project: Option<&Path>) -> i32 {
     let (n, df) = diagrams::check(factory);
     d.check(
         df.is_empty(),
-        format!("{n} diagrams match their sources"),
-        "diagrams stale (pf diagrams render)",
+        format!("{n} mermaid blocks lint clean"),
+        "mermaid blocks fail lint (pf diagrams check)",
     );
 
     println!("Factory repo");

@@ -24,5 +24,4 @@ constraints and indexes. Update it in the same change as the migration.
 ## Relations and flow
 
 Cross-service references are logical UUIDs, never foreign keys. Draw the flow of
-facts between services (which events create which rows) as a diagram source with a
-rendered image, and regenerate any ERD after schema changes.
+facts between services (which events create which rows) as an inline Mermaid diagram, and regenerate any ERD after schema changes.

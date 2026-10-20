@@ -25,7 +25,7 @@ a dated entry in [EVOLUTION_LOG](../status/EVOLUTION_LOG.md) and the affected ro
 | `pf doctor` (`cli/src/doctor.rs`) | [COMP-008](../components/COMP-008-doctor.md) check table, [guide/06](../guide/06-troubleshooting.md) if a new failure mode appears |
 | Any `pf` subcommand or flag | [09-tools-scripts-and-commands](09-tools-scripts-and-commands.md), [COMP-015](../components/COMP-015-pf-cli.md), and the matching component |
 | A new, moved or renamed document | put it under `docs/<area>/`; run `pf docs-map --fix --strict --allow kit/`; describe it in the area README's own text; add a route in the [link map](16-documentation-link-map.md) if agents need it |
-| A diagram | edit `docs/assets/diagrams/<name>.mmd`, run `pf diagrams render`, commit both files ([COMP-014](../components/COMP-014-diagrams.md)) |
+| A diagram | edit the inline ` ```mermaid ` block in the document, then run `pf diagrams check` and `pf diagrams validate` ([COMP-014](../components/COMP-014-diagrams.md)) |
 | Development knowledge (`docs/knowledge/`) | keep it generic; map every new page in at least one `kit/knowledge/stacks/<stack>/pack.map` (a test enforces it); update the folder README and [knowledge/README.md](../knowledge/README.md); if a page moves, update the pack maps |
 | A stack pack (`pack.map`, scaffolds) | [COMP-018](../components/COMP-018-knowledge-structure.md) stack table; the stack's handbook README and link map scaffolds |
 | A design decision | a new `decisions/ADR-NNN-*.md` and the [decisions index](../decisions/README.md) |

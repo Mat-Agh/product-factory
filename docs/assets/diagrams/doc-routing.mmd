@@ -1,8 +1,0 @@
-flowchart TB
-  Task["Task on the factory repo"] --> A["AGENTS.md"]
-  A --> M["This map"]
-  M --> S["Source of truth (CONSTITUTION, kit/…)"]
-  M --> D["Routed docs"]
-  S --> Change["Change + same-commit docs (03 change map)"]
-  D --> Change
-  Change --> Gates["Gates (04) → EVOLUTION_LOG + IMPLEMENTATION_STATUS"]

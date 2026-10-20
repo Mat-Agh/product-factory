@@ -5,6 +5,15 @@
 
 ## Branches and refs
 
+```mermaid
+flowchart LR
+  Work["Work branch"] -- "MR and human approval" --> Develop["develop"]
+  Develop -- "MR and human approval" --> Main["main"]
+  Main -- "stage deploy" --> Stage["Stage environment"]
+  Main -- "human pushes tag" --> Tag["vX.Y.Z"]
+  Tag --> Release["Signed release artifacts"]
+```
+
 | Branch or ref | Role |
 |---|---|
 | Work branch | One change; merge request into the integration branch |

@@ -4,7 +4,7 @@
 **Last updated:** {{DATE}}
 
 <!-- What runs, what talks to what, and where each responsibility lives.
-     Diagrams: docs/assets/diagrams/*.mmd rendered with `pf diagrams render`. -->
+     Diagrams: inline mermaid blocks, checked with `pf diagrams check`. -->
 
 ## Components
 ## Data and control flow

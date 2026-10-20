@@ -16,8 +16,8 @@ How knowledge is written, found and kept true in every repository.
 - READMEs link to each other so the docs form one connected map from
   `docs/README.md`; no orphan documents. Generate the links where tooling exists
   (`pf docs-map --fix`).
-- Diagrams are sources (Mermaid, Draw.io, DBML) rendered to committed images,
-  regenerated in the same change; never hand-edit generated output.
+- Diagrams are inline Mermaid blocks next to the text they explain
+  ([Diagrams](#diagrams)); never images of diagrams.
 
 ## Routing
 
@@ -48,10 +48,36 @@ architecture with a conformance ledger, decisions, features with an
 implementation-status page, cross-project routers, and temporary sessions that
 are promoted or deleted.
 
+## Diagrams
+
+Write diagrams as inline ` ```mermaid ` blocks. GitHub, GitLab and IDE previews
+render them live, they resize and follow the theme, and they stay editable text.
+
+| Use | For |
+|---|---|
+| `flowchart LR` / `TD` | Topology, ownership, dependencies, pipelines, decision trees |
+| `sequenceDiagram` | Requests across components, protocols, handshakes |
+| `stateDiagram-v2` | Lifecycles and state machines |
+| `erDiagram` | Data models and relations |
+
+Style:
+- One idea per diagram, small enough to read without scrolling; split a large one.
+- Quote every node label: `Api["Backend API"]`; short IDs, readable labels.
+- Label edges with the action or condition: `A -- "publishes fact" --> B`.
+- Dotted edges for optional, forbidden or indirect relations: `A -. "forbidden" .-> B`.
+- No theme or init directives, no colours, no HTML in labels (`<br/>` at most), one
+  edge per line.
+- Write it so the source still reads well as text in a terminal.
+- Keep the diagram and the prose consistent; change both in the same change.
+
+Check them before merging (the factory's `pf diagrams check` lints, `pf diagrams
+validate` parses with the Mermaid CLI). In IntelliJ, enable the Mermaid Markdown
+extension.
+
 ## Verification before completion
 
 Inventory Markdown, scan for stale terms and references, validate local links,
-parse diagram sources, regenerate generated output, and run `git diff --check`.
+parse every Mermaid block, regenerate generated output, and run `git diff --check`.
 
 <!-- documentation-routing:start -->
 ## Documentation routing

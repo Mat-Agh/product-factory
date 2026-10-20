@@ -4,9 +4,24 @@ An agentic product factory. You give it an idea or a request. It produces a
 reviewed, tested, documented, launch-ready product increment as a pull
 request. **You merge.**
 
-![The Product Factory pipeline: idea to human merge, release and retro](docs/assets/diagrams/pipeline.svg)
-
-<sub>Diagram source: [`pipeline.mmd`](docs/assets/diagrams/pipeline.mmd) · re-render with `pf diagrams render`</sub>
+```mermaid
+flowchart TD
+  Idea["Idea, request or issue"] --> Triage["Triage by the coordinator"]
+  Triage --> Product["Product: discovery, PRD, spec"]
+  Product --> Design["Design: flows, states, tokens"]
+  Design --> Plan["Tech lead: bounded plan"]
+  Plan --> Build["Engineer: worktree and branch"]
+  Build --> Review{"Review: code, security, UX, UI"}
+  Review -- "any CHANGES, up to 2 resumes" --> Build
+  Review -- "all PASS" --> QA["QA: evidence"]
+  QA --> Gate{"Gate"}
+  Gate -- "READY" --> PR["Pull request"]
+  Gate -- "ESCALATE" --> Draft["Draft PR with a question"]
+  PR --> Merge(["Human merges"])
+  Draft --> Merge
+  Merge --> Release["Release kit, human publishes"]
+  Release --> Retro["Retro: the factory improves"]
+```
 
 It merges two designs. The first is the Hermes factory (`Mat-Agh/Hermes`): roles,
 triage, bounded plans, evidence-based done, human merge, and truth that lives in

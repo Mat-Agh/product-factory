@@ -27,10 +27,25 @@ for its own sake.
 
 ## 2. Module topology
 
-```
-Deployables:  application/<service>     one Spring Boot app per service
-Features:     feature/<name>            vertical slices, each owned by one service
-Core:         core/<module>             contracts, security, persistence, events, web, observability
+```mermaid
+flowchart TB
+  subgraph Deployables["application/: one Spring Boot app per service"]
+    S1["service A"]
+    S2["service B"]
+  end
+  subgraph Features["feature/: vertical slices, each owned by one service"]
+    F1["feature owned by A"]
+    F2["feature owned by B"]
+  end
+  subgraph Core["core/: contracts, security, persistence, events, web, observability"]
+    C1["core modules"]
+  end
+  S1 --> F1
+  S2 --> F2
+  F1 --> C1
+  F2 --> C1
+  S1 --> C1
+  S2 --> C1
 ```
 
 Dependency rules (non-negotiable):

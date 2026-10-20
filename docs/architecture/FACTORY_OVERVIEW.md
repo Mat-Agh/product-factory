@@ -5,9 +5,41 @@
 
 ## Layers
 
-![Factory layers: factory repo, machine, product repo, git host](../assets/diagrams/layers.svg)
-
-<sub>Diagram source: [`layers.mmd`](../assets/diagrams/layers.mmd) · re-render with `pf diagrams render`</sub>
+```mermaid
+flowchart TB
+  subgraph Factory["Product Factory repo: portable and mirrored"]
+    Constitution["CONSTITUTION.md: rules"]
+    Operator["docs/operator/USER.md: who you are"]
+    Kit["kit/: skill, agents, guard, templates"]
+  end
+  subgraph Machine["Any machine, any account"]
+    UserCfg["~/.claude: links to the kit, imports USER.md"]
+    Runtime["Agent runtime: Claude Code, Codex, others"]
+  end
+  subgraph Product["Each product repo: the source of truth"]
+    Code["AGENTS.md, docs/ and code"]
+    Descriptor[".factory/factory.yaml"]
+    Backlog[".factory/backlog.md"]
+    KitCopy[".claude/: installed kit copy"]
+    Jobs[".factory/jobs/: runtime state, gitignored"]
+  end
+  subgraph Host["Git host"]
+    Branches["Job branches"]
+    Reviews["Pull requests, issues, branch protection"]
+  end
+  Kit -- "pf install project" --> KitCopy
+  Kit -- "pf install user" --> UserCfg
+  Operator --> UserCfg
+  UserCfg --> Runtime
+  KitCopy --> Runtime
+  Runtime -- "reads" --> Code
+  Runtime -- "reads" --> Descriptor
+  Runtime -- "reads" --> Backlog
+  Runtime -- "writes" --> Jobs
+  Runtime -- "pushes job branch, opens PR" --> Branches
+  Branches --> Reviews
+  Reviews -- "human merges" --> Code
+```
 
 | Layer | Holds | Lifetime | Lost if… |
 |---|---|---|---|
@@ -19,9 +51,39 @@
 
 ## Runtime: one job
 
-![Runtime sequence of one job](../assets/diagrams/job-sequence.svg)
-
-<sub>Diagram source: [`job-sequence.mmd`](../assets/diagrams/job-sequence.mmd) · re-render with `pf diagrams render`</sub>
+```mermaid
+sequenceDiagram
+  participant H as Human
+  participant C as Coordinator session
+  participant PM as Product manager
+  participant TL as Tech lead
+  participant E as Engineer
+  participant RV as Four reviewers
+  participant QA as Tester
+  participant G as Git host
+  H->>C: /factory request
+  C->>C: claim job, write triage.md, create worktree and branch
+  C->>PM: spec
+  PM-->>C: spec.md READY
+  C->>TL: plan
+  TL-->>C: plan.md READY
+  C->>E: build round 1
+  E-->>C: build.md READY and commits
+  loop up to 1 + max_resumes rounds
+    C->>RV: review round N, in parallel
+    RV-->>C: review files with verdicts
+    alt any CHANGES
+      C->>E: address round N
+    end
+  end
+  C->>QA: acceptance
+  QA-->>C: qa.md PASS
+  C->>TL: gate
+  TL-->>C: gate.md READY or ESCALATE, and pr.md
+  C->>G: push branch, open PR (draft on ESCALATE)
+  G-->>H: PR to review
+  H->>G: merge, human only
+```
 
 ## Contracts between components
 

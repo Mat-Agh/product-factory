@@ -14,7 +14,7 @@ with `cargo install --path cli`.
 | Rust (cargo) | 1.85+ (edition 2024) | builds `pf`, the only factory tool |
 | gh / glab | current | PR and MR operations, doctor checks |
 | Claude Code | current | running and observing the factory |
-| Node.js | 18+, optional | `pf diagrams render` (Mermaid CLI) |
+| Node.js | 18+, optional | `pf diagrams validate` (Mermaid CLI) |
 
 Install commands per OS are in [guide/01-getting-started.md](../guide/01-getting-started.md#install-them).
 

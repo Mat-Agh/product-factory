@@ -32,6 +32,23 @@ Write the boot sequence of each app as numbered steps: load the shell, obtain th
 CSRF token, read status, choose the view (setup, login, console), load data in
 parallel, perform mutations with CSRF and refresh authoritative data.
 
+```mermaid
+sequenceDiagram
+  participant B as Browser
+  participant E as Web server (static shell)
+  participant A as Backend administration API
+  B->>E: load static shell
+  B->>A: GET CSRF token
+  B->>A: GET status (setup, login or console)
+  B->>A: login or setup, JSON plus CSRF
+  A-->>B: opaque HttpOnly session cookie
+  B->>A: parallel reads for the console
+  B->>A: mutation plus CSRF
+  alt 403 CSRF
+    B->>A: refresh the token and retry once
+  end
+```
+
 ## Source layout
 
 | Path | Responsibility |

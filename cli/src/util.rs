@@ -6,8 +6,6 @@ use std::path::{Component, Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use sha2::{Digest, Sha256};
-
 /// Run a command and return trimmed stdout when it succeeds.
 pub fn output(cmd: &str, args: &[&str], dir: Option<&Path>) -> Option<String> {
     let mut c = Command::new(cmd);
@@ -127,14 +125,6 @@ pub fn rel(from: &Path, to: &Path) -> String {
     } else {
         parts.join("/")
     }
-}
-
-pub fn sha256_file(p: &Path) -> std::io::Result<String> {
-    let bytes = fs::read(p)?;
-    Ok(Sha256::digest(&bytes)
-        .iter()
-        .map(|b| format!("{b:02x}"))
-        .collect())
 }
 
 /// Locate the Product Factory checkout: --factory, $PRODUCT_FACTORY_HOME, an ancestor of the

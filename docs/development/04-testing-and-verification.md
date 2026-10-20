@@ -12,7 +12,8 @@ The factory has three levels of verification. Record every result in
 (cd cli && cargo test --release && cargo clippy --release && cargo fmt --check)   # unit tests incl. 73 guard cases
 pf guard --self-test                 # the installed pf agrees with the source
 pf docs-map --strict --allow kit/    # docs tree, links, map
-pf diagrams check                    # diagrams match their sources
+pf diagrams check                    # Mermaid blocks lint clean
+pf diagrams validate                 # Mermaid blocks parse (needs Node.js)
 pf doctor                            # machine + factory repo health
 ```
 

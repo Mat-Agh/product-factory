@@ -9,7 +9,7 @@
 All factory tooling is one Rust binary, following the operator's
 Rust-by-default rule ([USER.md](../operator/USER.md)). No Python, bash scripts
 or `jq` are needed. The only external programs `pf` calls are `git`, `gh`
-(branch-protection check), and the Mermaid CLI for `diagrams render`, because
+(branch-protection check), and the Mermaid CLI for `diagrams validate`, because
 Mermaid exists only as JavaScript.
 
 ## Install
@@ -30,7 +30,7 @@ blocked with the install hint above.
 | `pf guard` | Claude Code PreToolUse hook. Reads hook JSON on stdin; exit 2 blocks | [COMP-004](COMP-004-guard-hook.md) |
 | `pf guard --self-test` | Run the 80 built-in policy cases | [COMP-004](COMP-004-guard-hook.md) |
 | `pf docs-map [--fix] [--strict] [--allow <prefix>]` | `docs/` tree, generated README links and map | [COMP-012](COMP-012-docs-gate.md) |
-| `pf diagrams check \| render` | Mermaid sources to committed SVGs | [COMP-014](COMP-014-diagrams.md) |
+| `pf diagrams check \| validate` | Lint inline Mermaid blocks; parse them with the Mermaid CLI | [COMP-014](COMP-014-diagrams.md) |
 | `pf install project <path> [--no-ai-attribution] \| module <path> --workspace <root> \| user [--with-guard] \| all <path>` | Put the factory into a product or a user config | [COMP-007](COMP-007-installer.md) |
 | `pf doctor [project]` | Health check; exit code = failures | [COMP-008](COMP-008-doctor.md) |
 | `pf mirror add <name> <url> \| push \| bundle [dir]` | Backup remotes and offline bundles | [COMP-009](COMP-009-backup-tools.md) |
@@ -54,7 +54,7 @@ it was built from.
 | `cli/src/main.rs` | Argument parsing (clap) and dispatch |
 | `cli/src/guard.rs` | Guard policy, the shared `BLOCK`/`ALLOW` cases, the self-test |
 | `cli/src/docs_map.rs` | Docs tree checks and generation |
-| `cli/src/diagrams.rs` | Diagram check and render |
+| `cli/src/diagrams.rs` | Mermaid block lint and validation |
 | `cli/src/install.rs` | Project and user install, settings merge, legacy migration |
 | `cli/src/doctor.rs` | Health check |
 | `cli/src/backup.rs` | Mirror and export |
@@ -83,7 +83,7 @@ Equivalence with the Python and bash tools it replaced was checked on
 
 - `pf install user` creates symlinks, so it needs a Unix-like system (Linux,
   macOS, WSL).
-- `pf diagrams render` needs Node.js and a Chrome or Chromium binary. `check`
+- `pf diagrams validate` needs Node.js and a Chrome or Chromium binary. `check`
   needs nothing extra.
 
 <!-- documentation-routing:start -->

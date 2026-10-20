@@ -32,6 +32,14 @@ Spring implementation is in
 5. A new or changed event updates the AsyncAPI document, the JSON schema, the
    narrative event catalog and every listed consumer in the same change.
 
+```mermaid
+flowchart LR
+  Write["Domain write"] --> Outbox["Outbox row, same transaction"]
+  Outbox --> Broker["Broker"]
+  Broker --> Inbox["Consumer inbox by eventId"]
+  Inbox --> Effects["Side effects, once"]
+```
+
 <!-- documentation-routing:start -->
 ## Documentation routing
 

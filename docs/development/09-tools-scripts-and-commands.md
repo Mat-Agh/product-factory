@@ -14,7 +14,7 @@ print usage.
 | `pf guard` | Claude Code PreToolUse hook (stdin JSON → exit 0 or 2) | [COMP-004](../components/COMP-004-guard-hook.md) |
 | `pf guard --self-test` | Run the 80 policy cases | [COMP-004](../components/COMP-004-guard-hook.md) |
 | `pf docs-map` | Docs tree check and live map generator | [COMP-012](../components/COMP-012-docs-gate.md) |
-| `pf diagrams check \| render` | Mermaid sources to SVG; freshness check | [COMP-014](../components/COMP-014-diagrams.md) |
+| `pf diagrams check \| validate` | Lint inline Mermaid blocks; parse them with the Mermaid CLI | [COMP-014](../components/COMP-014-diagrams.md) |
 | `pf install project \| user \| all` | Put the factory into a product (copy) or a user config (links) | [COMP-007](../components/COMP-007-installer.md) |
 | `pf doctor [project]` | Health check; exit code = failures | [COMP-008](../components/COMP-008-doctor.md) |
 | `pf mirror add \| push \| bundle` | Backup remotes and offline bundles | [COMP-009](../components/COMP-009-backup-tools.md) |
@@ -67,7 +67,7 @@ pf guard --self-test
 pf docs-map --strict --allow kit/
 pf docs-map --fix --strict --allow kit/
 pf diagrams check
-pf diagrams render                      # after editing a .mmd
+pf diagrams validate                    # after adding or editing a diagram (needs Node.js)
 
 # Try the guard by hand
 echo '{"tool_name":"Bash","tool_input":{"command":"git merge main"}}' | pf guard; echo "exit=$?"   # exit=2 with reason
@@ -86,7 +86,7 @@ git worktree list
 | `PRODUCT_FACTORY_HOME` | `pf install`, `doctor`, `mirror`, `export` | Factory checkout (or pass `--factory <path>`) |
 | `CLAUDE_CONFIG_DIR` | `pf install user`, `doctor`, `export` | Claude config dir (default `~/.claude`) |
 | `FACTORY_GUARD=off` | `pf guard` | Disable the guard for a human-driven session (set before starting `claude`) |
-| `MMDC`, `MERMAID_CHROME` | `pf diagrams render` | Mermaid CLI binary and Chrome binary to use |
+| `MMDC`, `MERMAID_CHROME` | `pf diagrams validate` | Mermaid CLI binary and Chrome binary to use |
 
 <!-- documentation-routing:start -->
 ## Documentation routing

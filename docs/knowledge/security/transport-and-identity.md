@@ -19,6 +19,21 @@ Certificate and hostname verification are never disabled, in any build.
 
 ## Identity and authorization
 
+```mermaid
+flowchart TD
+  Req["Request"] --> Auth{"Authenticated principal?"}
+  Auth -- "no" --> Deny["Deny"]
+  Auth -- "yes" --> Member{"Tenant member?"}
+  Member -- "no" --> Deny
+  Member -- "yes" --> Cap{"Capability or entitlement?"}
+  Cap -- "no" --> Deny
+  Cap -- "yes" --> Role{"Role in surface or workspace?"}
+  Role -- "no" --> Deny
+  Role -- "yes" --> Own{"Owner or in scope?"}
+  Own -- "no" --> Deny
+  Own -- "yes" --> Allow["Allow"]
+```
+
 - Every resource operation checks, in order: an authenticated principal, tenant
   membership, capability or entitlement, role in the surface or workspace, and
   ownership.

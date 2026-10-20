@@ -102,11 +102,11 @@ transparent JPA `AttributeConverter`, `pgcrypto`, Jasypt or one unvalidated blob
 
 ## 5. Keys: hierarchy, custody, rotation
 
-```text
-restricted plaintext
-  -> random per-record data key (AES-256-GCM)
-  -> tenant/purpose key wraps the data key
-  -> service-scoped master key wraps the tenant/purpose key
+```mermaid
+flowchart LR
+  Plain["Restricted plaintext"] -- "AES-256-GCM" --> DEK["Random per-record data key"]
+  DEK -- "wrapped by" --> TK["Tenant and purpose key"]
+  TK -- "wrapped by" --> MK["Service-scoped master key on the host"]
 ```
 
 - Keys are generated on the target host with the OS CSPRNG. Each service has its

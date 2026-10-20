@@ -36,7 +36,6 @@ product-factory/
     ├── decisions/                ADR-NNN
     ├── status/                   CURRENT_STATE, IMPLEMENTATION_STATUS, ROADMAP, EVOLUTION_LOG
     ├── adapters/                 Hermes, Codex/Cursor/other (COMP-011)
-    ├── assets/diagrams/          *.mmd sources + rendered *.svg (COMP-014)
     └── operator/                 USER.md operator profile (COMP-010)
 ```
 

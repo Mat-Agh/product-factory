@@ -18,7 +18,8 @@ Current state: [`CURRENT_STATE.md`](docs/status/CURRENT_STATE.md). How to change
   README. Only `README.md`, `AGENTS.md` and `CLAUDE.md` stay at the root. After
   adding or moving a doc, run `pf docs-map --fix --strict --allow kit/`,
   which regenerates every README's links and the map in `docs/README.md`.
-  Diagrams are `docs/assets/diagrams/*.mmd` rendered to SVG, never inline Mermaid.
+  Diagrams are inline ` ```mermaid ` blocks in the Connect style
+  (`docs/knowledge/principles/documentation.md`, Diagrams), never images.
 - General engineering knowledge (any stack, any project) lives in `docs/knowledge/`,
   by language and stack. It is the single source: projects import it through
   `kit/knowledge/stacks/<stack>/pack.map`. Keep it generic (no product, company,
@@ -39,7 +40,7 @@ Current state: [`CURRENT_STATE.md`](docs/status/CURRENT_STATE.md). How to change
 ```bash
 (cd cli && cargo test --release && cargo clippy --release && cargo fmt --check)
 pf guard --self-test
-pf diagrams check   # after editing a .mmd: pf diagrams render
+pf diagrams check   # after adding or editing a diagram: pf diagrams validate
 pf docs-map --strict --allow kit/   # --fix after adding/moving a doc
 pf doctor
 ```

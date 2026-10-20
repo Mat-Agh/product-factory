@@ -5,6 +5,21 @@
 
 ## Approval-gated automatic merge
 
+```mermaid
+sequenceDiagram
+  participant Dev as Author or agent
+  participant CI as Pipeline
+  participant H as Human reviewer
+  participant P as Git platform
+  Dev->>P: open merge request
+  P->>CI: run validation
+  CI->>CI: watcher waits for a native approval
+  H->>P: approve
+  CI->>P: arm merge when the pipeline succeeds
+  P->>P: merge when green
+  P->>CI: start the post-merge branch pipeline
+```
+
 A pattern that keeps humans in charge without a manual merge click:
 
 1. The merge-request pipeline validates (conventions, static gates, builds).

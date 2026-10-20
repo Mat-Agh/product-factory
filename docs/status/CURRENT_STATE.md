@@ -47,9 +47,9 @@ It contains:
   and checked by `pf docs-map`. It covers governance, the operator guide,
   architecture, component contracts, the development handbook, ADRs, status
   (this page, implementation status, roadmap, evolution log), adapters and the
-  operator profile. Diagrams are committed SVGs rendered from Mermaid sources.
+  operator profile. Diagrams are inline Mermaid blocks, linted and parsed by `pf diagrams`.
 
-**Verification state:** `pf` passes its 27 cargo tests (including the 80 guard
+**Verification state:** `pf` passes its 28 cargo tests (including the 80 guard
 policy cases) and matches the Python tools it replaced. Every subcommand has
 run end to end on scratch setups. The docs map and diagram checks pass. **No job has run end to end
 on a real product yet.** That is the Phase 1 exit criterion. Details:

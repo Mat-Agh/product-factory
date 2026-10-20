@@ -62,7 +62,7 @@ enum Cmd {
         #[arg(long)]
         allow: Vec<String>,
     },
-    /// Mermaid sources in docs/assets/diagrams rendered to committed SVGs
+    /// Inline Mermaid diagrams in Markdown: lint them, or parse them with the Mermaid CLI
     Diagrams {
         #[command(subcommand)]
         action: DiagramCmd,
@@ -132,10 +132,10 @@ enum Cmd {
 
 #[derive(Subcommand)]
 enum DiagramCmd {
-    /// Verify every .svg exists and matches its .mmd (no browser needed)
+    /// Lint every ```mermaid block for constructs that break renderers (no tools needed)
     Check,
-    /// Render every .mmd to .svg with the Mermaid CLI, then check
-    Render,
+    /// Lint, then parse every block with the Mermaid CLI (needs Node.js)
+    Validate,
 }
 
 #[derive(Subcommand)]
@@ -246,7 +246,7 @@ fn run(cli: Cli) -> Result<i32, i32> {
             allow,
         } => docs_map::main(root, docs, fix, strict, allow),
         Cmd::Diagrams { action, root } => {
-            diagrams::main(root, matches!(action, DiagramCmd::Render))
+            diagrams::main(root, matches!(action, DiagramCmd::Validate))
         }
         Cmd::Install { target } => {
             let f = factory(&cli.factory)?;

@@ -19,15 +19,34 @@ internal HTTP and fail closed ([06](security.md)).
 
 ## Producer pattern
 
-```
-use case → mutate aggregates → insert outbox_events → commit
-publisher poller → broker → mark published
+```mermaid
+sequenceDiagram
+  participant UC as Use case
+  participant DB as Service database
+  participant Pub as Publisher poller
+  participant K as Broker
+  UC->>DB: mutate aggregates and insert outbox_events, one transaction
+  DB-->>UC: commit
+  Pub->>DB: read unpublished outbox rows
+  Pub->>K: publish versioned fact
+  Pub->>DB: mark published
 ```
 
 ## Consumer pattern
 
-```
-broker message → insert inbox (unique event id) → apply side effects → commit
+```mermaid
+sequenceDiagram
+  participant K as Broker
+  participant C as Consumer
+  participant DB as Consumer database
+  K->>C: fact with eventId
+  C->>DB: insert inbox row keyed by eventId
+  alt eventId already present
+    DB-->>C: conflict, skip as already processed
+  else new event
+    C->>DB: apply side effects in the same transaction
+    DB-->>C: commit
+  end
 ```
 
 If the inbox insert conflicts, the fact was already processed: skip it.

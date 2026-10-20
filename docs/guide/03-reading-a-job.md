@@ -58,9 +58,34 @@ cd .factory/jobs/004-tenant-org-name && head -n1 *.md round-*/*.md
 
 `job.json` → `stage` moves through the lane:
 
-![Job stages, simplified](../assets/diagrams/job-stages.svg)
-
-<sub>Diagram source: [`job-stages.mmd`](../assets/diagrams/job-stages.mmd) · re-render with `pf diagrams render`</sub>
+```mermaid
+stateDiagram-v2
+  [*] --> triage
+  triage --> discovery: idea
+  triage --> repro: bug
+  triage --> spec: feature
+  triage --> plan: chore or spike
+  triage --> build: trivial
+  triage --> needs_human: blocking question
+  discovery --> spec
+  repro --> plan
+  spec --> design: UI change
+  spec --> plan
+  design --> plan
+  plan --> build
+  build --> review
+  build --> needs_human: BLOCKED
+  review --> build: CHANGES, resumes left
+  review --> qa: all PASS
+  review --> gate: all PASS, no QA in lane
+  review --> needs_human: rounds exhausted
+  qa --> build: FAIL, resumes left
+  qa --> gate: PASS
+  gate --> pr_open: READY or ESCALATE
+  needs_human --> build: rework
+  pr_open --> done: merged and cleaned
+  pr_open --> closed: closed
+```
 
 The full state machine and its guards are in
 [architecture/JOB_LIFECYCLE.md](../architecture/JOB_LIFECYCLE.md).

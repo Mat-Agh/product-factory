@@ -41,6 +41,20 @@ Repository interfaces return domain types. DTOs stay in `data/` and map with
 - Outbound frames carry a strictly increasing connection-local sequence where the
   protocol requires it.
 
+```mermaid
+sequenceDiagram
+  participant WS as Supervised socket
+  participant Repo as Repository
+  participant API as REST
+  participant UI as ViewModel
+  WS-->>Repo: event (invalidation hint)
+  Repo->>Repo: drop duplicate event IDs
+  Repo->>API: refetch the affected resource
+  API-->>Repo: authoritative state
+  Repo-->>UI: updated flow
+  Note over WS,Repo: on reconnect, mark views stale and refetch
+```
+
 <!-- documentation-routing:start -->
 ## Documentation routing
 

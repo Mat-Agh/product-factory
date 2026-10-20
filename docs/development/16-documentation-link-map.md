@@ -7,9 +7,16 @@ Use this map to route to the smallest useful set of documents. Read every
 document only for repo-wide documentation work. The exhaustive list is
 [documentation map](../README.md#documentation-map).
 
-![How an agent routes a factory task through the docs](../assets/diagrams/doc-routing.svg)
-
-<sub>Diagram source: [`doc-routing.mmd`](../assets/diagrams/doc-routing.mmd) · re-render with `pf diagrams render`</sub>
+```mermaid
+flowchart TB
+  Task["Task on the factory repo"] --> Agents["AGENTS.md"]
+  Agents --> Map["This map"]
+  Map --> Truth["Source of truth: CONSTITUTION, kit/"]
+  Map --> Docs["Routed docs"]
+  Truth --> Change["Change plus same-commit docs, per the 03 change map"]
+  Docs --> Change
+  Change --> Gates["Gates, then EVOLUTION_LOG and IMPLEMENTATION_STATUS"]
+```
 
 ## Knowledge order
 

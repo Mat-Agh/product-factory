@@ -19,6 +19,14 @@ browser code is downloadable and never secret.
 
 ## Keys and environment variables
 
+```mermaid
+flowchart LR
+  Code["Source and config"] --> Bundle["Downloaded JavaScript bundle"]
+  Public["Values compiled into the bundle"] --> Bundle
+  Bundle --> Anyone["Anyone who opens the app"]
+  Secret["Secrets an operator types in"] --> Backend["Backend only, write-only, redacted"]
+```
+
 There are no front-end secret keys. Anything compiled into the bundle (for example
 `NEXT_PUBLIC_*`) is public. Never put private keys, API secrets, signing keys,
 database credentials, OAuth client secrets or service tokens in code, public

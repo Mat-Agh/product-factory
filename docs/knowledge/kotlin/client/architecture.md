@@ -9,15 +9,21 @@ navigation keys, repositories, use cases and platform abstractions.
 
 ## Layers
 
-```
-androidApp / iosApp (thin shells)
-        │
-     :shared  ── root navigation, DI start, auth state, responsive shell
-        │
-   :feature:*  ── screens, MVI, navigation stacks, use cases, repositories, DTOs
-        │
-     :core:*   ── design system, network, realtime, datastore, security, cache,
-                  shared domain contracts, SDK facades, observability
+```mermaid
+flowchart TD
+  Android[":androidApp shell"] --> Shared[":shared"]
+  IOS["iosApp shell"] --> Shared
+  Shared --> Nav["Root navigation and responsive shell"]
+  Nav --> Features[":feature:*"]
+  Features --> Design[":core:design_system"]
+  Features --> Network[":core:network: request policies, proofs, media"]
+  Features --> Realtime[":core:realtime: supervised socket"]
+  Features --> Datastore[":core:datastore"]
+  Features --> Contracts["core shared domain contracts"]
+  Features --> Facades["SDK facades: media, push, permissions, WebRTC"]
+  Features --> Observability["analytics, crash reporting, logging"]
+  Datastore --> Security[":core:security"]
+  Network --> Security
 ```
 
 | Layer | Responsibility |
@@ -33,6 +39,20 @@ androidApp / iosApp (thin shells)
 
 Rules: features never import other features; cross-feature needs go through a core
 contract or the shell. Vendor SDKs appear only behind core facades.
+
+Inside a feature, each screen follows MVI ([presentation](presentation-mvi.md)):
+
+```mermaid
+flowchart LR
+  Screen["Composable screen"] -- "user intent" --> Action["ScreenAction"]
+  Action --> VM["ViewModel"]
+  VM -- "calls" --> UseCase["Use case"]
+  UseCase --> Repo["Repository"]
+  VM -- "reduces" --> State["ScreenState"]
+  VM -- "one-off" --> Event["ScreenEvent"]
+  State --> Screen
+  Event --> Screen
+```
 
 ## Data policy: online-first
 

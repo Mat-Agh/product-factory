@@ -16,13 +16,14 @@ contract direction.
 
 ## Contract direction
 
-```text
-Business policy ──> Product contract <── Design contract
-                          │
-                          ├──> Web applications
-                          ├──> Backend services
-                          ├──> Mobile client
-                          └──> Cross-repository acceptance evidence
+```mermaid
+flowchart LR
+  Business["Business policy"] --> Product["Product contract"]
+  Design["Design contract"] --> Product
+  Product --> Web["Web applications"]
+  Product --> Backend["Backend services"]
+  Product --> Client["Mobile client"]
+  Product --> Evidence["Cross-repository acceptance evidence"]
 ```
 
 Product requirements win when behaviour is ambiguous. The backend owns physical

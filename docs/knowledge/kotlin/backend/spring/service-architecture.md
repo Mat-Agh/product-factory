@@ -10,10 +10,14 @@ covers topology and ownership. Runtime detail lives in
 
 ## Topology
 
-```
-application/*  →  feature/* (owned slices)  →  core/*
-                      ↑
-                 never reverse
+```mermaid
+flowchart LR
+  App["application/*: one deployable per service"] --> Feature["feature/*: slices owned by one service"]
+  App --> Core["core/*: contracts, security, persistence, events, web, observability"]
+  Feature --> Core
+  Feature -. "forbidden: another service's feature" .-> Other["feature/* of another service"]
+  App -- "facts: outbox to broker" --> Broker["Message broker"]
+  App -- "decisions: internal mTLS HTTP, fail closed" --> Peer["Another service"]
 ```
 
 - **Facts** (something happened) travel on the message broker through the

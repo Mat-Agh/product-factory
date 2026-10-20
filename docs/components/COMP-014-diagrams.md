@@ -1,67 +1,55 @@
 # COMP-014 — Diagrams
 
-**Status:** Implemented — all 7 diagrams validated with Mermaid 10.9 and 11.17 and rendered (2026-10-19)
-**Last updated:** 2026-10-19
-**Source:** [`cli/src/diagrams.rs`](../../cli/src/diagrams.rs) (`pf diagrams`), [`docs/assets/diagrams/`](../assets/diagrams/)
+**Status:** Implemented — inline Mermaid blocks, linted and parsed by the Mermaid CLI (2026-10-20)
+**Last updated:** 2026-10-20
+**Source:** [`cli/src/diagrams.rs`](../../cli/src/diagrams.rs) (`pf diagrams`)
+**Decisions:** [ADR-014](../decisions/ADR-014-inline-mermaid-diagrams.md)
 
 ## Purpose
 
-These diagrams display everywhere the docs are read: GitHub, a GitLab mirror,
-an IDE preview, or an offline bundle. Inline ` ```mermaid ` blocks depend on the
-host's live renderer. On GitHub that renderer is an iframe from
-`viewscreen.githubusercontent.com`, and when it cannot load, the page shows
-"Unable to render rich display". The docs therefore show **committed SVG
-images**, rendered from Mermaid sources.
-
-## Layout
-
-| File | Role |
-|---|---|
-| `docs/assets/diagrams/<name>.mmd` | The only source of a diagram. Edit this |
-| `docs/assets/diagrams/<name>.svg` | Generated image. A comment just inside the `<svg>` element records the `source-sha256` of the `.mmd` it came from. Never edit it |
-| The document that shows it | `![alt](…/assets/diagrams/<name>.svg)` plus a small "Diagram source" link to the `.mmd` |
-
-| Diagram | Shown in |
-|---|---|
-| `pipeline` | [README](../../README.md) |
-| `idea-to-market` | [guide/00-overview](../guide/00-overview.md) |
-| `job-stages` | [guide/03-reading-a-job](../guide/03-reading-a-job.md) |
-| `layers`, `job-sequence` | [architecture/FACTORY_OVERVIEW](../architecture/FACTORY_OVERVIEW.md) |
-| `job-state-machine` | [architecture/JOB_LIFECYCLE](../architecture/JOB_LIFECYCLE.md) |
-| `doc-routing` | [development/16-documentation-link-map](../development/16-documentation-link-map.md) |
+Diagrams are inline ` ```mermaid ` blocks inside the documents, as in the Daria
+Connect docs. GitHub, GitLab and IDE previews render them live, so they resize,
+follow the reader's theme and stay editable text that agents can read and change.
+The style rules are in
+[principles/documentation](../knowledge/principles/documentation.md#diagrams).
 
 ## Interface
 
 ```bash
-pf diagrams render    # render every .mmd (needs Node; uses system Chrome when present), then check
-pf diagrams check     # every .svg exists and matches its .mmd hash (no browser needed)
+pf diagrams check      # lint every mermaid block in tracked Markdown (no tools needed)
+pf diagrams validate   # lint, then parse every block with the Mermaid CLI (needs Node.js)
 ```
 
-Rendering uses `@mermaid-js/mermaid-cli` 11 (`$MMDC`, `mmdc` on the PATH, or
-`npx`), with the neutral theme on a white background so diagrams stay readable
-in dark mode. A source with a syntax error fails the render.
+`check` fails on the constructs that break older renderers such as GitHub's:
+- a diagram type outside the supported list (`flowchart`, `graph`,
+  `sequenceDiagram`, `stateDiagram-v2`, `erDiagram`, `classDiagram`, `gantt`,
+  `journey`, `gitGraph`, `timeline`, `pie`);
+- `%%{init}` directives (themes are the renderer's);
+- HTML-like text in labels (`<job>`) other than `<br/>`;
+- `A --> B & C` edge chaining (one edge per line);
+- unbalanced quotes, unclosed blocks;
+- diagrams over 60 lines (split them).
+
+`validate` runs each block through `@mermaid-js/mermaid-cli` 11 (`$MMDC`, `mmdc`
+on the PATH, or `npx`, with system Chrome when present) and reports
+`file:line: parse error`.
 
 ## Rules
 
-- No inline ` ```mermaid ` blocks in docs. Add a `.mmd`, render it, and embed
-  the SVG.
-- Commit the `.mmd` and the `.svg` together. `pf diagrams check` is a gate (`AGENTS.md`,
-  `pf doctor`).
-
-## Portability
-
-Rendered SVGs must display in IDE Markdown previews (IntelliJ, VS Code) as well as
-browsers and GitHub, so `render`:
-- passes Mermaid `htmlLabels: false`, so labels are SVG `<text>`, not HTML inside
-  `<foreignObject>`, which non-browser SVG renderers drop;
-- replaces `width="100%"` and the CSS `max-width` with the pixel size from the
-  `viewBox`;
-- keeps `<svg>` as the first element, with the hash note inside it.
+- No diagram images and no separate diagram files in docs; the block lives where
+  it is explained.
+- `pf diagrams check` is a gate (`AGENTS.md`, `pf doctor`); run
+  `pf diagrams validate` after adding or editing a diagram.
+- Viewers that do not render Mermaid (terminals, plain-text tools) show the source,
+  which is written to be readable as text.
 
 ## Known limitations
 
-Rendering needs Node.js and a Chrome or Chromium binary (or Puppeteer's
-download). Checking needs only `pf`.
+- GitHub's Mermaid version lags the CLI's; the lint covers the constructs known to
+  break it, but a brand-new diagram type can still pass `validate` and fail on
+  GitHub. Prefer the types listed above.
+- IntelliJ needs its Mermaid Markdown extension enabled (Settings → Languages &
+  Frameworks → Markdown → Markdown Extensions → Mermaid).
 
 <!-- documentation-routing:start -->
 ## Documentation routing

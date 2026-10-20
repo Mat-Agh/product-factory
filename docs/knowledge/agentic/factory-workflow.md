@@ -33,11 +33,32 @@ possible; it catches different mistakes.
   → tech lead ADR; QA → tester.
 - **Repo** decides where the work lands; one change lands in one repo.
 
+```mermaid
+flowchart TD
+  Start["New work"] --> Type{"Type?"}
+  Type -- "docs or product" --> PM["Product manager"]
+  Type -- "design" --> Des["Designer"]
+  Type -- "bug" --> QA["Tester reproduces first"]
+  Type -- "feature" --> TL["Tech-lead plan"]
+  Type -- "spike" --> ADR["Tech lead writes an ADR"]
+  Type -- "QA only" --> QA2["Tester records evidence"]
+  QA --> TL
+  TL --> Eng["Engineer in the owning repo"]
+```
+
 ## The line
 
-```
-work item → coordinator triage → first role → tech-lead plan → engineer
-          → reviewers → tester → merge request → human merges
+```mermaid
+flowchart LR
+  Work["Work item"] --> Coord["Coordinator triage"]
+  Coord --> First["First role by type"]
+  First --> Plan["Tech-lead plan"]
+  Plan --> Eng["Engineer, one repo"]
+  Eng --> Rev{"Reviewers"}
+  Rev -- "CHANGES" --> Eng
+  Rev -- "all PASS" --> QA["Tester"]
+  QA --> MR["Merge request"]
+  MR --> Human(["Human merges"])
 ```
 
 Work starts from chat or from a labelled issue picked up by a scheduled intake.
