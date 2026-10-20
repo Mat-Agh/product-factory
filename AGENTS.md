@@ -19,6 +19,10 @@ Current state: [`CURRENT_STATE.md`](docs/status/CURRENT_STATE.md). How to change
   adding or moving a doc, run `pf docs-map --fix --strict --allow kit/`,
   which regenerates every README's links and the map in `docs/README.md`.
   Diagrams are `docs/assets/diagrams/*.mmd` rendered to SVG, never inline Mermaid.
+- General engineering knowledge (any stack, any project) lives in `docs/knowledge/`,
+  by language and stack. It is the single source: projects import it through
+  `kit/knowledge/stacks/<stack>/pack.map`. Keep it generic (no product, company,
+  host or person names). A new page must be mapped by at least one pack.
 - Keep the kit project-agnostic. Anything about a specific product belongs in
   that product's `AGENTS.md` or `.factory/factory.yaml`, never here.
 - Every factory-level change updates, **in the same commit**, the docs listed for

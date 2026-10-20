@@ -6,6 +6,39 @@
 Append-only. One dated entry for each factory-level change: what changed, why,
 and its evidence.
 
+## 2026-10-20 — One development knowledge library for every stack
+
+- **Why.** The operator wants every piece of general knowledge gathered so far, for
+  every language and stack, in one place under the development docs, and imported
+  into projects from there. The per-stack template folders were hard to browse,
+  duplicated shared pages, and had no home for CI/CD, API, security, product,
+  Rust or agentic knowledge.
+- **Library.** Added `docs/knowledge/` ([ADR-013](../decisions/ADR-013-development-knowledge-library.md)):
+  `principles/` (engineering, evidence and done, documentation), `kotlin/` (shared
+  language and Gradle; `client/` with architecture, KMP source sets, Android, iOS,
+  MVI, data and realtime, library stack, cryptography, testing, acceptance, setup,
+  tools, samples; `backend/spring/` with the full service handbook), `typescript/`
+  (`web/`), `rust/` (CLI tooling), `api/` (HTTP conventions, errors, events),
+  `security/` (classification, cryptography policy, transport and identity,
+  threat modeling), `product/`, `cicd/` (GitFlow, approval-gated merge, pipeline
+  design, supply chain, runners, deployment) and `agentic/` (factory workflow,
+  agent instructions, memory, safety, workspaces). Sources: the Connect handbooks,
+  CI/CD, security, API, deployment and governance docs, the workspace CI and
+  runner docs, and the Hermes factory docs. Ktor server and iOS release are named
+  as not yet gathered.
+- **Packs.** The stack chapters moved out of `kit/knowledge/stacks/` into the
+  library. Each stack now has a `pack.map` (library page → project path) and keeps
+  only scaffolds; the handbook indexes and link maps route to the imported
+  `knowledge/` areas.
+- **Engine.** `pf knowledge` reads pack maps, imports library pages without the
+  factory routing block, and rewrites links between library pages to wherever the
+  targets landed (created files or existing equivalents). `pf docs-map` resolves
+  kit scaffold links through the base overlay and the pack maps.
+- **Evidence.** 26 cargo tests (new: library import with mapped links, every
+  library page mapped by a pack), clippy and fmt clean, docs map strict OK.
+  Plan and import on copies of the five Connect repos: every added link resolved,
+  reruns changed nothing; originals untouched.
+
 ## 2026-10-19 — Real stack knowledge, imported and merged; gap audit
 
 - **Why.** The first knowledge templates were headings and comments. The operator

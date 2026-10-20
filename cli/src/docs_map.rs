@@ -546,18 +546,42 @@ pub fn main(
     i32::from(!r.errors.is_empty())
 }
 
-/// A knowledge-pack stack template (`kit/knowledge/stacks/<stack>/…`) is overlaid
-/// on `kit/knowledge/base/` at import time, so its links may point at base files.
+/// Knowledge templates (`kit/knowledge/base/…`, `kit/knowledge/stacks/<stack>/…`)
+/// are combined at import time: a stack overlays the base, and its `pack.map`
+/// brings in pages from the knowledge library. Their links may point at any of
+/// those, so resolve them against the combined project layout.
 fn resolves_via_base(root: &Path, file: &str, target: &str) -> bool {
-    let Some(rest) = file.strip_prefix("kit/knowledge/stacks/") else {
-        return false;
-    };
-    let Some((_, inner)) = rest.split_once('/') else {
-        return false;
-    };
-    let base = root.join("kit/knowledge/base").join(inner);
-    base.parent()
-        .is_some_and(|d| util::normalize(&d.join(target)).exists())
+    let (stacks, inner): (Vec<String>, &str) =
+        if let Some(rest) = file.strip_prefix("kit/knowledge/stacks/") {
+            let Some((stack, inner)) = rest.split_once('/') else {
+                return false;
+            };
+            (vec![stack.to_string()], inner)
+        } else if let Some(inner) = file.strip_prefix("kit/knowledge/base/") {
+            (crate::knowledge::stacks(root), inner)
+        } else {
+            return false;
+        };
+    let dir = Path::new(inner).parent().unwrap_or(Path::new(""));
+    let virt = util::normalize(&Path::new("/").join(dir).join(target));
+    let virt = virt
+        .strip_prefix("/")
+        .unwrap_or(&virt)
+        .to_string_lossy()
+        .into_owned();
+    if root.join("kit/knowledge/base").join(&virt).exists() {
+        return true;
+    }
+    stacks.iter().any(|s| {
+        root.join("kit/knowledge/stacks")
+            .join(s)
+            .join(&virt)
+            .exists()
+            || crate::knowledge::pack_entries(root, s)
+                .unwrap_or_default()
+                .iter()
+                .any(|(dst, _)| *dst == virt)
+    })
 }
 
 #[cfg(test)]

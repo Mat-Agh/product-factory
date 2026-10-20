@@ -2,7 +2,6 @@
 
 **Status:** Active — agent routing authority
 **Last updated:** {{DATE}}
-**Source:** Product Factory knowledge pack (spring-kotlin-service)
 
 Route agents to the smallest useful set of docs. Do not read every document
 unless the task is repo-wide documentation work.
@@ -40,6 +39,13 @@ unless the task is repo-wide documentation work.
 | Decisions | `docs/decisions/README.md` | The ADR |
 | Development history | `docs/history/DEVELOPMENT_LOG.md` | `git log` |
 | Branching and review gate | `CONTRIBUTING.md` | [CICD](CICD.md) |
+
+| Gradle build | [11](11-build-system-gradle.md) | [08](08-build-ci.md) |
+| General principles, evidence, documentation | [knowledge/principles/](knowledge/principles/README.md) | |
+| API conventions, errors, events | [knowledge/api/](knowledge/api/README.md) | |
+| Security policy, classification, identity | [knowledge/security/](knowledge/security/README.md) | |
+| CI/CD and workflows | [knowledge/cicd/](knowledge/cicd/README.md) | [CICD](CICD.md) |
+| Agentic workflows | [knowledge/agentic/](knowledge/agentic/README.md) | |
 
 Add a row for every feature doc and every recurring task. Update this map in the
 same change that adds, moves or retires a doc.

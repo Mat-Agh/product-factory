@@ -19,6 +19,56 @@ fn templates(factory: &Path) -> PathBuf {
     factory.join("kit/knowledge")
 }
 
+/// The development knowledge library: the single source of stack knowledge.
+pub fn library(factory: &Path) -> PathBuf {
+    factory.join("docs/knowledge")
+}
+
+/// A stack's `pack.map`: (destination in the project, library source). Explicit
+/// file entries come first; a folder entry adds every page under it that is not
+/// mapped explicitly.
+pub fn pack_entries(factory: &Path, stack: &str) -> Result<Vec<(String, PathBuf)>, String> {
+    let map = templates(factory)
+        .join("stacks")
+        .join(stack)
+        .join("pack.map");
+    let Ok(text) = fs::read_to_string(&map) else {
+        return Ok(vec![]);
+    };
+    let lib = library(factory);
+    let lines: Vec<(String, String)> = text
+        .lines()
+        .map(str::trim)
+        .filter(|l| !l.is_empty() && !l.starts_with('#'))
+        .filter_map(|l| {
+            let mut it = l.split_whitespace();
+            Some((it.next()?.to_string(), it.next()?.to_string()))
+        })
+        .collect();
+    let mut out: Vec<(String, PathBuf)> = Vec::new();
+    for (src, dst) in lines.iter().filter(|(s, _)| !s.ends_with('/')) {
+        let p = lib.join(src);
+        if !p.is_file() {
+            return Err(format!("{}: no library page {src}", map.display()));
+        }
+        out.push((dst.clone(), p));
+    }
+    for (src, dst) in lines.iter().filter(|(s, _)| s.ends_with('/')) {
+        let dir = lib.join(src);
+        if !dir.is_dir() {
+            return Err(format!("{}: no library folder {src}", map.display()));
+        }
+        for f in files_under(&dir) {
+            let p = dir.join(&f);
+            if out.iter().any(|(_, s)| *s == p) {
+                continue;
+            }
+            out.push((format!("{}/{f}", dst.trim_end_matches('/')), p));
+        }
+    }
+    Ok(out)
+}
+
 pub fn stacks(factory: &Path) -> Vec<String> {
     let mut v: Vec<String> = fs::read_dir(templates(factory).join("stacks"))
         .into_iter()
@@ -38,7 +88,7 @@ fn files_under(dir: &Path) -> Vec<String> {
             let p = e.path();
             if p.is_dir() {
                 walk(base, &p, out);
-            } else if e.file_name() != ".exclude" {
+            } else if e.file_name() != ".exclude" && e.file_name() != "pack.map" {
                 out.push(util::rel(base, &p));
             }
         }
@@ -76,6 +126,9 @@ pub fn template_set(factory: &Path, stack: &str) -> Result<BTreeMap<String, Path
     }
     for f in files_under(&sdir) {
         set.insert(f.clone(), sdir.join(&f));
+    }
+    for (dst, src) in pack_entries(factory, stack)? {
+        set.insert(dst, src);
     }
     Ok(set)
 }
@@ -252,8 +305,33 @@ fn equivalent(root: &Path, wanted: &str, docs_root: &str) -> Option<Found> {
 /// Only these are merged section by section into existing files.
 const PACK_MARK: &str = "**Source:** Product Factory knowledge pack";
 
-pub fn is_knowledge(text: &str) -> bool {
-    text.contains(PACK_MARK)
+pub fn is_knowledge(factory: &Path, src: &Path, text: &str) -> bool {
+    src.starts_with(library(factory)) || text.contains(PACK_MARK)
+}
+
+const ROUTING_START: &str = "<!-- documentation-routing:start -->";
+const ROUTING_END: &str = "<!-- documentation-routing:end -->";
+
+/// A template's text as imported: a library page loses the factory's generated
+/// routing block, whose links only resolve inside the factory repository.
+fn template_text(factory: &Path, src: &Path) -> std::io::Result<String> {
+    let text = fs::read_to_string(src)?;
+    if !src.starts_with(library(factory)) {
+        return Ok(text);
+    }
+    Ok(match (text.find(ROUTING_START), text.find(ROUTING_END)) {
+        (Some(a), Some(b)) if b > a => {
+            format!(
+                "{}\n{}",
+                text[..a].trim_end(),
+                text[b + ROUTING_END.len()..].trim_start_matches('\n')
+            )
+            .trim_end()
+            .to_string()
+                + "\n"
+        }
+        _ => text,
+    })
 }
 
 /// `## ` sections outside code fences: (heading, full text including the heading line).
@@ -382,8 +460,8 @@ pub fn plan(factory: &Path, t: &Target) -> Result<Plan, String> {
         let dst = map_path(&rel, &t.docs_root);
         match equivalent(&t.root, &dst, &t.docs_root) {
             Some(Found::Same(found)) => {
-                let tmpl = fs::read_to_string(&src).unwrap_or_default();
-                let gaps = if is_knowledge(&tmpl) {
+                let tmpl = template_text(factory, &src).unwrap_or_default();
+                let gaps = if is_knowledge(factory, &src, &tmpl) {
                     let have = fs::read_to_string(t.root.join(&found)).unwrap_or_default();
                     missing_sections(&tmpl, &have)
                         .into_iter()
@@ -419,12 +497,18 @@ fn fill(text: &str, t: &Target) -> String {
         .replace("{{DATE}}", &util::today_utc())
 }
 
-/// Point links in imported text at files that exist in this repo: keep a link that
-/// resolves, retarget a handbook chapter to the repo's chapter with the same number,
-/// and turn any other dead relative link into plain text.
-fn fix_links(text: &str, file: &Path) -> String {
+/// Library page → where it lives in the project (the created file, or the existing
+/// equivalent it was matched to).
+type LibMap = std::collections::HashMap<PathBuf, PathBuf>;
+
+/// Point links in imported text at files that exist in this repo. A link between
+/// library pages follows the pack map to wherever the target landed. Then: keep a
+/// link that resolves, retarget a handbook chapter to the repo's chapter with the
+/// same number, and turn any other dead relative link into plain text.
+fn fix_links(text: &str, file: &Path, src: &Path, lib: &LibMap) -> String {
     let re = regex::Regex::new(r"\[([^\]\n]+)\]\(([^)\s]+)\)").expect("link regex");
     let dir = file.parent().unwrap_or(Path::new("."));
+    let src_dir = src.parent().unwrap_or(Path::new("."));
     let mut fence = false;
     let mut out = String::with_capacity(text.len());
     for line in text.split_inclusive('\n') {
@@ -445,9 +529,17 @@ fn fix_links(text: &str, file: &Path) -> String {
             if path.is_empty() || href.contains("://") || href.starts_with("mailto:") {
                 return c[0].to_string();
             }
+            let mapped;
+            let path = match lib.get(&util::normalize(&src_dir.join(path))) {
+                Some(landed) => {
+                    mapped = util::rel(dir, landed);
+                    mapped.as_str()
+                }
+                None => path,
+            };
             let target = dir.join(path);
             if target.exists() {
-                return c[0].to_string();
+                return format!("[{label}]({path}{anchor})");
             }
             let name = Path::new(path)
                 .file_name()
@@ -469,11 +561,15 @@ fn fix_links(text: &str, file: &Path) -> String {
     out
 }
 
-const ROUTING_START: &str = "<!-- documentation-routing:start -->";
-
 /// Append the missing knowledge-pack sections to an existing file, before its
 /// generated routing block when it has one. Existing text is never changed.
-fn merge_into(path: &Path, sections: &[(String, String)], t: &Target) -> std::io::Result<()> {
+fn merge_into(
+    path: &Path,
+    sections: &[(String, String)],
+    t: &Target,
+    src: &Path,
+    lib: &LibMap,
+) -> std::io::Result<()> {
     let existing = fs::read_to_string(path)?;
     let mut block = format!(
         "<!-- pf-knowledge:start pack={} date={} -->\n> The sections below were added from the Product Factory `{}` knowledge pack because this file did not cover them. Review them against this repository: keep what applies, adapt names and commands, delete what does not.\n\n",
@@ -486,7 +582,7 @@ fn merge_into(path: &Path, sections: &[(String, String)], t: &Target) -> std::io
         block.push_str("\n\n");
     }
     block.push_str("<!-- pf-knowledge:end -->\n");
-    let block = fix_links(&fill(&block, t), path);
+    let block = fix_links(&fill(&block, t), path, src, lib);
     let merged = match existing.find(ROUTING_START) {
         Some(i) => format!(
             "{}\n\n{block}\n{}",
@@ -512,6 +608,19 @@ pub fn init(factory: &Path, t: &Target, files_only: bool) -> Result<Applied, Str
         created: vec![],
         merged: vec![],
     };
+    let lib_root = library(factory);
+    let mut lib: LibMap = LibMap::new();
+    for (dst, src) in &p.missing {
+        if src.starts_with(&lib_root) {
+            lib.insert(util::normalize(src), t.root.join(dst));
+        }
+    }
+    for pr in &p.present {
+        if pr.src.starts_with(&lib_root) {
+            lib.insert(util::normalize(&pr.src), t.root.join(&pr.found));
+        }
+    }
+    let mut created_src: Vec<(String, PathBuf)> = Vec::new();
     for (dst, src) in &p.missing {
         let out = t.root.join(dst);
         if out.exists() {
@@ -520,29 +629,30 @@ pub fn init(factory: &Path, t: &Target, files_only: bool) -> Result<Applied, Str
         if let Some(d) = out.parent() {
             fs::create_dir_all(d).map_err(|e| e.to_string())?;
         }
-        let text = fs::read_to_string(src).map_err(|e| e.to_string())?;
+        let text = template_text(factory, src).map_err(|e| e.to_string())?;
         fs::write(&out, fill(&text, t)).map_err(|e| e.to_string())?;
         a.created.push(dst.clone());
+        created_src.push((dst.clone(), src.clone()));
     }
     // Links are fixed once every new file exists, so they can point at each other.
-    for dst in &a.created {
+    for (dst, src) in &created_src {
         let out = t.root.join(dst);
         let text = fs::read_to_string(&out).map_err(|e| e.to_string())?;
-        let fixed = fix_links(&text, &out);
+        let fixed = fix_links(&text, &out, src, &lib);
         if fixed != text {
             fs::write(&out, fixed).map_err(|e| e.to_string())?;
         }
     }
     if !files_only {
         for pr in p.present.iter().filter(|pr| !pr.gaps.is_empty()) {
-            let tmpl = fs::read_to_string(&pr.src).map_err(|e| e.to_string())?;
+            let tmpl = template_text(factory, &pr.src).map_err(|e| e.to_string())?;
             let path = t.root.join(&pr.found);
             let have = fs::read_to_string(&path).map_err(|e| e.to_string())?;
             let secs = missing_sections(&tmpl, &have);
             if secs.is_empty() {
                 continue;
             }
-            merge_into(&path, &secs, t).map_err(|e| e.to_string())?;
+            merge_into(&path, &secs, t, &pr.src, &lib).map_err(|e| e.to_string())?;
             a.merged
                 .push((pr.found.clone(), secs.into_iter().map(|(h, _)| h).collect()));
         }
@@ -872,6 +982,41 @@ mod tests {
                 }
             }
             fs::remove_dir_all(&d).ok();
+        }
+    }
+    #[test]
+    fn library_pages_are_imported_with_mapped_links_and_no_factory_routing() {
+        let d = scratch("lib");
+        let t = target(&d, Some("spring-kotlin-service".into()), None);
+        init(&factory(), &t, false).unwrap();
+        let events =
+            fs::read_to_string(d.join("docs/development/knowledge/api/events.md")).unwrap();
+        // A link to another library page follows the pack map.
+        assert!(events.contains("](../../05-events-messaging.md)"));
+        assert!(!events.contains("documentation-routing"));
+        let p0 =
+            fs::read_to_string(d.join("docs/development/00-engineering-principles.md")).unwrap();
+        assert!(p0.starts_with("# Spring service engineering principles"));
+        assert!(p0.contains("](03-clean-architecture-layers.md)"));
+        fs::remove_dir_all(&d).ok();
+    }
+
+    #[test]
+    fn every_library_page_is_in_some_pack() {
+        let f = factory();
+        let mapped: Vec<PathBuf> = stacks(&f)
+            .iter()
+            .flat_map(|s| pack_entries(&f, s).unwrap())
+            .map(|(_, src)| src)
+            .collect();
+        for page in files_under(&library(&f)) {
+            if page.ends_with("README.md") {
+                continue; // folder indexes; each project has its own
+            }
+            assert!(
+                mapped.contains(&library(&f).join(&page)),
+                "library page {page} is not imported by any stack pack"
+            );
         }
     }
 }

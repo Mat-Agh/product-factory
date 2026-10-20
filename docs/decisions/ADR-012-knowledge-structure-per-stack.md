@@ -1,6 +1,6 @@
 # ADR-012 — One knowledge structure per stack, distilled from Connect
 
-**Status:** Accepted
+**Status:** Accepted — amended by ADR-013 (the knowledge moved to one library)
 **Last updated:** 2026-10-19
 **Date:** 2026-10-19
 

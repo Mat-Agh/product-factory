@@ -1,0 +1,9 @@
+# Library page (under docs/knowledge/ in the factory)   destination in the project (docs/ = docs_root)
+# A folder entry imports every page under it, skipping pages mapped explicitly.
+principles/engineering.md            docs/development/00-engineering-principles.md
+principles/                                docs/development/knowledge/principles/
+api/                                       docs/development/knowledge/api/
+security/                                  docs/development/knowledge/security/
+cicd/                                      docs/development/knowledge/cicd/
+agentic/                                   docs/development/knowledge/agentic/
+rust/                                      docs/development/knowledge/rust/

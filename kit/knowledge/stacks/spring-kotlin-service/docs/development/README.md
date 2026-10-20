@@ -34,9 +34,11 @@ chapters a task needs, never the whole handbook.
 | 08 | [build-ci](08-build-ci.md) | Convention plugins, version catalog, reproducibility, CI gates |
 | 09 | [tools-scripts-and-commands](09-tools-scripts-and-commands.md) | Everyday loop, gates, generators, contract surfaces to keep in sync |
 | 10 | [cryptography](10-cryptography.md) | Classification, envelope encryption, key custody, hashing, blind indexes, transport |
+| 11 | [build-system-gradle](11-build-system-gradle.md) | Version catalog, convention plugins, repositories, flavors |
 | 15 | [code-samples-index](15-code-samples-index.md) | Templates by task and by file type |
 | 16 | [documentation-link-map](16-documentation-link-map.md) | Agent routing across docs, source paths and rules |
-| — | [CICD](CICD.md) | Branching, conventions, pipeline by trigger |
+| — | [CICD](CICD.md) | This repo's pipeline: branching, conventions, pipeline by trigger |
+| — | [knowledge/](knowledge/README.md) | General knowledge imported from the factory library: principles, API, security, CI/CD, agentic workflows |
 
 Numbering is shared across stacks: `00` principles, `09` tools, `15` samples, `16`
 link map. Stack chapters use the free numbers. When code and prose disagree,

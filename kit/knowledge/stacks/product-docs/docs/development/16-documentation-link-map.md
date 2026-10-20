@@ -2,7 +2,6 @@
 
 **Status:** Active — agent routing authority
 **Last updated:** {{DATE}}
-**Source:** Product Factory knowledge pack (product-docs)
 
 ## Knowledge order (mandatory)
 
@@ -27,3 +26,8 @@
 | Who decides | `docs/governance/README.md` | `docs/decisions/README.md` |
 | An implementation repo | `docs/cross-project/README.md` | That repo's docs |
 | History | `docs/history/DEVELOPMENT_LOG.md` | `git log` |
+| Requirements and delivery flow | [02](02-requirements-and-delivery.md) | [01](01-product-documentation.md) |
+| Repositories and authorities | [03](03-repository-model.md) | `docs/cross-project/README.md` |
+| General principles, evidence, documentation | [knowledge/principles/](knowledge/principles/README.md) | |
+| CI/CD and workflows | [knowledge/cicd/](knowledge/cicd/README.md) | `CICD.md` if present |
+| Agentic workflows | [knowledge/agentic/](knowledge/agentic/README.md) | |

@@ -2,7 +2,6 @@
 
 **Status:** Active — agent routing authority
 **Last updated:** {{DATE}}
-**Source:** Product Factory knowledge pack (typescript-web)
 
 ## Knowledge order (mandatory)
 
@@ -32,3 +31,8 @@
 | Reviewing a UI change | [REVIEW_CHECKLIST](REVIEW_CHECKLIST.md) | [03](03-ui-design-system.md), [05](05-security.md) |
 | Decisions | The decisions README | The ADR |
 | History | The development log | `git log` |
+| General principles, evidence, documentation | [knowledge/principles/](knowledge/principles/README.md) | |
+| API conventions, errors, events | [knowledge/api/](knowledge/api/README.md) | |
+| Security policy, classification, identity | [knowledge/security/](knowledge/security/README.md) | |
+| CI/CD and workflows | [knowledge/cicd/](knowledge/cicd/README.md) | [CICD](CICD.md) |
+| Agentic workflows | [knowledge/agentic/](knowledge/agentic/README.md) | |

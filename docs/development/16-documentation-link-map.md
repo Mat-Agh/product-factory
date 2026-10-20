@@ -25,6 +25,7 @@ document only for repo-wide documentation work. The exhaustive list is
 | Task | Read first | Then if needed |
 |---|---|---|
 | Any change | `AGENTS.md`, [03-changing-the-factory](03-changing-the-factory.md) | [00-principles](00-factory-engineering-principles.md) |
+| Engineering knowledge for a stack, or editing it | [knowledge/README.md](../knowledge/README.md) | The stack folder; [COMP-018](../components/COMP-018-knowledge-structure.md) for how packs import it |
 | Rules / authority | `CONSTITUTION.md` | [COMP-013](../components/COMP-013-constitution.md), [ADR-002](../decisions/ADR-002-human-only-merge.md) |
 | Coordinator, commands, lanes | `kit/.claude/skills/factory/SKILL.md` | [COMP-001](../components/COMP-001-coordinator-skill.md), [JOB_LIFECYCLE](../architecture/JOB_LIFECYCLE.md), [guide/02](../guide/02-commands.md) |
 | Agent behaviour | `kit/.claude/agents/<role>.md`, `kit/.claude/skills/factory/protocol.md` | [COMP-002](../components/COMP-002-agent-protocol.md), [COMP-003](../components/COMP-003-role-agents.md) |

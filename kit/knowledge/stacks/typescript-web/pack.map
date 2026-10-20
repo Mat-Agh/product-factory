@@ -1,0 +1,20 @@
+# Library page (under docs/knowledge/ in the factory)   destination in the project (docs/ = docs_root)
+# A folder entry imports every page under it, skipping pages mapped explicitly.
+typescript/web/principles.md           docs/development/00-engineering-principles.md
+typescript/web/architecture.md         docs/development/01-app-architecture.md
+typescript/language.md                 docs/development/02-typescript-language.md
+typescript/web/ui-design-system.md     docs/development/03-ui-design-system.md
+typescript/web/api-client.md           docs/development/04-api-contracts-clients.md
+typescript/web/security.md             docs/development/05-security.md
+typescript/web/testing.md              docs/development/06-testing.md
+typescript/web/build-and-deployment.md docs/development/07-build-deployment.md
+typescript/web/library-stack.md        docs/development/08-library-stack.md
+typescript/web/tools.md                docs/development/09-tools-scripts-and-commands.md
+typescript/web/code-samples.md         docs/development/15-code-samples-index.md
+typescript/web/review-checklist.md     docs/development/REVIEW_CHECKLIST.md
+principles/                                docs/development/knowledge/principles/
+api/                                       docs/development/knowledge/api/
+security/                                  docs/development/knowledge/security/
+cicd/                                      docs/development/knowledge/cicd/
+agentic/                                   docs/development/knowledge/agentic/
+rust/                                      docs/development/knowledge/rust/

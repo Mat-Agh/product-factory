@@ -159,24 +159,25 @@ Front-End `typescript-web` in `doc/`, Product `product-docs` in `product/`).
 pf knowledge plan --modules           # changes nothing: + import, = equivalent, ~ missing sections, ! numbering conflict
 ```
 
-The plan run on copies of the children on 2026-10-19 is in
-[COMP-018](../components/COMP-018-knowledge-structure.md#connect-today-plan-and-import-on-copies-2026-10-19).
+The plan run on copies of the children on 2026-10-20 is in
+[COMP-018](../components/COMP-018-knowledge-structure.md#connect-today-plan-and-import-on-copies-2026-10-20).
 In short:
-- **Back-End** already has most of the handbook. It would get 8 files (history,
-  sessions, architecture overview, templates) and the missing sections of 7
-  existing docs, for example an event-envelope section in `05` and a migrations
-  section in `04`.
-- **Federation** has a thin handbook. It would get 31 files, including
-  `CURRENT_STATE.md` and the full Spring handbook, plus the sections its `00`,
-  `09`, `15` and `16` lack.
-- **Client** would get 12 files and sections in 5 docs. It already uses `03` and
-  `09` for other topics, so nothing is imported for those two numbers; renumber
-  one of each pair or record the mapping in its handbook README.
+- **Every child** gets the cross-cutting knowledge under
+  `docs/development/knowledge/` (principles, API, security, CI/CD, agentic
+  workflows, Rust); Product gets principles, CI/CD, agentic and Rust.
+- **Back-End** already has most of its handbook. It would get 37 files and the
+  missing sections of 8 existing docs, for example an event-envelope section in
+  `05` and the general error rules in `api/ERRORS.md`.
+- **Federation** has a thin handbook. It would get 61 files, including
+  `CURRENT_STATE.md` and the full Spring handbook, plus sections in `00`, `09`, `15`.
+- **Client** would get 42 files (including the iOS chapter and the cross-cutting
+  knowledge) and sections in 4 docs. It already uses `03` and `09` for other
+  topics, so nothing is imported for those two numbers; renumber one of each pair
+  or record the mapping in its handbook README.
 - **Front-End** keeps its flat `doc/NN-*.md` chapters; they are recognised where
   the number and topic match. Four numbers (`02`, `03`, `08`, `09`) are used for
   other topics and are left to you.
-- **Product** would get 15 files (the product handbook, design, feature matrix,
-  history, templates); no existing doc lacks a pack section.
+- **Product** would get 37 files; no existing doc lacks a library section.
 
 When you agree, run `/factory knowledge init`. It opens one `docs` job per child.
 In each job worktree it imports the pack, then the engineer adapts it: scaffolds

@@ -35,11 +35,13 @@ It contains:
 - **Knowledge structure:** every repo gets its stack's knowledge structure:
   current state, development history, numbered handbook (`00` principles,
   `09` tools, `15` code samples, `16` link map, stack chapters), architecture,
-  decisions, features and status. Each stack has a knowledge pack with real
-  content distilled from the Connect handbooks (`spring-kotlin-service`,
-  `kmp-android-client`, `typescript-web`, `product-docs`). `pf knowledge init`
-  imports missing files and appends the sections an existing doc lacks, never
-  overwriting, and every job keeps it true
+  decisions, features and status. General engineering knowledge for every
+  language and stack used so far lives in one **development knowledge library**
+  ([docs/knowledge/](../knowledge/README.md)): principles, Kotlin (client: KMP,
+  Android, iOS; backend: Spring), TypeScript web, Rust, API, security, product,
+  CI/CD and agentic workflows. Each stack's pack map says which pages a repo
+  imports; `pf knowledge init` imports missing pages and appends the sections an
+  existing doc lacks, never overwriting, and every job keeps it true
   ([COMP-018](../components/COMP-018-knowledge-structure.md)).
 - **Documentation:** everything is under `docs/`, one connected tree generated
   and checked by `pf docs-map`. It covers governance, the operator guide,
@@ -47,7 +49,7 @@ It contains:
   (this page, implementation status, roadmap, evolution log), adapters and the
   operator profile. Diagrams are committed SVGs rendered from Mermaid sources.
 
-**Verification state:** `pf` passes its 24 cargo tests (including the 80 guard
+**Verification state:** `pf` passes its 26 cargo tests (including the 80 guard
 policy cases) and matches the Python tools it replaced. Every subcommand has
 run end to end on scratch setups. The docs map and diagram checks pass. **No job has run end to end
 on a real product yet.** That is the Phase 1 exit criterion. Details:

@@ -29,6 +29,7 @@ code and prose disagree.
 | 03 | [presentation-mvi](03-presentation-mvi.md) | Screen, ViewModel, State, Action, Event, navigation |
 | 04 | [data-realtime](04-data-realtime.md) | DTOs, remote and local sources, repositories, realtime reconciliation |
 | 05 | [library-stack](05-library-stack.md) | Each library: why, owning facade, what features must not import |
+| 06 | [ios](06-ios.md) | The iOS target |
 | 07 | [android-development](07-android-development.md) | App shell, platform modules, flavors, local hosts |
 | 09 | [tools-scripts-and-commands](09-tools-scripts-and-commands.md) | Gradle tasks, gates, setup |
 | 10 | [testing-performance-security](10-testing-performance-security.md) | Test placement, performance, client security rules |
@@ -38,4 +39,6 @@ code and prose disagree.
 | 16 | [documentation-link-map](16-documentation-link-map.md) | Agent routing |
 | — | [DEV_SETUP](DEV_SETUP.md) | Workstation setup (Linux, macOS, Windows) |
 | — | [ANDROID_ACCEPTANCE_TEST](ANDROID_ACCEPTANCE_TEST.md) | Runtime acceptance checklist |
-| — | [CICD](CICD.md) | Branching, conventions, pipeline |
+| — | [CICD](CICD.md) | This repo's pipeline |
+| — | [../architecture/APP_ARCHITECTURE.md](../architecture/APP_ARCHITECTURE.md) | App architecture and data policy |
+| — | [knowledge/](knowledge/README.md) | General knowledge imported from the factory library: principles, API, security, CI/CD, agentic workflows |

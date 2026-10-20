@@ -21,7 +21,7 @@ product-factory/
 │       ├── factory.yaml          descriptor template (COMP-005)
 │       ├── backlog.md            backlog template (COMP-006)
 │       └── dashboard.html        dashboard (COMP-006)
-│   └── knowledge/                per-stack knowledge templates: base/ + stacks/<name>/ (COMP-018)
+│   └── knowledge/                project scaffolds (base/ + stacks/<name>/) and each stack's pack.map into docs/knowledge/ (COMP-018)
 ├── cli/                          ── the `pf` Rust CLI (COMP-015) ──
 │   ├── Cargo.toml, Cargo.lock
 │   └── src/                      main, guard, docs_map, diagrams, install, doctor, backup, dashboard, descriptor, rules, memory, util
@@ -31,6 +31,7 @@ product-factory/
     ├── guide/                    operator handbook (+ examples/)
     ├── architecture/             overview, job lifecycle, sources
     ├── components/               COMP-NNN contracts
+    ├── knowledge/                development knowledge library by language and stack (COMP-018)
     ├── development/              this handbook, CONTRIBUTING
     ├── decisions/                ADR-NNN
     ├── status/                   CURRENT_STATE, IMPLEMENTATION_STATUS, ROADMAP, EVOLUTION_LOG

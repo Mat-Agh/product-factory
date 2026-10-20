@@ -34,4 +34,5 @@ monorepo of browser apps and shared packages). Agents route through
 | 15 | [code-samples-index](15-code-samples-index.md) | Living samples |
 | 16 | [documentation-link-map](16-documentation-link-map.md) | Agent routing |
 | — | [REVIEW_CHECKLIST](REVIEW_CHECKLIST.md) | Before approving a material UI change |
-| — | [CICD](CICD.md) | Branching, conventions, pipeline |
+| — | [CICD](CICD.md) | This repo's pipeline |
+| — | [knowledge/](knowledge/README.md) | General knowledge imported from the factory library: principles, API, security, CI/CD, agentic workflows |

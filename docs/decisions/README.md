@@ -58,4 +58,5 @@ next number. A reversed decision is marked `Superseded by ADR-NNN` and kept.
   - [ADR-010 — Sessions default to the factory; auto memory is promoted into git](ADR-010-session-behaviour-and-memory.md)
   - [ADR-011 — Adopt an existing process: inventory, preserve, configure, then align](ADR-011-adopt-existing-process.md)
   - [ADR-012 — One knowledge structure per stack, distilled from Connect](ADR-012-knowledge-structure-per-stack.md)
+  - [ADR-013 — One development knowledge library, imported through stack packs](ADR-013-development-knowledge-library.md)
 <!-- documentation-routing:end -->

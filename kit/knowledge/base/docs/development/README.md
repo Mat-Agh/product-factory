@@ -26,5 +26,6 @@
 | 15 | [code-samples-index](15-code-samples-index.md) | Living samples to copy |
 | 16 | [documentation-link-map](16-documentation-link-map.md) | Agent routing |
 | — | [CICD](CICD.md) | Branches, commits, pipeline, human-only steps |
+| — | [knowledge/](knowledge/README.md) | General knowledge imported from the factory library: principles, API, security, CI/CD, agentic workflows |
 
 Add a row for every stack chapter you write (free numbers: 01–08, 10–14, 17+).

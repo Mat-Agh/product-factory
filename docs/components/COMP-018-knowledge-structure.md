@@ -1,10 +1,10 @@
 # COMP-018 — Knowledge structure per stack
 
-**Status:** Implemented — real stack knowledge packs distilled from the five Connect repositories; plan and import (files and section merge) verified on copies of all five, never on the originals (2026-10-19)
+**Status:** Implemented — one development knowledge library (`docs/knowledge/`) imported through stack pack maps; plan and import verified on copies of the five Connect repositories, never on the originals (2026-10-20)
 **Last updated:** 2026-10-19
-**Source:** [`kit/knowledge/`](../../kit/knowledge/), [`cli/src/knowledge.rs`](../../cli/src/knowledge.rs), `/factory knowledge` in [`SKILL.md`](../../kit/.claude/skills/factory/SKILL.md), knowledge upkeep in [`protocol.md`](../../kit/.claude/skills/factory/protocol.md)
+**Source:** [`docs/knowledge/`](../knowledge/README.md) (the library), [`kit/knowledge/`](../../kit/knowledge/) (scaffolds and `pack.map`), [`cli/src/knowledge.rs`](../../cli/src/knowledge.rs), `/factory knowledge` in [`SKILL.md`](../../kit/.claude/skills/factory/SKILL.md), knowledge upkeep in [`protocol.md`](../../kit/.claude/skills/factory/protocol.md)
 **Rule:** [CONSTITUTION §1](../governance/CONSTITUTION.md)
-**Decisions:** [ADR-012](../decisions/ADR-012-knowledge-structure-per-stack.md)
+**Decisions:** [ADR-012](../decisions/ADR-012-knowledge-structure-per-stack.md), [ADR-013](../decisions/ADR-013-development-knowledge-library.md)
 
 ## Purpose
 
@@ -19,17 +19,23 @@ The shape is the one already used across Daria Connect. The factory imports it
 wherever it is missing, adds what an existing doc lacks, keeps it true through
 every job, and refreshes the stack knowledge against upstream changes.
 
-## Two kinds of template
+## Where the knowledge lives
 
-| Kind | Marked by | Examples | On import |
-|---|---|---|---|
-| **Knowledge pack** | A `**Source:** Product Factory knowledge pack (<stack>)` line | Handbook chapters (`00`–`16`), `ANDROID_ACCEPTANCE_TEST.md`, `REVIEW_CHECKLIST.md`, `api/README.md` | Created with the full content when missing. When an equivalent file exists, the sections it lacks are appended |
-| **Scaffold** | No `Source` line | `CURRENT_STATE.md`, `DEVELOPMENT_LOG.md`, `IMPLEMENTATION_STATUS.md`, area READMEs, routers, `CICD.md`, `CONTRIBUTING.md`, ADR/feature/PRD templates | Created when missing, never merged. They describe one project, so the docs job fills them from the code |
+| Part | Location | Holds |
+|---|---|---|
+| **Library** | [`docs/knowledge/`](../knowledge/README.md) | All general engineering knowledge, by language and stack: principles, Kotlin (language, Gradle, client: KMP/Android/iOS, backend: Spring), TypeScript web, Rust, API, security, product, CI/CD, agentic workflows |
+| **Pack map** | `kit/knowledge/stacks/<stack>/pack.map` | Which library pages a repo of that stack imports, and where they land |
+| **Scaffolds** | `kit/knowledge/base/`, `kit/knowledge/stacks/<stack>/` | Project-state files: current state, history, status, area READMEs, the handbook index, the link map, CI/CD, contributing, ADR/feature/PRD templates |
 
-The knowledge packs hold real content: the engineering principles, layer rules,
-naming, persistence, outbox/inbox, security, cryptography, testing policy, build
-and CI practice, library stacks and code samples of each stack, written
-generically with Connect-specific names removed.
+A pack map line is `<library page> <destination>`; a line ending in `/` imports a
+whole library folder, skipping pages mapped explicitly. Stack chapters map onto the
+numbered handbook (for example `kotlin/backend/spring/layers.md` →
+`docs/development/03-clean-architecture-layers.md`); cross-cutting areas map to
+`docs/development/knowledge/<area>/`.
+
+Library pages (and any template with a `**Source:** Product Factory knowledge` line)
+are **knowledge**: created when missing, and merged section by section into an
+existing equivalent. Scaffolds are created when missing and never merged.
 
 ## The structure
 
@@ -52,15 +58,15 @@ generically with Connect-specific names removed.
 | `docs/history/DEVELOPMENT_LOG.md` | Dated, newest-first, one entry per merged change | engineer, every job; release-manager compiles releases from it |
 | `docs/sessions/` | Temporary dated handoffs, then promoted | anyone; promote or delete |
 
-**Stack overlays** (`pf knowledge stacks`):
+**Stack packs** (`pf knowledge stacks`; the full list is each `pack.map`):
 
-| Stack | From | Adds |
+| Stack | From | Imports from the library |
 |---|---|---|
-| `spring-kotlin-service` | Back-End, Federation | Its own `00`, `09`, `15`, `16` and handbook README; `01` service architecture, `02` Kotlin, `03` clean-architecture layers, `04` persistence, `05` events and messaging, `06` security contracts, `07` testing and quality, `08` build and CI, `10` cryptography; `api/` (openapi, asyncapi, schemas), `data/`, `security/`, `operations/`, `deployment/` |
-| `kmp-android-client` | Client | Its own `00`, `09`, `15`, `16` and handbook README; `01` KMP module structure, `02` Kotlin, `03` presentation (MVI), `04` data and realtime, `05` library stack, `07` Android development, `10` testing/performance/security, `11` Gradle build, `12` client cryptography, `ANDROID_ACCEPTANCE_TEST.md`, `DEV_SETUP.md`; `data/`, `integrations/`, UX spec template |
-| `typescript-web` | Front-End | `01` app architecture, `02` TypeScript, `03` UI and design system, `04` API contracts and clients, `05` security, `06` testing, `07` build and deployment, `08` library stack; its own `00`, `09`, `15`, `16`, handbook README and `REVIEW_CHECKLIST.md` |
-| `product-docs` | Product | `vision/`, `roadmap/`, `prd/` with a PRD template, `feature-matrix/`, `acceptance/`, `delivery/`, `governance/`, `metrics/`, `risks/`, `design/`, `data/`; a product router, `development/01-product-documentation.md` (ownership, writing rules, the evidence model) and its own `16` (it excludes the code handbook from the base) |
-| `generic` | — | The base only: generic `00` principles, `16` link map, `CICD.md` and `CONTRIBUTING.md` with real guidance; `09` and `15` stay scaffolds |
+| `spring-kotlin-service` | Back-End, Federation | Spring principles (`00`), service architecture (`01`), Kotlin language (`02`), layers (`03`), persistence (`04`), outbox/inbox (`05`), security (`06`), testing (`07`), build and CI (`08`), tools (`09`), cryptography by layer (`10`), Gradle (`11`), samples (`15`); plus `principles/`, `api/`, `security/`, `cicd/`, `agentic/`, `rust/` |
+| `kmp-android-client` | Client | Client principles (`00`), KMP source sets (`01`), Kotlin (`02`), MVI (`03`), data and realtime (`04`), library stack (`05`), iOS (`06`), Android (`07`), tools (`09`), testing (`10`), Gradle (`11`), client cryptography (`12`), samples (`15`), acceptance, setup, `architecture/APP_ARCHITECTURE.md`; plus the cross-cutting areas |
+| `typescript-web` | Front-End | Web principles (`00`), architecture (`01`), TypeScript (`02`), UI (`03`), API client (`04`), security (`05`), testing (`06`), build (`07`), library stack (`08`), tools (`09`), samples (`15`), review checklist; plus the cross-cutting areas |
+| `product-docs` | Product | Product documentation (`01`), requirements and delivery (`02`), repository model (`03`); plus `principles/`, `cicd/`, `agentic/`, `rust/` (it excludes the code handbook scaffolds) |
+| `generic` | — | General engineering principles (`00`) and the cross-cutting areas |
 
 The numbers `00`, `09`, `15` and `16` mean the same thing in every stack. Stack
 chapters use the remaining numbers.
@@ -100,9 +106,12 @@ ignored. `Related` and `Documentation routing` are never merged.
 2. appends the missing sections to existing knowledge files, inside
    `<!-- pf-knowledge:start … -->` / `<!-- pf-knowledge:end -->` with a note asking
    for review, placed before a generated routing block when there is one;
-3. fixes links in what it wrote: a link that resolves stays, a handbook chapter
-   is pointed at the repo's own chapter with the same number, and any other dead
-   link becomes plain text.
+3. fixes links in what it wrote: a link between library pages follows the pack
+   map to wherever its target landed (a created file or an existing equivalent);
+   a link that resolves stays; a handbook chapter is pointed at the repo's own
+   chapter with the same number; any other dead link becomes plain text.
+
+Library pages are imported without the factory's generated routing block.
 
 It never overwrites a file and never edits existing text. `--files-only` skips
 step 2.
@@ -125,20 +134,22 @@ escalated jobs.
 | release-manager | builds release notes from `DEVELOPMENT_LOG.md` |
 | `pf audit`, `pf doctor` | report knowledge gaps per repo |
 
-## Connect today (plan and import on copies, 2026-10-19)
+## Connect today (plan and import on copies, 2026-10-20)
 
 Run against copies of the repositories' docs in a temporary directory; the
 originals were not touched.
 
 | Repo | Stack | Present | Missing (imported) | Files missing sections (merged) | Conflicts |
 |---|---|---|---|---|---|
-| Back-End | spring-kotlin-service | 32 | 8 (history, sessions, OVERVIEW, ADR/feature templates) | 7 (`api/README`, `03`, `04`, `05`, `07`, `08`, `09`) | 0 |
-| Federation | spring-kotlin-service | 9 | 31 (`CURRENT_STATE.md`, most of the handbook and areas) | 4 (`00`, `09`, `15`, `16`) | 0 |
-| Client | kmp-android-client | 23 | 12 | 5 (`07`, `15`, `16`, `17`, acceptance) | 2 (`03`, `09` used for other topics) |
-| Front-End | typescript-web (`doc/`, flat) | 9 | 19 | 4 (`01`, `04`, `07`, `16`) | 4 (`02`, `03`, `08`, `09`) |
-| Product | product-docs (`product/`) | 16 | 15 | 0 | 0 |
+| Back-End | spring-kotlin-service | 33 | 37 | 8 (`api/ERRORS.md`, `02`, `03`, `04`, `05`, `07`, `08`, `09`) | 0 |
+| Federation | spring-kotlin-service | 9 | 61 | 3 (`00`, `09`, `15`) | 0 |
+| Client | kmp-android-client | 24 | 42 | 4 (`07`, `15`, `17`, acceptance) | 2 (`03`, `09` used for other topics) |
+| Front-End | typescript-web (`doc/`, flat) | 9 | 48 | 3 (`01`, `04`, `07`) | 4 (`02`, `03`, `08`, `09`) |
+| Product | product-docs (`product/`) | 16 | 37 | 0 | 0 |
 
-Every link added by the import resolved, and a second run changed nothing.
+Most of the missing files are the cross-cutting knowledge under
+`docs/development/knowledge/`. Every link added by the import resolved, and a
+second run changed nothing.
 
 ## Known limitations
 

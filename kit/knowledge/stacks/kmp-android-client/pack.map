@@ -1,0 +1,24 @@
+# Library page (under docs/knowledge/ in the factory)   destination in the project (docs/ = docs_root)
+# A folder entry imports every page under it, skipping pages mapped explicitly.
+kotlin/client/principles.md                docs/development/00-engineering-principles.md
+kotlin/client/kmp-source-sets.md           docs/development/01-kmp-module-structure.md
+kotlin/language.md                         docs/development/02-kotlin-language.md
+kotlin/client/presentation-mvi.md          docs/development/03-presentation-mvi.md
+kotlin/client/data-and-realtime.md         docs/development/04-data-realtime.md
+kotlin/client/library-stack.md             docs/development/05-library-stack.md
+kotlin/client/ios.md                       docs/development/06-ios.md
+kotlin/client/android.md                   docs/development/07-android-development.md
+kotlin/client/tools.md                     docs/development/09-tools-scripts-and-commands.md
+kotlin/client/testing-and-performance.md   docs/development/10-testing-performance-security.md
+kotlin/gradle.md                           docs/development/11-build-system-gradle.md
+kotlin/client/security-and-cryptography.md docs/development/12-client-cryptography.md
+kotlin/client/code-samples.md              docs/development/15-code-samples-index.md
+kotlin/client/acceptance.md                docs/development/ANDROID_ACCEPTANCE_TEST.md
+kotlin/client/setup.md                     docs/development/DEV_SETUP.md
+kotlin/client/architecture.md              docs/architecture/APP_ARCHITECTURE.md
+principles/                                docs/development/knowledge/principles/
+api/                                       docs/development/knowledge/api/
+security/                                  docs/development/knowledge/security/
+cicd/                                      docs/development/knowledge/cicd/
+agentic/                                   docs/development/knowledge/agentic/
+rust/                                      docs/development/knowledge/rust/

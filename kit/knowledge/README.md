@@ -1,26 +1,20 @@
 # Knowledge packs
 
-Imported by `pf knowledge init`; `pf knowledge plan` shows what it would do.
-`base/` applies to every repo. `stacks/<name>/` adds the stack's handbook
-chapters and areas and overrides base files with the same path. A stack's
-`.exclude` lists base paths it does not need. Paths under `docs/` map to the
-module's `docs_root`. Placeholders: `{{PRODUCT}}`, `{{MODULE}}`, `{{AREA}}`,
-`{{STACK}}`, `{{DATE}}`.
+Project scaffolds plus, per stack, a `pack.map` into the factory's development
+knowledge library (`docs/knowledge/`). `pf knowledge plan` shows what a repository
+lacks; `pf knowledge init` imports it.
 
-Two kinds of file:
-- **Knowledge** files carry a `**Source:** Product Factory knowledge pack (<stack>)`
-  line. They hold real stack knowledge. When missing they are created; when an
-  equivalent exists, the `##` sections it lacks are appended in a marked block for
-  review.
-- **Scaffolds** have no `Source` line (current state, history, status, area
-  READMEs, routers, CI/CD, contributing, ADR/feature/PRD templates). They are
-  created when missing and never merged.
+- `base/` — scaffolds every repository gets (current state, history, status, area
+  READMEs, handbook index, link map, CI/CD, contributing, ADR and feature templates).
+- `stacks/<name>/` — the stack's own scaffolds, overriding base files with the same
+  path, plus:
+  - `pack.map` — `<library page> <destination>` per line; a line ending in `/`
+    imports a whole library folder, skipping pages mapped explicitly;
+  - `.exclude` — base paths the stack does not need.
 
-Write pack content generically: no product, company, host or person names.
-Commands that depend on the repo are written as `<…>` for the docs job to fill.
+Paths under `docs/` map to the module's `docs_root`. Placeholders in scaffolds:
+`{{PRODUCT}}`, `{{MODULE}}`, `{{AREA}}`, `{{STACK}}`, `{{DATE}}`.
 
-The knowledge is distilled from the Daria Connect repositories:
-- Back-End and Federation: `spring-kotlin-service`
-- Client: `kmp-android-client`
-- Front-End: `typescript-web`
-- Product: `product-docs`
+Library pages are knowledge: created when missing and merged section by section
+into an existing equivalent. Scaffolds are created when missing and never merged.
+Write knowledge in `docs/knowledge/`, never here.
