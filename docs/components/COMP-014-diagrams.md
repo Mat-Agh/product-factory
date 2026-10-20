@@ -18,7 +18,7 @@ images**, rendered from Mermaid sources.
 | File | Role |
 |---|---|
 | `docs/assets/diagrams/<name>.mmd` | The only source of a diagram. Edit this |
-| `docs/assets/diagrams/<name>.svg` | Generated image. Its first line records the `source-sha256` of the `.mmd` it came from. Never edit it |
+| `docs/assets/diagrams/<name>.svg` | Generated image. A comment just inside the `<svg>` element records the `source-sha256` of the `.mmd` it came from. Never edit it |
 | The document that shows it | `![alt](…/assets/diagrams/<name>.svg)` plus a small "Diagram source" link to the `.mmd` |
 
 | Diagram | Shown in |
@@ -47,6 +47,16 @@ in dark mode. A source with a syntax error fails the render.
   the SVG.
 - Commit the `.mmd` and the `.svg` together. `pf diagrams check` is a gate (`AGENTS.md`,
   `pf doctor`).
+
+## Portability
+
+Rendered SVGs must display in IDE Markdown previews (IntelliJ, VS Code) as well as
+browsers and GitHub, so `render`:
+- passes Mermaid `htmlLabels: false`, so labels are SVG `<text>`, not HTML inside
+  `<foreignObject>`, which non-browser SVG renderers drop;
+- replaces `width="100%"` and the CSS `max-width` with the pixel size from the
+  `viewBox`;
+- keeps `<svg>` as the first element, with the hash note inside it.
 
 ## Known limitations
 

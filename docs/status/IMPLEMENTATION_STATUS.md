@@ -17,7 +17,7 @@ there is recorded evidence that it works.
 | Mechanical enforcement | Guard hook (`pf guard`, Rust) passes 80/80 (the original 73 match the Python guard on 117 inputs); follows the project branch template and blocks hook bypasses; fails closed without `pf`. Branch protection depends on each product |
 | Distribution and portability | `pf install`, `pf doctor`, `pf mirror bundle` (with restore) and `pf export` verified on scratch setups. No second remote yet |
 | Documentation | All docs under `docs/`, one connected tree. `pf docs-map --strict` and `pf diagrams check` pass |
-| Tooling | One Rust CLI (`pf`); no Python, bash scripts or `jq`. 26 cargo tests, clippy clean |
+| Tooling | One Rust CLI (`pf`); no Python, bash scripts or `jq`. 27 cargo tests, clippy clean |
 | **Phase 1 exit (roadmap)** | **Not met.** No job has run end to end |
 
 ## Components

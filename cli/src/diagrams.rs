@@ -71,6 +71,19 @@ pub fn render(root: &Path) -> i32 {
                 .find_map(|c| util::which(c))
         });
     let pp = std::env::temp_dir().join(format!("pf-puppeteer-{}.json", std::process::id()));
+    // Plain SVG text labels (no HTML in <foreignObject>), so IDE previews and other
+    // non-browser SVG renderers show the labels, not only browsers.
+    let mc = std::env::temp_dir().join(format!("pf-mermaid-{}.json", std::process::id()));
+    let mermaid_cfg = serde_json::json!({
+        "htmlLabels": false,
+        "flowchart": {"htmlLabels": false},
+        "class": {"htmlLabels": false},
+        "state": {"htmlLabels": false}
+    });
+    if fs::write(&mc, mermaid_cfg.to_string()).is_err() {
+        eprintln!("FAIL cannot write {}", mc.display());
+        return 1;
+    }
     let cfg = match &chrome {
         Some(c) => serde_json::json!({"executablePath": c, "args": ["--no-sandbox"]}),
         None => serde_json::json!({"args": ["--no-sandbox"]}),
@@ -86,6 +99,8 @@ pub fn render(root: &Path) -> i32 {
         cmd.args(&cli[1..])
             .args(["-q", "-p"])
             .arg(&pp)
+            .arg("-c")
+            .arg(&mc)
             .args(["-t", "neutral", "-b", "white", "-i"])
             .arg(&src)
             .arg("-o")
@@ -105,14 +120,43 @@ pub fn render(root: &Path) -> i32 {
         }
         let sha = util::sha256_file(&src).unwrap_or_default();
         let name = src.file_name().unwrap().to_string_lossy();
-        let header = format!(
-            "<!-- source-sha256: {sha} — generated from {name} by pf diagrams render; do not edit -->\n"
+        let note = format!(
+            "<!-- source-sha256: {sha} — generated from {name} by pf diagrams render; do not edit -->"
         );
-        let _ = fs::write(&svg, header + &body);
+        let _ = fs::write(&svg, portable_svg(&body, &note));
         println!("rendered {}", util::rel(root, &svg));
     }
     let _ = fs::remove_file(&pp);
+    let _ = fs::remove_file(&mc);
     code
+}
+
+/// Make Mermaid's SVG render in IDE previews as well as browsers: the `<svg>`
+/// element comes first (the hash note goes inside it), and `width="100%"` with a
+/// CSS `max-width` becomes the explicit pixel size from the `viewBox`.
+pub fn portable_svg(body: &str, note: &str) -> String {
+    let body = body.trim_start();
+    let body = body
+        .strip_prefix("<?xml")
+        .and_then(|r| r.split_once("?>"))
+        .map_or(body, |(_, r)| r.trim_start());
+    let Some(end) = body.find('>') else {
+        return format!("{note}\n{body}");
+    };
+    let (open, rest) = body.split_at(end);
+    let mut open = open.to_string();
+    let vb = regex::Regex::new(r#"viewBox="[-\d.]+ [-\d.]+ ([\d.]+) ([\d.]+)""#).expect("viewBox");
+    if let Some(c) = vb.captures(&open) {
+        let (w, h) = (c[1].to_string(), c[2].to_string());
+        let width = regex::Regex::new(r#"\swidth="[^"]*""#).expect("width");
+        open = width.replace(&open, "").into_owned();
+        let height = regex::Regex::new(r#"\sheight="[^"]*""#).expect("height");
+        open = height.replace(&open, "").into_owned();
+        open = open.replacen("<svg", &format!(r#"<svg width="{w}" height="{h}""#), 1);
+        let maxw = regex::Regex::new(r"max-width:\s*[\d.]+px;?\s*").expect("max-width");
+        open = maxw.replace(&open, "").into_owned();
+    }
+    format!("{open}>{note}{}", &rest[1..])
 }
 
 pub fn main(root: Option<PathBuf>, do_render: bool) -> i32 {
@@ -132,5 +176,19 @@ pub fn main(root: Option<PathBuf>, do_render: bool) -> i32 {
         0
     } else {
         1
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn portable_svg_sizes_from_viewbox_and_puts_the_root_first() {
+        let raw = r#"<svg id="m" width="100%" xmlns="http://www.w3.org/2000/svg" style="max-width: 475.8px; background-color: white;" viewBox="0 0 475.8 686"><g/></svg>"#;
+        let out = portable_svg(raw, "<!-- source-sha256: abc -->");
+        assert!(out.starts_with(r#"<svg width="475.8" height="686" id="m""#));
+        assert!(!out.contains("100%") && !out.contains("max-width"));
+        assert!(out.contains("><!-- source-sha256: abc --><g/></svg>"));
     }
 }

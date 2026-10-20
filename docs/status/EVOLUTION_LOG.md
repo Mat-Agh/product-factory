@@ -6,6 +6,19 @@
 Append-only. One dated entry for each factory-level change: what changed, why,
 and its evidence.
 
+## 2026-10-20 — Diagrams render in IDE Markdown previews
+
+- **Why.** In IntelliJ IDEA's Markdown preview, six of the seven diagrams did not
+  load. They carried labels as HTML inside `<foreignObject>`, `width="100%"` with a
+  CSS `max-width`, and a comment before the `<svg>` element; browsers accept that,
+  IDE SVG renderers do not. The one diagram without HTML labels displayed.
+- **Change.** `pf diagrams render` passes Mermaid `htmlLabels: false`, writes the
+  explicit pixel size from the `viewBox`, and puts the hash note inside `<svg>`.
+  All seven diagrams were re-rendered: no `<foreignObject>` remains.
+- **Evidence.** `pf diagrams check` OK; headless Chrome screenshots show text
+  labels and intact layout; a unit test covers the SVG rewrite. Not yet confirmed
+  in IntelliJ itself.
+
 ## 2026-10-20 — One development knowledge library for every stack
 
 - **Why.** The operator wants every piece of general knowledge gathered so far, for
