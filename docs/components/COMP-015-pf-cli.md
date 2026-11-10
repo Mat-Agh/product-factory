@@ -101,6 +101,10 @@ checkout selected by `--root` or the current directory. `pf providers setup`,
 validate and dispatch the active role's route. Pass `--root` to select the
 workspace. [Model routing](../guide/01-getting-started.md#model-routing)
 
+`pf job knowledge <id>` reports feature, spike and dependency signals, the
+inspected commit and the changed knowledge paths. The command is read-only.
+`pf job advance` enforces capture for jobs claimed with the updated kit.
+
 <!-- documentation-routing:start -->
 ## Documentation routing
 

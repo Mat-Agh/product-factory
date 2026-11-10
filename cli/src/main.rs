@@ -16,6 +16,7 @@ mod graph;
 mod guard;
 mod install;
 mod job;
+mod job_knowledge;
 mod knowledge;
 mod memory;
 mod providers;

@@ -173,8 +173,15 @@ fn parallel_modules_run_isolated_with_bounded_review_and_recovery() {
     evidence(a, "plan.md", "STATUS: READY\n");
     assert_eq!(advance(a, "plan", "1")["stage"], "build");
     fs::write(web.join("web/main.ts"), "export const port = 3;\n").unwrap();
+    fs::create_dir_all(web.join("web/docs")).unwrap();
+    fs::write(web.join("web/docs/feature.md"), "# Feature contract\n").unwrap();
+    git(&web, &["add", "web/docs/feature.md"]);
     git(&web, &["commit", "-qam", "Change web port"]);
-    evidence(a, "build.md", "STATUS: READY\n");
+    evidence(
+        a,
+        "build.md",
+        "STATUS: READY\n\n## Knowledge capture\n- Project: web/docs/feature.md\n",
+    );
     assert_eq!(advance(a, "build", "1")["reviews"]["security"], "pending");
     assert_eq!(
         fs::read_to_string(service.join("web/main.ts")).unwrap(),
@@ -228,9 +235,17 @@ fn parallel_modules_run_isolated_with_bounded_review_and_recovery() {
 
     fs::write(web.join("web/main.ts"), "export const port = 5;\n").unwrap();
     git(&web, &["commit", "-qam", "Apply review feedback"]);
-    evidence(a, "build.md", "STATUS: READY\n");
+    evidence(
+        a,
+        "build.md",
+        "STATUS: READY\n\n## Knowledge capture\n- Project: web/docs/feature.md\n",
+    );
     assert_eq!(advance(a, "build", "2")["stage"], "review");
-    evidence(a, "round-2/review-code.md", "VERDICT: PASS\n");
+    evidence(
+        a,
+        "round-2/review-code.md",
+        "VERDICT: PASS\n\n## Knowledge review\n- Checked: Feature contract matches the diff.\n",
+    );
     evidence(a, "round-2/review-security.md", "VERDICT: PASS\n");
     assert_eq!(advance(a, "review", "2")["stage"], "qa");
     evidence(a, "qa.md", "VERDICT: PASS\n");
@@ -498,4 +513,157 @@ printf 'STATUS: READY\n' > "$artifact"
     assert!(folder.join("build.md").is_file());
     assert_eq!(job(&repo, &["show", id])["stage"], "build");
     assert!(!local(&allowed).output().unwrap().status.success());
+}
+
+#[test]
+fn committed_knowledge_capture_blocks_dependency_changes_until_documented() {
+    let fixture = fixture();
+    let repo = fixture.0.join("app");
+    let claim = job(
+        &repo,
+        &["claim", "new-library", "--request", "Add a library"],
+    );
+    let id = claim["id"].as_str().unwrap();
+    assert_eq!(claim["knowledge_capture"], true);
+    let dir = repo.join(".factory/jobs").join(id);
+    fs::write(dir.join("triage.md"), "# Triage: Dependency fixture\n").unwrap();
+    let state = job(
+        &repo,
+        &[
+            "prepare", id, "--module", "web", "--type", "chore", "--tier", "trivial",
+        ],
+    );
+    let tree = Path::new(state["worktree"].as_str().unwrap());
+    let package = tree.join("web/package.json");
+    fs::write(
+        &package,
+        r#"{"scripts":{"verify":"tsc"},"devDependencies":{"typescript":"*"}}"#,
+    )
+    .unwrap();
+    git(tree, &["commit", "-qam", "Add a script"]);
+    assert_eq!(
+        job(&repo, &["knowledge", id])["requires_project_docs"],
+        false
+    );
+    fs::write(
+        &package,
+        r#"{"scripts":{"verify":"tsc"},"devDependencies":{"typescript":"*","fixture":"1.0.0"}}"#,
+    )
+    .unwrap();
+    git(tree, &["commit", "-qam", "Change a dependency"]);
+    let report = job(&repo, &["knowledge", id]);
+    assert_eq!(
+        report["dependency_files"],
+        serde_json::json!(["web/package.json"])
+    );
+    let build = ["job", "advance", id, "--expect", "build", "--round", "1"];
+    let evidence = |file: &str, text: &str| fs::write(dir.join(file), text).unwrap();
+    evidence(
+        "build.md",
+        "STATUS: READY\n\n## Knowledge capture\n- None: Routine maintenance.\n",
+    );
+    reject(&repo, &build, "must cite changed project docs");
+    fs::create_dir_all(tree.join("web/docs")).unwrap();
+    fs::write(tree.join("web/docs/library.md"), "# Library setup\n").unwrap();
+    evidence(
+        "build.md",
+        "STATUS: READY\n\n## Knowledge capture\n- Project: web/docs/library.md\n- Shared: Document when this library applies in the TypeScript stack pack.\n",
+    );
+    reject(&repo, &build, "changed, committed module documentation");
+    git(tree, &["add", "web/docs/library.md"]);
+    git(tree, &["commit", "-qm", "Document library setup"]);
+    assert_eq!(
+        job(&repo, &["knowledge", id])["changed_docs"],
+        serde_json::json!(["web/docs/library.md"])
+    );
+    ok(pf(&repo, &build).output().unwrap());
+    evidence("round-1/review-code.md", "VERDICT: PASS\n");
+    evidence("round-1/review-security.md", "VERDICT: PASS\n");
+    let review = ["job", "advance", id, "--expect", "review", "--round", "1"];
+    reject(&repo, &review, "PASS requires ## Knowledge review");
+    evidence(
+        "round-1/review-code.md",
+        "VERDICT: PASS\n\n## Knowledge review\n- Checked: The setup guide covers the new dependency.\n",
+    );
+    ok(pf(&repo, &review).output().unwrap());
+    evidence("gate.md", "READY\n");
+    evidence("pr.md", "Fixture summary.\n");
+    let gate = ["job", "advance", id, "--expect", "gate", "--round", "1"];
+    evidence(
+        "build.md",
+        "STATUS: READY\n\n## Knowledge capture\n- None: Removed evidence.\n",
+    );
+    reject(&repo, &gate, "must cite changed project docs");
+}
+
+#[test]
+fn jobs_claimed_with_the_old_kit_keep_their_evidence_contract() {
+    let fixture = fixture();
+    let repo = fixture.0.join("app");
+    let protocol = repo.join(".claude/skills/factory/protocol.md");
+    let current = fs::read_to_string(&protocol).unwrap();
+    fs::write(
+        &protocol,
+        current.replace("<!-- pf: knowledge-capture-v1 -->", ""),
+    )
+    .unwrap();
+    let claim = job(&repo, &["claim", "old-kit", "--request", "Update docs"]);
+    let id = claim["id"].as_str().unwrap();
+    assert!(claim.get("knowledge_capture").is_none());
+    fs::write(protocol, current).unwrap();
+    let dir = repo.join(".factory/jobs").join(id);
+    fs::write(dir.join("triage.md"), "# Triage: Legacy fixture\n").unwrap();
+    let state = job(
+        &repo,
+        &[
+            "prepare", id, "--module", "web", "--type", "docs", "--tier", "trivial",
+        ],
+    );
+    assert_eq!(state["stage"], "build");
+    fs::write(dir.join("build.md"), "STATUS: READY\n").unwrap();
+    assert_eq!(
+        job(&repo, &["advance", id, "--expect", "build", "--round", "1"])["stage"],
+        "review"
+    );
+}
+
+#[test]
+fn spike_captures_findings_in_the_plan_with_a_flat_docs_root() {
+    let fixture = fixture();
+    let repo = fixture.0.join("app");
+    let descriptor = repo.join(".factory/factory.yaml");
+    let config = fs::read_to_string(&descriptor).unwrap();
+    fs::write(
+        &descriptor,
+        config.replace("docs_root: docs", "docs_root: ."),
+    )
+    .unwrap();
+    let claim = job(
+        &repo,
+        &["claim", "spike", "--request", "Explore an alternative"],
+    );
+    let id = claim["id"].as_str().unwrap();
+    let dir = repo.join(".factory/jobs").join(id);
+    fs::write(dir.join("triage.md"), "# Triage: Spike fixture\n").unwrap();
+    let state = job(
+        &repo,
+        &[
+            "prepare", id, "--module", "web", "--type", "spike", "--tier", "standard",
+        ],
+    );
+    assert_eq!(state["knowledge_docs_root"], ".");
+    let tree = Path::new(state["worktree"].as_str().unwrap());
+    fs::write(tree.join("web/decision.md"), "# Findings and tradeoffs\n").unwrap();
+    git(tree, &["add", "web/decision.md"]);
+    git(tree, &["commit", "-qm", "Record the spike findings"]);
+    fs::write(dir.join("plan.md"), "STATUS: READY\n").unwrap();
+    let advance = ["job", "advance", id, "--expect", "plan", "--round", "1"];
+    reject(&repo, &advance, "must cite changed project docs");
+    fs::write(
+        dir.join("plan.md"),
+        "STATUS: READY\n\n## Knowledge capture\n- Project: web/decision.md\n",
+    )
+    .unwrap();
+    ok(pf(&repo, &advance).output().unwrap());
+    assert_eq!(job(&repo, &["show", id])["stage"], "gate");
 }

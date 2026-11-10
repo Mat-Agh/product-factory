@@ -47,6 +47,14 @@ For unfamiliar code, the protocol points agents to a bounded Graphify query
 in the job's own worktree. Agents verify graph results against the files
 and respect the assigned module boundaries.
 
+## Capture during delivery
+
+The protocol asks planners, builders and reviewers to look for newly learned
+practices, API uses and pitfalls. New jobs on the updated kit record capture
+in the existing ready artifact. The independent code lens checks the committed
+pages and records its evidence on PASS. See the [knowledge
+structure](COMP-018-knowledge-structure.md#capture-new-knowledge-during-a-job).
+
 <!-- documentation-routing:start -->
 ## Documentation routing
 

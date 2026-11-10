@@ -34,6 +34,8 @@ the tech-lead. **Do not widen scope.**
   knowledge upkeep). That always includes the `DEVELOPMENT_LOG.md` entry for this
   job, and `CURRENT_STATE.md` when the repo's contents change. A behaviour or contract change with no doc change
   fails review.
+- Capture newly learned practices and feature changes using the protocol’s
+  knowledge-capture section.
 - Use the toolchain and commands from `AGENTS.md`. Lint only the files you
   changed, and never run repo-wide `--fix`.
 

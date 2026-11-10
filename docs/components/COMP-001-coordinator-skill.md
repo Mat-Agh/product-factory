@@ -72,6 +72,11 @@ and Gemini CLI. Dispatch follows the project's API route or the host's
 installed native role. A configured worker writes the canonical artifact,
 then `pf job advance` validates it. [Routing](../guide/01-getting-started.md#model-routing)
 
+Before advancing an enrolled build, spike or release, inspect the committed
+signals with `pf job knowledge <id>`. Route missing capture evidence back to
+the role that owns it. Include proposed shared knowledge from the completed
+job when running a retro.
+
 <!-- documentation-routing:start -->
 ## Documentation routing
 

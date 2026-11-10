@@ -130,6 +130,13 @@ per round, and the risk. Check at least:
 
 Merge it yourself on GitHub or GitLab. Then run `/factory clean`.
 
+## Knowledge evidence
+
+New jobs on the v1.1 kit use `## Knowledge capture` in the ready build or
+direct-to-gate producer artifact. Read its committed project pages and any
+shared proposal. A passing code review also includes `## Knowledge review`
+with the independent check.
+
 <!-- documentation-routing:start -->
 ## Documentation routing
 

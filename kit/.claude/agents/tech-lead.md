@@ -31,6 +31,11 @@ STATUS: READY | BLOCKED
 ## Out of scope — what the engineer must not touch
 ```
 
+Plan how to document new knowledge. For a plan-only lane, include the
+protocol’s knowledge-capture section in the ready plan. At the gate, check
+that the capture matches the reviewed branch and surface shared candidates
+in the PR.
+
 For a **bug**, the plan is the smallest fix for the root cause shown in
 `repro.md`, and nothing wider. For a **spike**, investigate and write an ADR under
 `docs.adr_dir` in the worktree. Commit it, and set `plan.md` to READY with the

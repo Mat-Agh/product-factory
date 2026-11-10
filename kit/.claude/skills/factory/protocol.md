@@ -13,6 +13,59 @@ documented dependencies. If Graphify is unavailable or the graph is empty,
 locate files with ordinary source search.
 
 
+## Capture new knowledge
+
+<!-- pf: knowledge-capture-v1 -->
+
+While planning, building or reviewing, look for first use of a library or API,
+an unfamiliar technique, a new feature or contract, a changed convention, and
+a failed approach that future work should avoid. Check the owning module's
+handbook and living samples. Record what was learned, where it applies, and
+how to verify it. Link upstream primary sources for external behavior and
+point to the checked-in example or test. Keep speculative ideas out of rules.
+
+Plan the likely doc locations up front. If a lesson appears during the build,
+keep the documentation inside the assigned module and add it to the same
+branch. Put project patterns in the module's handbook, feature behavior in
+its feature docs, and durable tradeoffs in an ADR. Record reusable lessons
+locally first. A cross-project candidate also names a proposed Factory
+knowledge page and stack pack, for a separate reviewed docs change.
+
+For a job with `knowledge_capture: true`, use
+`pf job --root <workspace> knowledge <id>` after committing. It reports
+feature and spike jobs, changed dependency files and candidate documentation
+paths from the recorded base to HEAD. Use the same report during review.
+The report flags concrete changes. The engineer and reviewer still judge
+whether any new practice emerged from the work.
+
+In the ready producer artifact (`build.md`, or `plan.md` or `release.md`
+in a lane that goes directly to the gate), use an exact heading and bullets:
+
+```markdown
+## Knowledge capture
+- Project: <changed Markdown file relative to the Git root>
+- Shared: <optional proposal for a reusable lesson and its destination>
+```
+
+Repeat `Project` for every page that captures a lesson. For a job with no
+durable learning, use only `- None: <job-specific reason>`. A feature,
+spike or detected dependency-file change requires a project page. Existing
+jobs without the field keep their previous evidence contract.
+
+The code lens independently checks the committed diff, dependency signals
+and actual documentation. If a lesson is missing or the documentation
+doesn't match the implementation, write a CHANGES finding naming the
+expected page and evidence. A PASS includes:
+
+```markdown
+## Knowledge review
+- Checked: <what was checked and why the capture is sufficient>
+```
+
+The gate checks the same capture against the pinned branch and surfaces any
+shared candidate in the PR. If useful knowledge surfaces after delivery,
+use the retro to propose its update.
+
 ## Where you work
 
 Your prompt gives the **job folder**, the **worktree**, the **branch** and the

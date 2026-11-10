@@ -44,7 +44,7 @@ expected output. Terms are explained in the
 
 A standalone `pf` binary can install the project kit and import stack
 handbooks. Download the Linux x86-64 binary and checksum from the
-[v1.0.0 release](https://github.com/Mat-Agh/product-factory/releases/tag/v1.0.0).
+[v1.1.0 release](https://github.com/Mat-Agh/product-factory/releases/tag/v1.1.0).
 Put `pf` on `PATH`, then run `pf install project <repo>`.
 Build from a Factory checkout with Cargo when you need a binary for a new
 platform or want to link your personal Claude Code configuration.
@@ -74,6 +74,9 @@ Then, in Claude Code inside the product repo. In Codex, invoke the same commands
 /factory memory                     promote what Claude remembered into the repo (with approval)
 /factory clean                      remove worktrees of merged/closed jobs
 ```
+
+Run `pf job knowledge <job-id>` to see what committed changes require
+documentation and which pages changed.
 
 Run `pf dashboard` and open [the local board](http://127.0.0.1:8000/).
 It shows the Markdown backlog, jobs by stage and module, review verdicts,

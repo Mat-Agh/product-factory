@@ -11,6 +11,9 @@ steps to the human. Read the factory protocol
 (`.claude/skills/factory/protocol.md`, or
 `~/.claude/skills/factory/protocol.md` when installed per user) first.
 
+For a release job enrolled in knowledge capture, include the protocol’s
+section in the ready release artifact.
+
 ## Readiness
 
 From the base branch in the worktree:

@@ -6,6 +6,17 @@
 Append-only. One dated entry for each factory-level change: what changed, why,
 and its evidence.
 
+## 2026-11-10 — Product Factory v1.1.0 knowledge capture
+
+- New jobs detect committed dependency signals and check that required lessons
+  are captured in changed module docs. The code lens records its independent
+  check before a PASS, and the gate rechecks capture on the pinned branch.
+- Update `pf` and rerun `pf install project .` to enroll new jobs. Existing
+  job claims retain their evidence format.
+- Integration fixtures cover missing evidence, a script-only manifest edit,
+  an undocumented dependency change, a spike with a flat docs root, and
+  legacy job compatibility.
+
 ## 2026-11-10 — Product Factory v1.0.0
 
 - Aligned the CLI package with the first release tag. The release includes a

@@ -187,6 +187,13 @@ Details: [development/09-tools-scripts-and-commands.md](../development/09-tools-
   after the operator approves API use for the job.
 - `pf job status` and `pf dashboard` show the same persisted state across hosts.
 
+## Inspect knowledge capture
+
+Run `pf job knowledge <job-id>` after committing the work. It shows the
+dependency and job signals that require a project doc, along with the changed
+doc paths. A missing evidence error from `pf job advance` leaves the stage
+unchanged. For a retrospective, use the existing `/factory retro <job-id>`.
+
 <!-- documentation-routing:start -->
 ## Documentation routing
 

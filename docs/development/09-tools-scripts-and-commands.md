@@ -100,6 +100,10 @@ checkout selected by `--root` or the current directory. `pf providers setup`,
 validate and dispatch the active role's route. Pass `--root` to select the
 workspace. [Model routing](../guide/01-getting-started.md#model-routing)
 
+Use `pf job knowledge <id>` from a Factory workspace to see committed change
+signals and candidate documentation for the job. From a worktree, pass
+`pf job --root <workspace> knowledge <id>`.
+
 <!-- documentation-routing:start -->
 ## Documentation routing
 

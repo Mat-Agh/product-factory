@@ -124,6 +124,15 @@ Changing any first-line format is a **breaking change** to the factory. See
 | Browser sessions | `<job-id>-<role>` |
 | Engineer identity | named `engineer-<job-id>` so the coordinator can resume it with `SendMessage` |
 
+## Knowledge evidence
+
+Claims made with the capture-enabled kit carry `knowledge_capture: true`.
+Preparation records the owning module's docs root. Ready build artifacts
+and direct-to-gate plan and release artifacts record capture. A passing code
+review records its independent check, and the gate revalidates the capture
+on the pinned commit. Claims without the field retain the original artifact
+contract.
+
 <!-- documentation-routing:start -->
 ## Documentation routing
 

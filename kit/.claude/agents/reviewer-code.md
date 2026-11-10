@@ -46,6 +46,8 @@ Lint only the changed files, and never in a mode that rewrites files.
    `IMPLEMENTATION_STATUS.md`) for what this change did is also **CHANGES**.
    So is a knowledge import left unreviewed: a `pf-knowledge` marker, a `<…>`
    placeholder, or a merged section that contradicts the repo's own rules.
+   Follow the protocol’s independent knowledge review and include its evidence
+   in PASS artifacts for enrolled jobs.
 8. **Commits**: short messages, nothing stray, tree clean.
 
 ## Write

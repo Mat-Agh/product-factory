@@ -250,7 +250,10 @@ init or adoption before opening a worktree or running a delivery lane.
    The CLI validates the artifacts, pins the reviewed commit, and records
    the next stage or why the job needs a human. On an error, inspect the
    stated problem. Keep valid evidence and dispatch only the missing work.
-   During automated rework the engineer must write a fresh build artifact
+   Read `pf job knowledge <id>` for the committed change signals when the
+   build, spike, or release is ready. Have the owning role correct missing
+   capture evidence before advancing. During automated rework the engineer
+   must write a fresh build artifact
    and every required lens must review the new round.
 5. **Finish.** At a successful gate, read `gate_verdict`, `gate_commit`,
    `base_branch`, `host`, `remote` and `open_pr` from the job. If PR delivery
@@ -319,7 +322,9 @@ Read the finished job(s): every artifact, the review rounds and the human's
 rework notes. Also run `pf memory --json`, and include any memory written since the
 job started in the same proposals, using the `/factory memory` verdicts. Write `retro.md` in the job folder, covering what went wrong,
 what the agents missed, and **proposed** edits to the product's `AGENTS.md` or
-docs and to the factory's agents or checklists. Never apply factory changes
+docs and to the factory's agents or checklists. Include any shared knowledge
+candidate from the job artifacts and cite its committed project evidence.
+Never apply factory changes
 silently. Offer to open a PR against the Product Factory repo (`factory.source`
 in the descriptor) with the proposed edits and a dated evolution-log entry.
 

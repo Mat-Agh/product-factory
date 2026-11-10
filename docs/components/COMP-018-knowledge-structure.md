@@ -165,6 +165,26 @@ changes. Empty projects are indexed when supported files appear. Graphs
 live in the checkout's ignored `.factory/graphify/` directory. Source files
 and the stack handbook remain authoritative. [Graph commands](../guide/02-commands.md)
 
+## Capture new knowledge during a job
+
+`pf job knowledge <id>` compares the committed job branch with its recorded
+base. It reports feature and spike jobs, dependency signals and changed
+Markdown files in the owning module. It compares dependency fields in
+`package.json` and treats changes to recognized manifests and lockfiles in
+other ecosystems as signals.
+
+The producer records a lesson in project docs and cites the changed path in
+`## Knowledge capture`. Feature, spike and dependency-signal jobs need at
+least one committed page. For other jobs the producer may give a specific
+reason why there is no durable learning. The code lens independently looks
+for newly learned practices, verifies the cited docs and records its check.
+The gate rechecks the evidence against the committed branch. Shared
+candidates point to a local evidence page and a proposed Factory knowledge
+page or pack. Promotion is a separate reviewed docs change.
+
+Upgrade `pf` and rerun `pf install project .` to enable capture for new jobs.
+Existing claims keep their original evidence contract.
+
 <!-- documentation-routing:start -->
 ## Documentation routing
 

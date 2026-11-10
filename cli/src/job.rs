@@ -10,7 +10,7 @@ use serde_json::{Value, json};
 
 use crate::{
     descriptor::{self, Descriptor, Map},
-    discovery, util,
+    discovery, job_knowledge, util,
 };
 
 const JOBS: &str = ".factory/jobs";
@@ -74,6 +74,8 @@ pub enum Action {
         #[arg(long)]
         all: bool,
     },
+    /// Show committed changes that may require durable project knowledge
+    Knowledge { id: String },
     /// Return a job's durable state as JSON
     Show { id: String },
     /// Park a job and release its active slot while keeping its worktree
@@ -323,6 +325,13 @@ fn claim(
         "id": id, "request": request, "source": source, "stage": "triage",
         "round": 1, "resumes": 0, "reviews": {}, "pr": null, "backlog_pending": backlog,
     });
+    let protocol = Path::new(".claude/skills/factory/protocol.md");
+    if discovery::local_path(&d.root, protocol)
+        && fs::read_to_string(d.root.join(protocol))
+            .is_ok_and(|s| s.lines().any(|l| l == job_knowledge::MARKER))
+    {
+        job["knowledge_capture"] = json!(true);
+    }
     if let Err(e) = save(&staging, &mut job).and_then(|_| fs::rename(&staging, &dir).map_err(fail))
     {
         let _ = fs::remove_file(staging.join("job.json"));
@@ -486,6 +495,16 @@ fn prepare(
     if (repo != d.root && repo != util::normalize(&scope)) || !repo.join(".git").exists() {
         return Err("Cannot resolve the owning Git checkout".into());
     }
+    let knowledge_root = module
+        .get("docs_root")
+        .map(String::as_str)
+        .filter(|p| !p.is_empty())
+        .or_else(|| d.get("docs.root"))
+        .unwrap_or("docs");
+    if job["knowledge_capture"] == true && !discovery::local_path(&scope, Path::new(knowledge_root))
+    {
+        return Err("Unsafe knowledge docs root".into());
+    }
     let area = module
         .get("area")
         .filter(|s| !s.is_empty())
@@ -627,6 +646,9 @@ fn prepare(
     );
     job["worktree"] = json!(tree);
     job["kit_checkout"] = json!(repo);
+    if job["knowledge_capture"] == true {
+        job["knowledge_docs_root"] = json!(knowledge_root);
+    }
     job["module_worktree"] = json!(util::normalize(&tree.join(prefix)));
     if repo == d.root {
         let scope = util::normalize(&scope);
@@ -758,7 +780,12 @@ fn advance(
     }
 
     let mut changes_code = false;
-    if let Some(base) = job["base_commit"].as_str() {
+    let mut capture = None;
+    let base = job["base_commit"].as_str();
+    if job["knowledge_capture"] == true && base.is_none() {
+        return Err("Missing knowledge capture base commit".into());
+    }
+    if let Some(base) = base {
         let paths = changed_paths(&tree, base, &head)?;
         if expect == "gate" && paths.is_empty() {
             return Err("The delivery branch contains no changes against its recorded base".into());
@@ -782,6 +809,14 @@ fn advance(
                 ));
             }
         }
+        if job["knowledge_capture"] == true
+            && (matches!(expect, "build" | "review" | "gate" | "release")
+                || (expect == "plan" && next.as_deref() == Some("gate")))
+        {
+            capture = Some(job_knowledge::Report::inspect(
+                &job, &tree, base, &head, &paths,
+            )?);
+        }
         changes_code = paths
             .iter()
             .any(|p| p.extension().is_none_or(|ext| ext != "md"));
@@ -794,6 +829,8 @@ fn advance(
             let file = format!("{expect}.md");
             if verdict(dir, &file, &["STATUS: READY", "STATUS: BLOCKED"])? == "STATUS: BLOCKED" {
                 stop = Some(format!("{file} reports STATUS: BLOCKED"));
+            } else if let Some(report) = &capture {
+                report.validate(&file, &artifact(dir, &file)?)?;
             }
         }
         "repro" => {
@@ -802,6 +839,9 @@ fn advance(
             }
         }
         "review" => {
+            if let Some(report) = &capture {
+                report.validate("build.md", &artifact(dir, "build.md")?)?;
+            }
             let current = job["reviews"].as_object().ok_or("Missing review lenses")?;
             if !current
                 .get("code")
@@ -821,6 +861,9 @@ fn advance(
                 let file = format!("round-{round}/review-{lens}.md");
                 let result = verdict(dir, &file, &["VERDICT: PASS", "VERDICT: CHANGES"])?;
                 let result = result.trim_start_matches("VERDICT: ");
+                if lens == "code" && result == "PASS" && capture.is_some() {
+                    job_knowledge::validate_review(&artifact(dir, &file)?)?;
+                }
                 *value = json!(result);
                 if result == "CHANGES" {
                     changes.push(lens.clone());
@@ -847,6 +890,24 @@ fn advance(
         }
         "gate" => {
             let gate = verdict(dir, "gate.md", &["READY", "ESCALATE"])?;
+            if let Some(report) = &capture {
+                let producer = lane
+                    .iter()
+                    .find_map(|stage| match stage.as_str()? {
+                        "build" => Some("build.md"),
+                        "release" => Some("release.md"),
+                        "plan" if !lane.iter().any(|s| s == "build") => Some("plan.md"),
+                        _ => None,
+                    })
+                    .ok_or("No knowledge evidence producer in this lane")?;
+                report.validate(producer, &artifact(dir, producer)?)?;
+                if lane.iter().any(|s| s == "review") {
+                    job_knowledge::validate_review(&artifact(
+                        dir,
+                        &format!("round-{round}/review-code.md"),
+                    )?)?;
+                }
+            }
             if gate == "READY"
                 && (job["requires_escalation"] == true || job["tier"] == "cross-cutting")
             {
@@ -1004,6 +1065,20 @@ pub fn main(root: Option<PathBuf>, action: Action) -> i32 {
         }
         if let Action::Show { id } = action {
             return read(&folder(&d.root, &id)?);
+        }
+        if let Action::Knowledge { id } = action {
+            let (_, state) = context(&d.root, &id)?;
+            let tree = Path::new(state["worktree"].as_str().ok_or("Prepare the job first")?);
+            let branch = state["branch"].as_str().ok_or("Missing branch")?;
+            if !tree.is_absolute() || !tree.is_dir() || util::git_root(tree) != tree {
+                return Err("Job worktree is unavailable".into());
+            }
+            let head = git_head(tree, branch)?;
+            let base = state["base_commit"].as_str().ok_or("Missing base commit")?;
+            let paths = changed_paths(tree, base, &head)?;
+            return Ok(
+                job_knowledge::Report::inspect(&state, tree, base, &head, &paths)?.json(&head),
+            );
         }
         let _lock = lock(&d.root)?;
         if let Action::Claim {

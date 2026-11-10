@@ -37,11 +37,19 @@ there is recorded evidence that it works.
 | [COMP-011](../components/COMP-011-adapters.md) Adapters | Codex kit and manual adapters | partially | Generated Codex and Antigravity roles and shared Hermes/Gemini entry points. A synthetic Hermes worker exercised authorization, key checks and stage artifact handoff. The local Hermes resolver selected a test gateway and its key (2026-11-10) | The local Antigravity CLI listing did not show workspace agents in the scratch checkout. Verify discovery from an opened workspace, then run native dispatch and paid provider lanes |
 | [COMP-012](../components/COMP-012-docs-gate.md) Docs map | yes | yes | `pf docs-map --fix --strict` on this repo: 62 docs, every folder has a README, every doc is reachable from `docs/README.md` (2026-10-19) | Run on a real product (`/factory init`) |
 | [COMP-014](../components/COMP-014-diagrams.md) Diagrams | yes | yes | 29 inline Mermaid blocks lint clean and parse with Mermaid CLI 11; `validate` reports a broken block with file and line (2026-10-20) | Confirm live rendering on GitHub and in IntelliJ with the Mermaid extension |
-| [COMP-015](../components/COMP-015-pf-cli.md) `pf` CLI | yes | yes | `v1.0.0` passed all 35 Rust tests, Clippy and formatting. The Linux x86-64 release binary was built with the lockfile | Graph refresh and provider dispatch also covered by integration fixtures. Prebuilt binaries remain optional (ADR-009) |
+| [COMP-015](../components/COMP-015-pf-cli.md) `pf` CLI | yes | yes | `v1.0.0` passed all 35 Rust tests, Clippy and formatting. The Linux x86-64 release binary was built with the lockfile | v1.1 adds committed knowledge signals and validates evidence for newly enrolled jobs. The integration fixtures cover dependencies and v1.0 compatibility |
 | [COMP-016](../components/COMP-016-session-integration.md) Session integration and memory | yes | partially | Scratch workspace with two nested repos: workspace and module installs, `pf rules sync`, attribution off, doctor flags missing modules; `pf memory` read a project auto-memory directory; 15 cargo tests (2026-10-19) | Observe a live Claude session routing a request through `/factory`; run `/factory memory` on an adopted project |
 | [COMP-017](../components/COMP-017-adoption.md) Adoption | yes | partially | Read-only workspace audit discovered five module checkouts. Four rejected the default job branch shape. Their copied convention sources accepted the sample branch from the example descriptor (2026-11-10) | Run `/factory adopt` on a product workspace; land the mirror and `CLAUDE.md` MRs |
 | [COMP-018](../components/COMP-018-knowledge-structure.md) Knowledge structure | yes | partially | One development knowledge library (`docs/knowledge/`: principles, Kotlin client and Spring backend, TypeScript web, Rust, API, security, product, CI/CD, agentic) imported through stack pack maps; links between library pages follow the map; on copies of five module repositories every added link resolved and a rerun changed nothing; 8 knowledge tests incl. library coverage and a fresh-import link check per stack (2026-10-20) | Resolve five Client and Front-End numbering collisions, then run approved import and adapt jobs in an adopted workspace. The November docs-only copy verified flat Front-End and top-level Product handbooks and zero changes on a second import |
 | [COMP-013](../components/COMP-013-constitution.md) Constitution | v1 | n/a | — | Revisit after the pilot retro |
+
+## Knowledge capture evidence (2026-11-10)
+
+- New jobs on the updated kit checked dependency changes against committed
+  documentation. A missing page or reviewer check stopped advancement, and a
+  job started on the older kit could still advance.
+- Detection of new practices outside the committed signals remains an agent
+  and reviewer judgment. Shared pack promotion remains a separate docs job.
 
 ## Live runtime evidence (2026-11-10)
 
