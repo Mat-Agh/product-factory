@@ -44,7 +44,7 @@ expected output. Terms are explained in the
 
 A standalone `pf` binary can install the project kit and import stack
 handbooks. Download the Linux x86-64 binary and checksum from the
-[v1.1.0 release](https://github.com/Mat-Agh/product-factory/releases/tag/v1.1.0).
+[v1.0.0 release](https://github.com/Mat-Agh/product-factory/releases/tag/v1.0.0).
 Put `pf` on `PATH`, then run `pf install project <repo>`.
 Build from a Factory checkout with Cargo when you need a binary for a new
 platform or want to link your personal Claude Code configuration.

@@ -6,7 +6,17 @@
 Append-only. One dated entry for each factory-level change: what changed, why,
 and its evidence.
 
-## 2026-11-10 — Product Factory v1.1.0 knowledge capture
+## 2026-11-10 — Consolidated Product Factory v1 release
+
+- Consolidated the installer, knowledge capture and CLI usage updates into
+  a single v1.0.0 release. Existing job claims retain their evidence format.
+
+## 2026-11-10 — Knowledge capture operator guide
+
+- Aligned the CLI reference with the released command help and documented the
+  kit upgrade, job report and evidence failure recovery.
+
+## 2026-11-10 — Knowledge capture during delivery
 
 - New jobs detect committed dependency signals and check that required lessons
   are captured in changed module docs. The code lens records its independent
@@ -17,7 +27,7 @@ and its evidence.
   an undocumented dependency change, a spike with a flat docs root, and
   legacy job compatibility.
 
-## 2026-11-10 — Product Factory v1.0.0
+## 2026-11-10 — First standalone installer
 
 - Aligned the CLI package with the first release tag. The release includes a
   Linux x86-64 binary with the project installer and stack knowledge embedded.

@@ -1,7 +1,7 @@
 # 02 — Commands
 
 **Status:** Active
-**Last updated:** 2026-10-19
+**Last updated:** 2026-11-10
 
 Run these commands from the main checkout or a configured module. Use
 `/factory` in Claude Code or `$product-factory` in Codex. Each session
@@ -189,10 +189,25 @@ Details: [development/09-tools-scripts-and-commands.md](../development/09-tools-
 
 ## Inspect knowledge capture
 
-Run `pf job knowledge <job-id>` after committing the work. It shows the
-dependency and job signals that require a project doc, along with the changed
-doc paths. A missing evidence error from `pf job advance` leaves the stage
-unchanged. For a retrospective, use the existing `/factory retro <job-id>`.
+For a prepared job, commit the changes in its worktree, then inspect the
+job from the workspace that holds its descriptor:
+
+```bash
+pf job knowledge 001-add-library
+# From a separate job worktree, point to the workspace explicitly.
+pf job --root /path/to/workspace knowledge 001-add-library
+```
+
+The JSON includes the inspected `commit`, `dependency_files`, `changed_docs`
+and `requires_project_docs`. `enabled` tells you whether the capture gate
+applies to this job. Paths in `changed_docs` are relative to the owning Git
+checkout root. If advance rejects the evidence, the stage stays unchanged.
+Have the assigned role correct the evidence and retry the same stage and
+round. [Troubleshooting](06-troubleshooting.md#knowledge-capture)
+
+Use `pf knowledge plan` to inspect the stack handbook and missing pack pages.
+Use `pf job knowledge` to inspect the committed changes for one job. For
+lessons discovered after delivery, use `/factory retro <job-id>`.
 
 <!-- documentation-routing:start -->
 ## Documentation routing

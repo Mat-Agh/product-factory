@@ -13,8 +13,9 @@ The factory uses semantic versioning on its git tags: `vMAJOR.MINOR.PATCH`.
 | MINOR | New lane, agent, lens, command, descriptor key with a default, script |
 | PATCH | Wording, checklists, bug fixes, docs |
 
-The current release is `v1.1.0`. Reinstall its project kit to enable knowledge
-capture for new jobs. See the [implementation status](../status/IMPLEMENTATION_STATUS.md) for verified features and remaining live runtime checks.
+The current release is `v1.0.0`. It includes knowledge capture and the
+updated CLI guide. Verify the installer checksum and reinstall its project
+kit to enable capture for new jobs. See the [implementation status](../status/IMPLEMENTATION_STATUS.md) for verified features and remaining live runtime checks.
 
 ## Releasing the factory
 

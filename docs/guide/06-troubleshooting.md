@@ -1,7 +1,7 @@
 # 06 — Troubleshooting
 
 **Status:** Active
-**Last updated:** 2026-10-19
+**Last updated:** 2026-11-10
 
 Start with `pf doctor <product>`. It catches most setup problems. Then
 find your symptom below.
@@ -10,13 +10,13 @@ find your symptom below.
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| `/factory` is not recognised, or Claude answers without running the pipeline | The skill is not installed where this session looks, or the session started before installation | Run `pf install user` or `project <path>`, then **start a new Claude Code session**. Skills and agents load at session start. |
+| `/factory` is not recognised, or Claude answers without running the pipeline | The skill is not installed where this session looks, or the session started before installation | Run `pf install user` or `pf install project <path>`, then **start a new Claude Code session**. Skills and agents load at session start. |
 | "Agent type 'engineer' not found" | Agents are missing from `.claude/agents/` and `~/.claude/agents/` | Re-run the installer, and start a new session |
 | `git clone git@github.com:…` fails with `Permission denied (publickey)` | No SSH key on GitHub | Run `gh auth login` and choose SSH, or `gh ssh-key add ~/.ssh/id_ed25519.pub` |
 | Every Bash call is blocked: "the pf CLI is not installed, so Bash is blocked (fail closed)" | `pf` is not on the PATH Claude Code sees | `cargo install --path cli` in the factory checkout (or the `--git` form). Make sure `~/.cargo/bin` is on PATH, then restart the session |
 | `cargo install` fails with "linker cc not found" | No C toolchain | Ubuntu: `sudo apt install build-essential`. macOS: `xcode-select --install` |
 | The installer says "<path> is not a git repo" | Target folder is not a repository | Run `git init` there first, or point at the repository root |
-| `pf doctor`: "drift: … differs from factory kit" | The project copy is older (or newer, if edited) than the factory | Review the diff (`git diff --no-index`), then re-run `pf install project`. Edit the factory, not the copy |
+| `pf doctor`: "drift: … differs from factory kit" | The project copy is older (or newer, if edited) than the factory | Review the diff (`git diff --no-index`), then rerun `pf install project <path>`. Make shared kit changes in the Factory repo |
 
 ## Guard hook
 
@@ -39,6 +39,18 @@ find your symptom below.
 | Every bug job ends `NOT REPRODUCED` | The tester cannot run the app the way users do | Add run instructions, test accounts or fixtures to `AGENTS.md` |
 | A job sits in one stage with no activity | The coordinator session was closed | Open Claude Code and run `/factory status`. Then `/factory rework <job> "resume from <stage>"`. Job state is on disk, not in the closed session |
 | Two sessions claimed the same backlog line | Someone edited the backlog by hand during a claim | Close one session. Claims use exact-line edits, so give each line unique text |
+
+## Knowledge capture
+
+| Symptom | What to check |
+|---|---|
+| `Prepare the job first` | The report needs a prepared worktree and a recorded base commit. Inspect `pf job show <id>` and resume the coordinator from the recorded stage. |
+| The report says `"enabled": false` | The job was claimed before capture was enabled. Check `pf job knowledge --help`, install the current release binary if needed, and reinstall the project kit for future claims. |
+| `must cite changed project docs` or `must name changed, committed module documentation` | Compare the `Project` entry with `changed_docs` in `pf job knowledge <id>`. Have the assigned role commit the appropriate Markdown page and cite its Git-root-relative path in the ready artifact. |
+| `PASS requires ## Knowledge review` | Have the code reviewer independently check the captured docs and record its check in the code review artifact before retrying advancement. |
+
+Run the report from the workspace root or pass `pf job --root <workspace>
+knowledge <id>`. See [the command example](02-commands.md#inspect-knowledge-capture).
 
 ## PRs
 

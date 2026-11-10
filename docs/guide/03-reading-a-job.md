@@ -132,7 +132,7 @@ Merge it yourself on GitHub or GitLab. Then run `/factory clean`.
 
 ## Knowledge evidence
 
-New jobs on the v1.1 kit use `## Knowledge capture` in the ready build or
+New jobs on the capture-enabled kit use `## Knowledge capture` in the ready build or
 direct-to-gate producer artifact. Read its committed project pages and any
 shared proposal. A passing code review also includes `## Knowledge review`
 with the independent check.

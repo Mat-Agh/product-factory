@@ -1,7 +1,7 @@
 # 04 — Add a project
 
 **Status:** Active
-**Last updated:** 2026-10-19
+**Last updated:** 2026-11-10
 
 0. **If the project already has a process** (agent rules, hooks, CI, other
    automation), audit it first: `pf audit <path>`, then `/factory adopt` after
@@ -73,12 +73,22 @@ isolate changes on disk. They can still conflict when branches are integrated.
 ## Updating a project to a newer factory
 
 ```bash
-cd ~/Work/ProductFactory && git pull
-pf doctor ~/Work/MyApp        # shows drift
+cd ~/Work/ProductFactory
+git pull --ff-only
+cargo install --path cli --locked
+pf --version
 pf install project ~/Work/MyApp
+pf doctor ~/Work/MyApp
 ```
-Your `factory.yaml` and `backlog.md` are kept. Review the diff in the product
-repo and commit it.
+
+For a binary install, replace `pf` with the verified release binary before
+running the project installer. The installer preserves `factory.yaml` and
+`backlog.md`. Review and commit the kit changes, then reopen your AI session.
+New jobs are enrolled in knowledge capture after the kit update. If an
+earlier installer also reports `pf 1.0.0`, verify its SHA-256 checksum against
+the current release and check that `pf job knowledge --help` is available.
+Previously claimed jobs retain their original evidence requirements.
+[Release downloads](https://github.com/Mat-Agh/product-factory/releases)
 
 ## Runtime entry points and code graphs
 

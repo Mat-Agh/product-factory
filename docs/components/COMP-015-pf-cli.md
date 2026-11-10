@@ -1,16 +1,16 @@
 # COMP-015 — `pf` CLI
 
-**Status:** Implemented — 10 Rust tests pass, clippy clean, every subcommand exercised end to end (2026-10-19)
-**Last updated:** 2026-10-19
+**Status:** Implemented — v1.0.0 passed 38 Rust tests, Clippy, and a standalone upgrade smoke test
+**Last updated:** 2026-11-10
 **Source:** [`cli/`](../../cli/) (Rust 2024 edition, one binary `pf`)
 
 ## Purpose
 
 All factory tooling is one Rust binary, following the operator's
-Rust-by-default rule ([USER.md](../operator/USER.md)). No Python, bash scripts
-or `jq` are needed. The only external programs `pf` calls are `git`, `gh`
-(branch-protection check), and the Mermaid CLI for `diagrams validate`, because
-Mermaid exists only as JavaScript.
+Rust-by-default rule ([USER.md](../operator/USER.md)). Project setup and job
+control use Git. Specific features invoke their own tools: GitHub CLI for
+remote health checks, Mermaid CLI for diagram validation, Graphify for code
+graphs, `uv` to provision Graphify, and Hermes Agent for routed API workers.
 
 ## Install
 
@@ -35,13 +35,15 @@ blocked with the install hint above.
 | `pf guard --self-test` | Run the 80 built-in policy cases | [COMP-004](COMP-004-guard-hook.md) |
 | `pf docs-map [--fix] [--strict] [--allow <prefix>]` | `docs/` tree, generated README links and map | [COMP-012](COMP-012-docs-gate.md) |
 | `pf diagrams check \| validate` | Lint inline Mermaid blocks; parse them with the Mermaid CLI | [COMP-014](COMP-014-diagrams.md) |
-| `pf install project <path> [--no-ai-attribution] [--modules] \| module <path> --workspace <root> \| user [--with-guard] \| all <path>` | Put the factory into a product or a user config | [COMP-007](COMP-007-installer.md) |
+| `pf install project <path> \| module <path> --workspace <root> \| user \| all <path>` | Put the factory into a product or a user config | [COMP-007](COMP-007-installer.md) |
 | `pf doctor [project]` | Health check; exit code = failures | [COMP-008](COMP-008-doctor.md) |
 | `pf mirror add <name> <url> \| push \| bundle [dir]` | Backup remotes and offline bundles | [COMP-009](COMP-009-backup-tools.md) |
 | `pf export` | Copy Claude Code memory into `.claude-export/<date>/` for review | [COMP-009](COMP-009-backup-tools.md) |
 | `pf job claim \| prepare \| advance \| status \| show \| pause \| resume \| rework \| finish` | Durable job control, Git worktrees and evidence transitions | [Job lifecycle](../architecture/JOB_LIFECYCLE.md) |
+| `pf job knowledge <id>` | Inspect committed change signals and candidate project docs for a prepared job | [Knowledge capture](../guide/02-commands.md#inspect-knowledge-capture) |
+| `pf graph refresh [--modules]` or `pf graph query <question>` | Build or query a local Graphify index | [Knowledge structure](COMP-018-knowledge-structure.md#local-code-graph) |
+| `pf providers setup`, `check` or `run <job-id> <role> --allow-api` | Configure or dispatch a model route | [Model routing](../guide/01-getting-started.md#model-routing) |
 | `pf dashboard [--dir .factory] [--port 8000]` | Serve the dashboard on loopback | [COMP-006](COMP-006-backlog-and-dashboard.md) |
-| `pf install module <path> --workspace <root>` | Put both runtime kits into one module repo of a workspace | [COMP-016](COMP-016-session-integration.md) |
 | `pf rules sync` | Generate path-scoped `.claude/rules/modules/<area>.md` from the descriptor | [COMP-016](COMP-016-session-integration.md) |
 | `pf memory [--json] [--root <repo>]` | Show the repo's auto memory, for `/factory memory` | [COMP-016](COMP-016-session-integration.md) |
 | `pf audit [path] [--modules] [--json]` | Inventory the existing agentic setup and flag clashes before adoption | [COMP-017](COMP-017-adoption.md) |
@@ -64,9 +66,10 @@ it was built from.
 | `cli/src/doctor.rs` | Health check |
 | `cli/src/backup.rs` | Mirror and export |
 | `cli/src/dashboard.rs` | Loopback static server |
+| `cli/src/job.rs` and `cli/src/job_knowledge.rs` | Job state, committed change inspection and evidence gates |
 | `cli/src/util.rs` | Paths, git, hashing, dates |
 
-Dependencies: `clap`, `regex`, `serde_json`, `sha2`, `shlex`.
+The CLI uses `clap`, `regex`, `serde_json`, `shlex`, and `libc` on Unix.
 
 ## Verification
 
