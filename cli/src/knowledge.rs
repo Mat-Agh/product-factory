@@ -13,7 +13,7 @@ use std::collections::BTreeMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use crate::{descriptor, util};
+use crate::{descriptor, discovery, util};
 
 fn templates(factory: &Path) -> PathBuf {
     factory.join("kit/knowledge")
@@ -102,7 +102,7 @@ fn files_under(dir: &Path) -> Vec<String> {
 pub fn template_set(factory: &Path, stack: &str) -> Result<BTreeMap<String, PathBuf>, String> {
     let root = templates(factory);
     let sdir = root.join("stacks").join(stack);
-    if !sdir.is_dir() {
+    if !stacks(factory).iter().any(|s| s == stack) {
         return Err(format!(
             "unknown stack '{stack}' (known: {})",
             stacks(factory).join(", ")
@@ -137,23 +137,26 @@ pub struct Target {
     pub root: PathBuf,
     pub stack: String,
     pub docs_root: String,
+    handbook: String,
     pub module: String,
     pub product: String,
 }
 
 /// Resolve stack and docs root: flags, then the descriptor module whose path is this
-/// repo, then the single-repo descriptor's first module, then `generic` and `docs`.
+/// repo, then local manifest and documentation evidence.
 pub fn target(root: &Path, stack: Option<String>, docs: Option<String>) -> Target {
-    let root = util::git_root(root);
+    let root = util::absolute(root);
     let name = root
         .file_name()
         .unwrap_or_default()
         .to_string_lossy()
         .into_owned();
+    let inferred = discovery::infer_stack(&root);
     let mut t = Target {
         root: root.clone(),
-        stack: "generic".into(),
-        docs_root: "docs".into(),
+        stack: inferred.into(),
+        docs_root: discovery::docs_root(&root, inferred).into(),
+        handbook: String::new(),
         module: name,
         product: String::new(),
     };
@@ -167,7 +170,11 @@ pub fn target(root: &Path, stack: Option<String>, docs: Option<String>) -> Targe
                 m.get("path")
                     .is_some_and(|p| p.trim_end_matches('/') == rel)
             })
-            .or_else(|| (!d.multi_repo()).then(|| d.modules.first()).flatten());
+            .or_else(|| {
+                (!d.multi_repo() && d.root == root)
+                    .then(|| d.modules.first())
+                    .flatten()
+            });
         if let Some(m) = m {
             if let Some(s) = m.get("stack").filter(|s| !s.is_empty()) {
                 t.stack = s.clone();
@@ -188,13 +195,34 @@ pub fn target(root: &Path, stack: Option<String>, docs: Option<String>) -> Targe
     if let Some(d) = docs {
         t.docs_root = d;
     }
+    let docs_root = t.docs_root.trim_end_matches('/');
+    t.handbook = if t.stack == "product-docs" && t.root.join("development/README.md").is_file() {
+        "development".into()
+    } else if t
+        .root
+        .join(docs_root)
+        .join("16-documentation-link-map.md")
+        .is_file()
+        && !t
+            .root
+            .join(docs_root)
+            .join("development/README.md")
+            .is_file()
+    {
+        docs_root.into()
+    } else {
+        format!("{docs_root}/development")
+    };
     t
 }
 
-fn map_path(rel: &str, docs_root: &str) -> String {
-    match rel.strip_prefix("docs/") {
-        Some(rest) => format!("{}/{rest}", docs_root.trim_end_matches('/')),
-        None => rel.to_string(),
+fn map_path(rel: &str, t: &Target) -> String {
+    if let Some(rest) = rel.strip_prefix("docs/development/") {
+        format!("{}/{rest}", t.handbook)
+    } else if let Some(rest) = rel.strip_prefix("docs/") {
+        format!("{}/{rest}", t.docs_root.trim_end_matches('/'))
+    } else {
+        rel.to_string()
     }
 }
 
@@ -252,6 +280,7 @@ fn equivalent(root: &Path, wanted: &str, docs_root: &str) -> Option<Found> {
     }
     if let Some(num) = numbered(&name) {
         let want = topic_words(&name);
+        let mut conflict = None;
         // The same number on the same topic counts; the same number on another
         // topic is a numbering conflict for the human to resolve.
         for d in &dirs {
@@ -259,11 +288,10 @@ fn equivalent(root: &Path, wanted: &str, docs_root: &str) -> Option<Found> {
                 if numbered(&n) == Some(num) {
                     let found = util::rel(root, &path);
                     let shared = topic_words(&n).iter().any(|w| want.contains(w));
-                    return Some(if shared {
-                        Found::Same(found)
-                    } else {
-                        Found::NumberTaken(found)
-                    });
+                    if shared {
+                        return Some(Found::Same(found));
+                    }
+                    conflict.get_or_insert(found);
                 }
             }
         }
@@ -281,6 +309,9 @@ fn equivalent(root: &Path, wanted: &str, docs_root: &str) -> Option<Found> {
                 }
             }
         }
+        if let Some(found) = conflict {
+            return Some(Found::NumberTaken(found));
+        }
     }
     // A file with the same name elsewhere in the docs (READMEs excluded).
     if name != "README.md" {
@@ -288,7 +319,7 @@ fn equivalent(root: &Path, wanted: &str, docs_root: &str) -> Option<Found> {
         while let Some(d) = stack.pop() {
             for e in fs::read_dir(&d).into_iter().flatten().flatten() {
                 let ep = e.path();
-                if ep.is_dir() {
+                if e.file_type().is_ok_and(|t| t.is_dir()) {
                     if e.file_name() != "node_modules" {
                         stack.push(ep);
                     }
@@ -450,6 +481,15 @@ pub struct Plan {
 }
 
 pub fn plan(factory: &Path, t: &Target) -> Result<Plan, String> {
+    if !t.root.is_dir()
+        || t.docs_root.trim().is_empty()
+        || !discovery::local_path(&t.root, Path::new(&t.docs_root))
+        || !discovery::local_path(&t.root, Path::new(&t.handbook))
+    {
+        return Err(
+            "knowledge requires an existing root and local, non-symlink documentation paths".into(),
+        );
+    }
     let set = template_set(factory, &t.stack)?;
     let mut p = Plan {
         present: vec![],
@@ -457,9 +497,20 @@ pub fn plan(factory: &Path, t: &Target) -> Result<Plan, String> {
         conflicts: vec![],
     };
     for (rel, src) in set {
-        let dst = map_path(&rel, &t.docs_root);
+        if rel == "docs/development/README.md" && t.handbook == t.docs_root {
+            continue; // A flat handbook already shares the documentation index.
+        }
+        let dst = map_path(&rel, t);
+        if !discovery::local_path(&t.root, Path::new(&dst)) {
+            return Err(format!("unsafe knowledge destination: {dst}"));
+        }
         match equivalent(&t.root, &dst, &t.docs_root) {
             Some(Found::Same(found)) => {
+                if !discovery::local_path(&t.root, Path::new(&found))
+                    || !t.root.join(&found).is_file()
+                {
+                    return Err(format!("knowledge target is not a local file: {found}"));
+                }
                 let tmpl = template_text(factory, &src).unwrap_or_default();
                 let gaps = if is_knowledge(factory, &src, &tmpl) {
                     let have = fs::read_to_string(t.root.join(&found)).unwrap_or_default();
@@ -546,9 +597,12 @@ fn fix_links(text: &str, file: &Path, src: &Path, lib: &LibMap) -> String {
                 .map(|n| n.to_string_lossy().into_owned())
                 .unwrap_or_default();
             if let (Some(num), Some(tdir)) = (numbered(&name), target.parent())
-                && let Some((n, _)) = md_files(tdir)
-                    .into_iter()
-                    .find(|(n, _)| numbered(n) == Some(num))
+                && let Some((n, _)) = md_files(tdir).into_iter().find(|(n, _)| {
+                    numbered(n) == Some(num)
+                        && topic_words(n)
+                            .iter()
+                            .any(|w| topic_words(&name).contains(w))
+                })
             {
                 let parent = Path::new(path).parent().unwrap_or(Path::new(""));
                 let new = parent.join(&n).to_string_lossy().into_owned();
@@ -660,20 +714,6 @@ pub fn init(factory: &Path, t: &Target, files_only: bool) -> Result<Applied, Str
     Ok(a)
 }
 
-fn roots(start: &Path, modules: bool) -> Vec<PathBuf> {
-    let start = util::git_root(start);
-    let mut v = vec![start.clone()];
-    if modules && let Some(d) = descriptor::find(&start).filter(|d| d.multi_repo()) {
-        v.extend(
-            d.modules
-                .iter()
-                .filter_map(|m| m.get("path"))
-                .map(|p| d.root.join(p)),
-        );
-    }
-    v
-}
-
 pub fn main_plan(
     factory: &Path,
     root: Option<PathBuf>,
@@ -683,14 +723,36 @@ pub fn main_plan(
     apply: bool,
     files_only: bool,
 ) -> i32 {
-    let start = root.unwrap_or_else(|| std::env::current_dir().unwrap_or_default());
-    let mut code = 0;
-    for r in roots(&start, modules) {
-        let t = target(
-            &r,
-            stack.clone().filter(|_| !modules),
-            docs.clone().filter(|_| !modules),
-        );
+    let start =
+        root.unwrap_or_else(|| util::git_root(&std::env::current_dir().unwrap_or_default()));
+    let (roots, missing) = discovery::roots(&start, modules);
+    for path in &missing {
+        util::warn(format!("module unavailable: {}", path.display()));
+    }
+    let targets: Vec<_> = roots
+        .iter()
+        .map(|root| {
+            target(
+                root,
+                stack.clone().filter(|_| !modules),
+                docs.clone().filter(|_| !modules),
+            )
+        })
+        .collect();
+    if apply && modules {
+        if !missing.is_empty() {
+            return 1;
+        }
+        for t in &targets {
+            if let Err(e) = plan(factory, t) {
+                util::warn(format!("{}: {e}", t.root.display()));
+                return 1;
+            }
+        }
+    }
+    let mut code = i32::from(!missing.is_empty());
+    for t in targets {
+        let r = &t.root;
         let head = format!(
             "{} (stack {}, docs {}/)",
             t.root.display(),
@@ -737,7 +799,7 @@ pub fn main_plan(
                 );
                 for (want, taken) in &p.conflicts {
                     println!(
-                        "  ! {want}  (number already used by {taken}; renumber one of them, or record the mapping in the handbook README)"
+                        "  ! {want}  (number already used by {taken}; review which chapter should move, then update its inbound links)"
                     );
                 }
                 for x in &p.present {

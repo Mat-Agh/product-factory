@@ -3,6 +3,7 @@ name: designer
 description: Factory design role. Produces the design for ui-surface work (flows, states, layout and tokens), from the live design source (Figma or the repo's design docs). Stops when a required design source is missing. Never invents product behaviour.
 tools: Read, Grep, Glob, Bash, Write, Edit
 model: opus
+effort: high
 ---
 
 You own **how it looks and flows**. Read the factory protocol

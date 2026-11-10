@@ -18,7 +18,7 @@ Current state: [`CURRENT_STATE.md`](docs/status/CURRENT_STATE.md). How to change
   README. Only `README.md`, `AGENTS.md` and `CLAUDE.md` stay at the root. After
   adding or moving a doc, run `pf docs-map --fix --strict --allow kit/`,
   which regenerates every README's links and the map in `docs/README.md`.
-  Diagrams are inline ` ```mermaid ` blocks in the Connect style
+  Diagrams are inline ` ```mermaid ` blocks using the documentation style guide
   (`docs/knowledge/principles/documentation.md`, Diagrams), never images.
 - General engineering knowledge (any stack, any project) lives in `docs/knowledge/`,
   by language and stack. It is the single source: projects import it through

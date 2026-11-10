@@ -25,6 +25,14 @@ Code stores skills, agents and memory under `~/.claude`, on one machine.
   the source.
 - No account ids, tokens or hosted state exist anywhere in the factory.
 
+## Standalone installation
+
+The binary carries the generic project kit and stack knowledge. When a
+Factory checkout is unavailable, project installs copy from that bundled
+snapshot and record its version and payload fingerprint. The operator
+profile stays in the checkout for user-level links. Source mirrors and
+offline Git bundles still preserve the development history.
+
 ## Alternatives considered
 
 - **Symlinks into products.** No drift, but they break on any other machine and

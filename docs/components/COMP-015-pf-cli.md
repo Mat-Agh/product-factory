@@ -14,6 +14,10 @@ Mermaid exists only as JavaScript.
 
 ## Install
 
+For project installation and knowledge import, the standalone binary
+carries the generic kit. Factory checkout commands such as
+`pf mirror` still use a source repository.
+
 ```bash
 cargo install --path cli                                                     # from a factory checkout
 cargo install --git ssh://git@github.com/Mat-Agh/product-factory.git pf     # on any machine with repo access
@@ -31,12 +35,13 @@ blocked with the install hint above.
 | `pf guard --self-test` | Run the 80 built-in policy cases | [COMP-004](COMP-004-guard-hook.md) |
 | `pf docs-map [--fix] [--strict] [--allow <prefix>]` | `docs/` tree, generated README links and map | [COMP-012](COMP-012-docs-gate.md) |
 | `pf diagrams check \| validate` | Lint inline Mermaid blocks; parse them with the Mermaid CLI | [COMP-014](COMP-014-diagrams.md) |
-| `pf install project <path> [--no-ai-attribution] \| module <path> --workspace <root> \| user [--with-guard] \| all <path>` | Put the factory into a product or a user config | [COMP-007](COMP-007-installer.md) |
+| `pf install project <path> [--no-ai-attribution] [--modules] \| module <path> --workspace <root> \| user [--with-guard] \| all <path>` | Put the factory into a product or a user config | [COMP-007](COMP-007-installer.md) |
 | `pf doctor [project]` | Health check; exit code = failures | [COMP-008](COMP-008-doctor.md) |
 | `pf mirror add <name> <url> \| push \| bundle [dir]` | Backup remotes and offline bundles | [COMP-009](COMP-009-backup-tools.md) |
 | `pf export` | Copy Claude Code memory into `.claude-export/<date>/` for review | [COMP-009](COMP-009-backup-tools.md) |
+| `pf job claim \| prepare \| advance \| status \| show \| pause \| resume \| rework \| finish` | Durable job control, Git worktrees and evidence transitions | [Job lifecycle](../architecture/JOB_LIFECYCLE.md) |
 | `pf dashboard [--dir .factory] [--port 8000]` | Serve the dashboard on loopback | [COMP-006](COMP-006-backlog-and-dashboard.md) |
-| `pf install module <path> --workspace <root>` | Put the Claude Code kit into one module repo of a workspace | [COMP-016](COMP-016-session-integration.md) |
+| `pf install module <path> --workspace <root>` | Put both runtime kits into one module repo of a workspace | [COMP-016](COMP-016-session-integration.md) |
 | `pf rules sync` | Generate path-scoped `.claude/rules/modules/<area>.md` from the descriptor | [COMP-016](COMP-016-session-integration.md) |
 | `pf memory [--json] [--root <repo>]` | Show the repo's auto memory, for `/factory memory` | [COMP-016](COMP-016-session-integration.md) |
 | `pf audit [path] [--modules] [--json]` | Inventory the existing agentic setup and flag clashes before adoption | [COMP-017](COMP-017-adoption.md) |
@@ -85,6 +90,16 @@ Equivalence with the Python and bash tools it replaced was checked on
   macOS, WSL).
 - `pf diagrams validate` needs Node.js and a Chrome or Chromium binary. `check`
   needs nothing extra.
+
+## Cross-runtime commands
+
+`pf install project <repo> [--root-only] [--install-graphify] [--configure-models]`
+installs the runtime kits, can provision Graphify and can prompt for routing.
+`pf graph refresh [--modules]` and `pf graph query <question>` operate on the
+checkout selected by `--root` or the current directory. `pf providers setup`,
+`pf providers check` and `pf providers run <job-id> <role> --allow-api` select,
+validate and dispatch the active role's route. Pass `--root` to select the
+workspace. [Model routing](../guide/01-getting-started.md#model-routing)
 
 <!-- documentation-routing:start -->
 ## Documentation routing

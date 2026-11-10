@@ -27,7 +27,7 @@ Adapt the list to the product; keep every line that applies.
    unauthorized states.
 4. Exercise creates with idempotency across an ambiguous retry, pagination, and
    optimistic updates reconciled with the server.
-5. Exercise realtime: connect, heartbeat timeout, network loss, bounded reconnect,
+5. Exercise realtime: initial connection, heartbeat timeout, network loss, bounded reconnect,
    duplicate events, and REST reconciliation.
 6. Exercise push in foreground, background and process-killed states; expiry,
    duplicates and sign-out cleanup.

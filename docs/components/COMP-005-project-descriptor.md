@@ -24,14 +24,15 @@ Duplicating either one in the other is a defect.
 | `layout` | `single-repo \| multi-repo` | single-repo | coordinator, tech-lead | Module model |
 | `workspace_root` | path | `.` | coordinator | Multi-repo: the folder holding module clones |
 | `modules[].area` | string | `app` | triage | Matches `area::`/`repo::` labels |
-| `modules[].path` | path | `.` | coordinator | Module clone, relative to `workspace_root` |
+| `modules[].path` | path | `.` | coordinator, `pf job` | Independent checkout or directory in the shared Git history, relative to the descriptor root |
 | `modules[].owner_role` | role | engineer | tech-lead | Who implements there |
-| `modules[].stack` | stack name | generic | `pf knowledge`, audit, doctor | Knowledge template: spring-kotlin-service, kmp-android-client, typescript-web, product-docs, generic |
-| `modules[].docs_root` | path | `docs` | every agent, `pf knowledge`, `pf docs-map --docs` | Where the module keeps its docs (Connect: Front-End `doc`, Product `product`) |
+| `modules[].stack` | stack name | manifest detection | `pf knowledge`, audit, doctor | Knowledge template: spring-kotlin-service, kmp-android-client, typescript-web, product-docs, generic |
+| `modules[].docs` | inline map | rebase shared paths | coordinator, roles | Optional worktree-relative overrides for `prd_dir`, `adr_dir` and `design_dir` |
+| `modules[].docs_root` | path | detected layout | every agent, `pf knowledge`, `pf docs-map --docs` | Where the module keeps its docs (for example `doc` or `product`) |
 | `modules[].agents_md` | path | `AGENTS.md` | every agent | The module's live instructions |
 | `modules[].gates` | `see AGENTS.md` or list | see AGENTS.md | engineer, reviewer-code, tester | Quality gates |
 | `modules[].tests` | `yes \| no` | yes | product-manager, engineer, tester | `no` means the module forbids unit tests, so acceptance is manual and documented |
-| `modules[].vcs` | map | — | coordinator | Per-module override of `vcs` (multi-repo) |
+| `modules[].vcs` | map | — | coordinator | Per-module host, remote, base branch and PR setting. Branch shapes follow the workspace guard policy |
 | `vcs.host` | `github \| gitlab` | github | coordinator | Which CLI opens the PR or MR |
 | `vcs.remote` | string | origin | coordinator | Push target |
 | `vcs.base_branch` | string | main | coordinator, tech-lead | PR target. Never committed to |
@@ -41,7 +42,7 @@ Duplicating either one in the other is a defect.
 | `vcs.open_pr` | bool | true | coordinator | `false` means stop at a local branch |
 | `vcs.human_merge` | bool | true | — | Documentation of the constitutional rule. Not a switch |
 | `vcs.attribution` | `default \| none` | default | `pf install`, coordinator, agents | `none` = no AI trailer or line in commits or PRs; `pf install` writes `"attribution": {"commit": "", "pr": "", "sessionUrl": false}` to `.claude/settings.json` |
-| `docs.root` | path | `docs` | every agent, `pf docs-map` | Where all documentation lives (CONSTITUTION §1) |
+| `docs.root` | path | detected layout | every agent, `pf docs-map` | Where all documentation lives (CONSTITUTION §1) |
 | `docs.prd_dir`, `docs.adr_dir`, `docs.design_dir` | path | `docs/product`, `docs/adr`, `docs/design` | product-manager, tech-lead, designer | Where durable outputs land in the branch |
 | `docs.changelog` | path | `CHANGELOG.md` | engineer, release-manager | Changelog |
 | `docs.index` | path | `docs/README.md` | every agent | Link map instead of dump-reading |
@@ -58,7 +59,8 @@ Duplicating either one in the other is a defect.
 | `release.store_listing` | path | none | release-manager | Store metadata |
 | `limits.max_resumes` | int | 2 | coordinator | Engineer resumes after round 1 |
 | `limits.max_parallel_jobs` | int | 3 | coordinator | Concurrency cap |
-| `models.deep`, `models.build` | string | opus, sonnet | — | Documentation of intent. Agent frontmatter is authoritative |
+| `models.deep`, `models.build` | model ID or alias | opus, sonnet | `pf install` | Claude Code routes for deep and build roles |
+| `models.codex_deep`, `models.codex_build` | model ID | session model | `pf install` | Optional Codex model routes. Effort comes from the canonical role |
 
 ## Verification
 
@@ -72,6 +74,10 @@ protection. There is no schema validator yet (see
 Adding a key with a default is non-breaking. Renaming or removing a key, or
 changing its meaning, is breaking: bump `factory.version`, describe the
 migration in the evolution log, and update every agent that reads the key.
+
+Native model overrides stay in the descriptor. API worker routes live in the
+workspace's `.factory/model-routes.json`. Manage them with `pf providers setup`.
+[Model routing](../guide/01-getting-started.md#model-routing)
 
 <!-- documentation-routing:start -->
 ## Documentation routing

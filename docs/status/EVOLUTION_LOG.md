@@ -1,16 +1,79 @@
 # Evolution log
 
 **Status:** Active — append-only
-**Last updated:** 2026-10-19
+**Last updated:** 2026-11-10
 
 Append-only. One dated entry for each factory-level change: what changed, why,
 and its evidence.
 
-## 2026-10-20 — Inline Mermaid diagrams, Connect style
+## 2026-11-10 — Product Factory v1.0.0
+
+- Aligned the CLI package with the first release tag. The release includes a
+  Linux x86-64 binary with the project installer and stack knowledge embedded.
+- The release notes record the tested installation paths and the remaining
+  live runtime and hosted delivery checks.
+
+## 2026-11-10 — Cross-runtime installation, model routes and Graphify
+
+- Project installs generate Antigravity agents alongside Codex and Claude
+  roles. Independent modules receive their own entry points. Hermes and Gemini
+  CLI load the shared coordinator skill and project context.
+- Project routes select direct Claude, GPT and Gemini models or 9Router-compatible
+  aliases by role and effort. Setup saves model identifiers. Runtime credentials
+  come from the host environment. The fixture verified routing, missing-key
+  and authorization checks, stage ownership and artifact handoff.
+- Graphify indexes existing code and refreshes in job worktrees as source is
+  added, renamed or removed. A local fixture verified submodule separation,
+  uncommitted queries and removal of a stale graph from an empty checkout.
+
+## 2026-11-10 — Product-independent installation materials
+
+- Replaced project-specific guides, descriptor examples and test fixtures
+  with generic workspace examples. Removed project identifiers, local paths
+  and service references from the documentation and operator profile.
+
+## 2026-11-10 — Standalone project installer
+
+- The Rust build embeds the generic project kit, constitution and stack
+  library. Project installs, knowledge, audit and doctor use the bundled kit
+  when the source checkout is absent.
+- The project lock records a stable bundled revision. Personal operator
+  profiles and user-level symlinks remain checkout-based.
+- Release checks now include installing with only the binary in a clean
+  environment and attaching checksums for the platforms actually verified.
+
+## 2026-11-10 — Durable job execution and the operator board
+
+- `pf job` serializes claims from chat, issues and the backlog. It enforces
+  workspace capacity, prepares branches in the selected Git history, checks
+  module scope, and advances from artifact verdicts on a pinned commit.
+- The coordinator dispatches the native roles and uses the persisted stage and
+  round to continue a job. Review and QA rework retain prior evidence and stop
+  at the configured bound. The board adds queued items, module filtering,
+  partial reviewer progress and blocking reasons.
+- Integration fixtures verified parallel claims, separate worktrees, submodule
+  base refs, out-of-scope changes, a blocked review, rework, QA, and a gated
+  local delivery. Live runtime and hosted PR verification remain release checks.
+
+## 2026-11-10 — Workspace discovery and Codex installation
+
+- `pf audit --modules` and `pf knowledge plan --modules` discover submodules
+  and supported stack directories before adoption. Project install drafts
+  topology and docs settings, and `--modules` copies the kits to independent
+  checkouts. The coordinator and doctor flag an unreviewed descriptor.
+- The installer generates Codex custom agents and configures Claude agents
+  from the canonical role files. Deep roles use high effort and build roles
+  use medium. The descriptor can select separate models in each runtime.
+- The read-only workspace plan detected all five modules. A docs-only copy
+  verified install, local Codex skill discovery, high/medium TOML routes and
+  an idempotent knowledge import. Front-End and Product kept their handbook
+  layouts. Live jobs in both runtimes and five handbook collisions remain
+  open for the product pilot.
+
+## 2026-10-20 — Inline Mermaid diagrams
 
 - **Why.** Rendered SVGs were static, not resizable, partly dropped by IntelliJ, and
-  unreadable to agents. The operator asked for proper inline Mermaid as in the
-  Connect docs ([ADR-014](../decisions/ADR-014-inline-mermaid-diagrams.md)).
+  unreadable to agents. The operator asked for inline Mermaid ([ADR-014](../decisions/ADR-014-inline-mermaid-diagrams.md)).
 - **Change.** The seven factory diagrams are inline blocks again, rewritten without
   the constructs that broke GitHub's renderer (HTML-like labels, `<br/>`, `&`
   chaining); the pipeline is now top-down. `docs/assets/diagrams/` and
@@ -55,7 +118,7 @@ and its evidence.
   `security/` (classification, cryptography policy, transport and identity,
   threat modeling), `product/`, `cicd/` (GitFlow, approval-gated merge, pipeline
   design, supply chain, runners, deployment) and `agentic/` (factory workflow,
-  agent instructions, memory, safety, workspaces). Sources: the Connect handbooks,
+  agent instructions, memory, safety, workspaces). Sources: existing stack handbooks,
   CI/CD, security, API, deployment and governance docs, the workspace CI and
   runner docs, and the Hermes factory docs. Ktor server and iOS release are named
   as not yet gathered.
@@ -69,7 +132,7 @@ and its evidence.
   kit scaffold links through the base overlay and the pack maps.
 - **Evidence.** 26 cargo tests (new: library import with mapped links, every
   library page mapped by a pack), clippy and fmt clean, docs map strict OK.
-  Plan and import on copies of the five Connect repos: every added link resolved,
+  Plan and import on copies of five module repos: every added link resolved,
   reruns changed nothing; originals untouched.
 
 ## 2026-10-19 — Real stack knowledge, imported and merged; gap audit
@@ -78,7 +141,7 @@ and its evidence.
   asked for the stack knowledge itself to be imported where missing, and for
   existing docs to receive what they lack.
 - **Knowledge packs.** Rewrote every stack overlay with real content distilled
-  from the Connect handbooks, with Connect names removed: Spring/Kotlin (principles,
+  from generic stack practices: Spring/Kotlin (principles,
   service ownership, Kotlin rules, layers, persistence, outbox/inbox, security,
   testing policy, build/CI, cryptography by layer, samples, link map, API
   conventions), KMP/Android (principles, source sets, MVI, data and realtime,
@@ -108,14 +171,13 @@ and its evidence.
 - **Evidence.** 24 cargo tests, clippy clean, fmt clean. Knowledge tests cover
   equivalence, section matching (stems, numbering, non-ASCII), merge placement,
   link fixing, idempotence, and a link check of a fresh import for every stack.
-  Plan and import ran on copies of the five Connect repos in a temporary
+  Plan and import ran on copies of five module repos in a temporary
   directory: every added link resolved and a second run changed nothing. The
   originals were not touched.
 
-## 2026-10-19 — Knowledge structure per stack, distilled from Connect
+## 2026-10-19 — Knowledge structure per stack
 
-- Surveyed the docs of all five Connect repos and the workspace root. They
-  share a shape: `CURRENT_STATE.md`, a docs router, a numbered handbook (`00`
+- Documented a shared handbook structure: `CURRENT_STATE.md`, a docs router, a numbered handbook (`00`
   principles, `09` tools, `15` samples, `16` link map, plus stack chapters),
   architecture with a conformance ledger, ADRs, features with
   `IMPLEMENTATION_STATUS.md`, cross-project routers and sessions. Front-End
@@ -132,8 +194,8 @@ and its evidence.
   knowledge-upkeep table in the protocol, enforced by reviewer-code, with
   history entries by the engineer and release notes built from history.
 - `pf docs-map` now ignores HTML comments, and allows `CURRENT_STATE.md`,
-  `CONTRIBUTING.md` and `INSTALL.md` at the root (the Connect convention).
-- Evidence: 20 cargo tests; the read-only plan on Connect is recorded in
+  `CONTRIBUTING.md` and `INSTALL.md` at the root.
+- Evidence: 20 cargo tests; the read-only workspace plan is recorded in
   COMP-018; scratch init passes `docs-map --strict`.
 
 ## 2026-10-19 — Adopting projects that already have a process (constitution v1.2)
@@ -155,15 +217,15 @@ and its evidence.
 - The installer keeps same-named non-factory agents and skills as
   `*.pre-factory*` instead of overwriting them. `pf doctor` fails on audit
   blockers.
-- Connect audit (read-only): the branch conventions in all five repos reject
-  `factory/<job-id>`, a BLOCKER, which the Connect descriptor resolves with
+- Workspace audit (read-only): the branch conventions in all five repos reject
+  `factory/<job-id>`, a BLOCKER, which the adopted descriptor resolves with
   `{kind}/{job-id}`. Also found: Conventional Commits, no AI attribution,
   approval-triggered auto-merge (compatible), inactive `.githooks`, bypass
   switches, three rule mirrors, `CLAUDE.md` files without `.md`, Hermes
   references, and a gitignored plaintext token. The reconciliation is in
-  `docs/guide/07-workspace-connect.md`.
+  `docs/guide/07-multi-repo-workspaces.md`.
 - Evidence: 18 cargo tests and clippy clean; a scratch-repo scenario; `pf audit`
-  on the real Connect repos, with no change to them (`git status` clean).
+  on a product workspace, with no change to them (`git status` clean).
 
 ## 2026-10-19 — Sessions default to the factory; workspaces and memory
 
@@ -179,14 +241,13 @@ and its evidence.
   memory is not loaded into subagents, so knowledge left there was invisible to
   factory roles ([ADR-010](../decisions/ADR-010-session-behaviour-and-memory.md)).
 - Attribution: added `vcs.attribution: none`, and `pf install --no-ai-attribution`
-  writes Claude Code's `attribution` setting, as required by Connect's
-  no-AI-attribution rule.
+  writes Claude Code's `attribution` setting, as required by the adopted workspace’s attribution policy.
 - Added `doctor` checks for the rule, attribution, module installs, module rules,
   a `CLAUDE.md` that does not import `AGENTS.md`, and auto memory awaiting review.
-- Added the Connect walkthrough (`docs/guide/07-workspace-connect.md`) and the
-  draft descriptor (`docs/guide/examples/connect.factory.yaml`).
+- Added the workspace walkthrough (`docs/guide/07-multi-repo-workspaces.md`) and the
+  draft descriptor (`docs/guide/examples/workspace.factory.yaml`).
 - Evidence: 15 cargo tests and clippy clean; an end-to-end scratch-workspace run;
-  `pf memory` on the real Connect auto memory (read-only).
+  `pf memory` on an existing auto-memory directory (read-only).
 
 ## 2026-10-19 — All tooling ported to one Rust CLI, `pf`
 
@@ -239,7 +300,7 @@ and its evidence.
 
 ## 2026-10-19 — Documentation set aligned with the operator's repo conventions
 
-- Restructured `docs/` to match the Daria Connect repositories. Added
+- Restructured `docs/` to use a consistent repository handbook. Added
   `docs/README.md` as a router; `guide/` (getting started, commands, reading a
   job, troubleshooting, glossary, example `AGENTS.md`); `architecture/` (plus
   `JOB_LIFECYCLE.md`); `components/` (COMP-001…013 and `IMPLEMENTATION_STATUS.md`);

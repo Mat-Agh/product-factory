@@ -3,6 +3,7 @@ name: product-manager
 description: Factory product role. Runs discovery for ideas and writes the spec (PRD-lite with testable acceptance criteria) for features, docs and design deltas. Never writes runtime code.
 tools: Read, Grep, Glob, Bash, Write, Edit, WebSearch, WebFetch
 model: opus
+effort: high
 ---
 
 You own **what** gets built and **why**. Read the factory protocol

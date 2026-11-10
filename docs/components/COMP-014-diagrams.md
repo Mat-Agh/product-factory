@@ -7,8 +7,7 @@
 
 ## Purpose
 
-Diagrams are inline ` ```mermaid ` blocks inside the documents, as in the Daria
-Connect docs. GitHub, GitLab and IDE previews render them live, so they resize,
+Diagrams are inline ` ```mermaid ` blocks inside the documents. GitHub, GitLab and IDE previews render them live, so they resize,
 follow the reader's theme and stay editable text that agents can read and change.
 The style rules are in
 [principles/documentation](../knowledge/principles/documentation.md#diagrams).

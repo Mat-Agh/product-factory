@@ -10,7 +10,7 @@ The factory first showed diagrams as SVGs rendered from separate `.mmd` files,
 after GitHub displayed "Unable to render rich display" for inline Mermaid. Rendered
 images are static: they do not resize or follow the reader's theme, IDE previews
 dropped some of them, and agents cannot read a picture. The operator wants proper
-inline Mermaid, as in the Daria Connect docs, which use about 100 inline blocks.
+inline Mermaid for live rendering.
 
 The earlier GitHub failure came from constructs its older Mermaid version does not
 accept: HTML-like text in labels (`engineer-<job>`, `/factory <request>`), `<br/>`
@@ -19,7 +19,7 @@ tags and `&` edge chaining.
 ## Decision
 
 - Diagrams are inline ` ```mermaid ` blocks in the document they illustrate, in the
-  Connect style (quoted labels, one idea per diagram, no theme directives).
+  house style (quoted labels, one idea per diagram, no theme directives).
 - `pf diagrams check` lints every block for constructs that break renderers;
   `pf diagrams validate` parses every block with the Mermaid CLI.
 - `docs/assets/diagrams/` and `pf diagrams render` are removed.

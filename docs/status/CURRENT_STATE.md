@@ -1,7 +1,7 @@
 # Current repository state
 
 **Status:** Active
-**Last updated:** 2026-10-19
+**Last updated:** 2026-11-10
 
 This repository owns the Product Factory: an agentic pipeline that takes a product
 idea or request through triage, product, design, planning, build, parallel
@@ -17,16 +17,30 @@ It contains:
   template, a backlog and a local dashboard.
 - **The operator profile** (`docs/operator/USER.md`), which keeps preferences out of
   vendor memory.
-- **Adapters** for running the same roles in Hermes, Codex, Cursor and other
-  agents.
+- **Distribution:** the standalone binary carries the generic project kit
+  and stack knowledge. A Factory checkout supplies editable assets and the
+  personal operator profile for user-level links.
+- **Runtimes:** the installer generates Claude Code, Codex and Antigravity
+  roles and provides a shared project skill for Hermes and Gemini CLI.
+  Workspaces can route independent workers through Hermes to Claude, GPT,
+  Gemini or a gateway such as 9Router by task effort.
+- **Code navigation:** Graphify builds and refreshes a local graph for each
+  Git checkout and job worktree. The protocol uses it for bounded navigation.
+- **Discovery:** audit and knowledge planning can discover checked-out Git
+  submodules and stack directories without a descriptor. Project install
+  drafts a descriptor and can install both kits into independent modules.
 - **Tooling:** one Rust CLI, `pf` (`cli/`). It covers the guard hook, docs map,
   diagrams, installer (project copy or user symlinks), doctor, mirror and bundle
   backups, memory export, and the dashboard server. There is no Python and no
   bash script.
+- **Job control:** `pf job` serializes intake, creates an isolated worktree per
+  job, verifies module scope and advances only on the required artifacts. The
+  coordinator uses the installed native role dispatcher. The local board
+  shows queued requests, module filters, review rounds and evidence.
 - **Session integration:** an always-on rule makes every Claude session in a
   factory repo, or in a module of a factory workspace, route change requests
   through `/factory`. Module kits and path-scoped module rules cover multi-repo
-  workspaces such as Daria Connect, and `/factory memory` promotes auto memory
+  workspaces, and `/factory memory` promotes auto memory
   into git.
 - **Adoption:** `pf audit` and `/factory adopt` take over a project that already
   has its own process. The factory keeps that process, configures itself to obey
@@ -49,9 +63,9 @@ It contains:
   (this page, implementation status, roadmap, evolution log), adapters and the
   operator profile. Diagrams are inline Mermaid blocks, linted and parsed by `pf diagrams`.
 
-**Verification state:** `pf` passes its 28 cargo tests (including the 80 guard
-policy cases) and matches the Python tools it replaced. Every subcommand has
-run end to end on scratch setups. The docs map and diagram checks pass. **No job has run end to end
+**Verification state:** CLI tests include scratch worktree runs, Graphify
+updates and provider dispatch with a synthetic credential. Paid provider
+calls and live Antigravity dispatch are pending. **No job has run end to end
 on a real product yet.** That is the Phase 1 exit criterion. Details:
 [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md).
 

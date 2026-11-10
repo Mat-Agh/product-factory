@@ -9,8 +9,8 @@ use std::sync::LazyLock;
 use regex::Regex;
 use serde_json::{Value, json};
 
-use crate::descriptor;
 use crate::util::{self, say, warn};
+use crate::{bundle, descriptor, discovery, graph, rules, runtime};
 
 /// The hook command. It fails closed: without `pf` on PATH every Bash call is blocked
 /// with an install hint, rather than silently running unguarded.
@@ -25,7 +25,8 @@ static ROUTING: LazyLock<Regex> = LazyLock::new(|| {
 });
 
 pub fn revision(factory: &Path) -> String {
-    util::output("git", &["rev-parse", "--short", "HEAD"], Some(factory))
+    bundle::revision(factory)
+        .or_else(|| util::output("git", &["rev-parse", "--short", "HEAD"], Some(factory)))
         .unwrap_or_else(|| "unknown".into())
 }
 
@@ -169,15 +170,18 @@ pub fn merge_attribution(settings: &Path) -> Result<String, String> {
 
 /// The Claude Code side of an install: the /factory skill with the constitution, the
 /// agents, the always-on factory rule, the guard hook and the attribution policy.
-fn install_claude_kit(factory: &Path, root: &Path, attribution_none: bool) -> Result<(), String> {
+fn install_claude_kit(
+    factory: &Path,
+    root: &Path,
+    roles: &[runtime::Role],
+    attribution_none: bool,
+) -> Result<(), String> {
     let kit = kit(factory);
     let skill = root.join(".claude/skills/factory");
     if skill.exists() {
         let ours =
             fs::read_to_string(skill.join("SKILL.md")).is_ok_and(|t| t.contains("Product Factory"));
-        if ours {
-            fs::remove_dir_all(&skill).map_err(|e| e.to_string())?;
-        } else {
+        if !ours {
             // Never destroy someone else's skill that happens to share the name.
             let keep = root.join(".claude/skills/factory.pre-factory");
             fs::rename(&skill, &keep).map_err(|e| e.to_string())?;
@@ -193,9 +197,8 @@ fn install_claude_kit(factory: &Path, root: &Path, attribution_none: bool) -> Re
     fs::write(&constitution, shipped_constitution(&text)).map_err(|e| e.to_string())?;
     let agents_dir = root.join(".claude/agents");
     fs::create_dir_all(&agents_dir).map_err(|e| e.to_string())?;
-    let agents = agent_files(factory);
-    for a in &agents {
-        let dst = agents_dir.join(a.file_name().unwrap());
+    for role in roles {
+        let dst = agents_dir.join(&role.filename);
         let foreign = fs::read_to_string(&dst).is_ok_and(|t| !t.contains("description: Factory"));
         if foreign {
             let keep = dst.with_extension("pre-factory.md");
@@ -205,7 +208,7 @@ fn install_claude_kit(factory: &Path, root: &Path, attribution_none: bool) -> Re
                 keep.display()
             ));
         }
-        fs::copy(a, &dst).map_err(|e| e.to_string())?;
+        fs::write(&dst, &role.claude).map_err(|e| e.to_string())?;
     }
     let rules_dir = root.join(".claude/rules");
     fs::create_dir_all(&rules_dir).map_err(|e| e.to_string())?;
@@ -217,7 +220,7 @@ fn install_claude_kit(factory: &Path, root: &Path, attribution_none: bool) -> Re
     .map_err(|e| e.to_string())?;
     say(format!(
         "copied the /factory skill (with the constitution), {} agents and the always-on factory rule",
-        agents.len()
+        roles.len()
     ));
     remove_legacy(
         &root.join(".claude/hooks/factory-guard.py"),
@@ -233,7 +236,7 @@ fn install_claude_kit(factory: &Path, root: &Path, attribution_none: bool) -> Re
 
 /// Install into a module repo of a multi-repo workspace: the Claude Code kit only, so a
 /// session opened inside the module also runs under the factory. The workspace keeps the
-/// descriptor, backlog and job state; the module's own AGENTS.md and CLAUDE.md are untouched.
+/// descriptor, backlog and job state. Existing module instructions are preserved.
 pub fn module(factory: &Path, target: &Path, workspace: &Path, no_attribution: bool) -> i32 {
     let root = util::absolute(target);
     let ws = util::absolute(workspace);
@@ -258,10 +261,13 @@ pub fn module(factory: &Path, target: &Path, workspace: &Path, no_attribution: b
         return 1;
     }
     let rel = util::rel(&ws, &root);
-    if !d.modules.iter().any(|m| {
-        m.get("path")
-            .is_some_and(|p| p.trim_end_matches('/') == rel)
-    }) {
+    if root == ws
+        || !discovery::local_path(&ws, Path::new(&rel))
+        || !d.modules.iter().any(|m| {
+            m.get("path")
+                .is_some_and(|p| p.trim_end_matches('/') == rel)
+        })
+    {
         warn(format!(
             "{rel} is not listed under modules: in the workspace descriptor; add it first"
         ));
@@ -272,10 +278,11 @@ pub fn module(factory: &Path, target: &Path, workspace: &Path, no_attribution: b
         revision(factory),
         ws.display()
     );
-    if let Err(e) = install_claude_kit(factory, &root, d.attribution_none() || no_attribution) {
+    if let Err(e) = install_runtimes(factory, &root, &d, no_attribution) {
         warn(e);
         return 1;
     }
+    graph::install(&root);
     println!(
         "Done. Nothing was committed. Sessions opened in {rel} now use the workspace factory."
     );
@@ -284,9 +291,180 @@ pub fn module(factory: &Path, target: &Path, workspace: &Path, no_attribution: b
 
 const RULE: &str = ".claude/rules/product-factory.md";
 
-pub fn project(factory: &Path, target: &Path, no_attribution: bool) -> i32 {
+fn install_runtimes(
+    factory: &Path,
+    root: &Path,
+    d: &descriptor::Descriptor,
+    no_attribution: bool,
+) -> Result<(), String> {
+    let roles = runtime::roles(factory, d)?;
+    let paths = [
+        ".claude/settings.json",
+        ".claude/skills/factory/SKILL.md",
+        ".claude/skills/factory/protocol.md",
+        ".claude/skills/factory/CONSTITUTION.md",
+        ".claude/skills/factory.pre-factory",
+        RULE,
+    ];
+    for relative in paths
+        .into_iter()
+        .map(PathBuf::from)
+        .chain(roles.iter().flat_map(|role| {
+            let file = Path::new(".claude/agents").join(&role.filename);
+            [file.with_extension("pre-factory.md"), file]
+        }))
+    {
+        if !discovery::local_path(root, &relative) {
+            return Err(format!(
+                "Unsafe install path: {}",
+                root.join(relative).display()
+            ));
+        }
+    }
+    install_entrypoints(factory, root)?;
+    runtime::install_shared(factory, root, &roles)?;
+    install_claude_kit(
+        factory,
+        root,
+        &roles,
+        d.attribution_none() || no_attribution,
+    )
+}
+
+fn install_entrypoints(factory: &Path, root: &Path) -> Result<(), String> {
+    const MARKER: &str = "<!-- product-factory-entrypoints -->";
+    for path in ["AGENTS.md", "CLAUDE.md"] {
+        if !discovery::local_path(root, Path::new(path)) {
+            return Err(format!(
+                "Unsafe install path: {}",
+                root.join(path).display()
+            ));
+        }
+    }
+    let agents = root.join("AGENTS.md");
+    let current = match fs::read_to_string(&agents) {
+        Ok(text) => text,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => String::new(),
+        Err(e) => return Err(e.to_string()),
+    };
+    if !current.contains(MARKER) {
+        let template = fs::read_to_string(kit(factory).join("AGENTS.factory.md"))
+            .map_err(|e| e.to_string())?;
+        let section = if current.lines().any(|l| l == "## Product Factory") {
+            template
+                .split_once(MARKER)
+                .ok_or("Missing kit entrypoints")?
+                .1
+        } else {
+            template
+                .split_once('\n')
+                .ok_or("Missing kit entrypoints")?
+                .1
+        };
+        let marker = if section.contains(MARKER) { "" } else { MARKER };
+        let sep = if current.is_empty() { "" } else { "\n\n" };
+        fs::write(agents, format!("{current}{sep}{marker}{section}")).map_err(|e| e.to_string())?;
+        say("installed Product Factory entrypoints in AGENTS.md");
+    }
+    append_entrypoint(root, "GEMINI.md", "@./AGENTS.md")?;
+    // A Hermes-specific context file takes precedence over AGENTS.md.
+    for file in [".hermes.md", "HERMES.md"] {
+        if root.join(file).is_file() {
+            append_entrypoint(
+                root,
+                file,
+                "Read AGENTS.md and follow its Product Factory entrypoint. Load the product-factory project skill before working on a change.",
+            )?;
+        }
+    }
+    if !root.join("CLAUDE.md").exists() {
+        fs::write(root.join("CLAUDE.md"), "@AGENTS.md\n").map_err(|e| e.to_string())?;
+        say("created CLAUDE.md -> @AGENTS.md");
+    }
+    Ok(())
+}
+
+fn append_entrypoint(root: &Path, name: &str, instructions: &str) -> Result<(), String> {
+    let path = root.join(name);
+    if !discovery::local_path(root, Path::new(name)) {
+        return Err(format!("Unsafe install path: {}", path.display()));
+    }
+    let current = match fs::read_to_string(&path) {
+        Ok(text) => text,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => String::new(),
+        Err(e) => return Err(e.to_string()),
+    };
+    const MARKER: &str = "<!-- product-factory-context -->";
+    if !current.contains(MARKER) && !current.lines().any(|line| line.trim() == instructions) {
+        let sep = if current.is_empty() { "" } else { "\n\n" };
+        fs::write(path, format!("{current}{sep}{MARKER}\n{instructions}\n"))
+            .map_err(|e| e.to_string())?;
+    }
+    Ok(())
+}
+
+/// Draft topology and knowledge settings. Adoption supplies VCS and process rules.
+fn draft_descriptor(factory: &Path, root: &Path) -> Result<String, String> {
+    let template = fs::read_to_string(kit(factory).join(".factory/factory.yaml"))
+        .map_err(|e| e.to_string())?;
+    let (roots, missing) = discovery::inferred_roots(root);
+    if !missing.is_empty() {
+        return Err(format!(
+            "Check out workspace modules before installing: {missing:?}"
+        ));
+    }
+    let workspace = roots.iter().filter(|p| p.join(".git").exists()).count() > 1;
+    let (before, rest) = template
+        .split_once("modules:\n")
+        .ok_or("Missing modules template")?;
+    let (_, after) = rest.split_once("\nvcs:").ok_or("Missing vcs template")?;
+    let mut out = format!("# pf: draft descriptor (review with factory init/adopt)\n{before}");
+    if workspace {
+        out = out.replacen("layout: single-repo", "layout: multi-repo", 1);
+    }
+    out.push_str("modules:\n");
+    let mut areas = std::collections::BTreeSet::new();
+    for repo in roots.iter().filter(|repo| !workspace || *repo != root) {
+        let path = util::rel(root, repo);
+        let slug: String = path
+            .chars()
+            .map(|c| {
+                if c.is_ascii_alphanumeric() || c == '-' {
+                    c.to_ascii_lowercase()
+                } else {
+                    '-'
+                }
+            })
+            .collect();
+        let mut area = if path == "." {
+            "app".into()
+        } else {
+            slug.clone()
+        };
+        let mut suffix = 2;
+        while !areas.insert(area.clone()) {
+            area = format!("{slug}-{suffix}");
+            suffix += 1;
+        }
+        if path.contains(['\r', '\n', '"', '\\']) {
+            return Err(format!(
+                "Module path cannot be represented in the descriptor: {path:?}"
+            ));
+        }
+        let stack = discovery::infer_stack(repo);
+        let docs = discovery::docs_root(repo, stack);
+        out.push_str(&format!(
+            "  - area: \"{area}\"\n    path: \"{path}\"\n    owner_role: engineer\n    agents_md: AGENTS.md\n    stack: {stack}\n    docs_root: {docs}\n    gates: see AGENTS.md\n    tests: yes # verify\n"
+        ));
+    }
+    out.push_str("\nvcs:");
+    out.push_str(after);
+    Ok(out)
+}
+
+pub fn project(factory: &Path, target: &Path, no_attribution: bool, modules: bool) -> i32 {
     let root = util::absolute(target);
-    if util::output("git", &["rev-parse", "--show-toplevel"], Some(&root)).is_none() {
+    if !root.join(".git").exists() || util::git_root(&root) != root {
         warn(format!("{} is not a git repo", root.display()));
         return 1;
     }
@@ -296,15 +474,64 @@ pub fn project(factory: &Path, target: &Path, no_attribution: bool) -> i32 {
         revision(factory),
         root.display()
     );
-    let step = || -> Result<(), String> {
-        let attribution_none = descriptor::find(&root)
-            .filter(|d| d.root == root)
-            .is_some_and(|d| d.attribution_none());
-        install_claude_kit(factory, &root, attribution_none || no_attribution)?;
-
+    let step = || -> Result<Vec<PathBuf>, String> {
         let fdir = root.join(".factory");
+        for path in [
+            ".factory/factory.yaml",
+            ".factory/backlog.md",
+            ".factory/dashboard.html",
+            ".factory/installed.lock",
+            ".gitignore",
+            "AGENTS.md",
+            "CLAUDE.md",
+        ] {
+            if !discovery::local_path(&root, Path::new(path)) {
+                return Err(format!(
+                    "Unsafe install path: {}",
+                    root.join(path).display()
+                ));
+            }
+        }
+        let config = fdir.join("factory.yaml");
+        let (text, draft) = match fs::read_to_string(&config) {
+            Ok(text) => (text, false),
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+                (draft_descriptor(factory, &root)?, true)
+            }
+            Err(e) => return Err(e.to_string()),
+        };
+        let d = descriptor::parse(&text);
+        let mut children = Vec::new();
+        if modules && d.multi_repo() {
+            if d.modules.iter().any(|m| !m.contains_key("path")) {
+                return Err("Descriptor module has no path".into());
+            }
+            let (targets, missing) = if draft {
+                discovery::inferred_roots(&root)
+            } else {
+                discovery::roots(&root, true)
+            };
+            if !missing.is_empty() {
+                return Err(format!(
+                    "Check out workspace modules before installing: {missing:?}"
+                ));
+            }
+            children.extend(
+                targets
+                    .into_iter()
+                    .filter(|p| p != &root && p.join(".git").exists() && util::git_root(p) == *p),
+            );
+        }
+        install_runtimes(factory, &root, &d, no_attribution)?;
+
         fs::create_dir_all(&fdir).map_err(|e| e.to_string())?;
-        for f in ["factory.yaml", "backlog.md"] {
+        if draft {
+            fs::write(&config, text).map_err(|e| e.to_string())?;
+            say("created a draft .factory/factory.yaml (review with factory init/adopt)");
+        } else {
+            say("kept existing .factory/factory.yaml");
+        }
+        for f in ["backlog.md"] {
             if fdir.join(f).exists() {
                 say(format!("kept existing .factory/{f}"));
             } else {
@@ -336,24 +563,12 @@ pub fn project(factory: &Path, target: &Path, no_attribution: bool) -> i32 {
             say("added .factory/jobs/ to .gitignore");
         }
 
-        let agents_md = root.join("AGENTS.md");
-        let current = fs::read_to_string(&agents_md).unwrap_or_default();
-        if current.lines().any(|l| l.starts_with("## Product Factory")) {
-            say("AGENTS.md already has the Product Factory section");
+        let source = if bundle::revision(factory).is_some() {
+            bundle::SOURCE_URL.into()
         } else {
-            let section =
-                fs::read_to_string(kit.join("AGENTS.factory.md")).map_err(|e| e.to_string())?;
-            let section: String = section.lines().skip(1).map(|l| format!("{l}\n")).collect();
-            let sep = if current.is_empty() { "" } else { "\n" };
-            fs::write(&agents_md, format!("{current}{sep}{section}")).map_err(|e| e.to_string())?;
-            say("appended the Product Factory section to AGENTS.md");
-        }
-        if !root.join("CLAUDE.md").exists() {
-            fs::write(root.join("CLAUDE.md"), "@AGENTS.md\n").map_err(|e| e.to_string())?;
-            say("created CLAUDE.md -> @AGENTS.md");
-        }
-        let source = util::output("git", &["remote", "get-url", "origin"], Some(factory))
-            .unwrap_or_else(|| factory.display().to_string());
+            util::output("git", &["remote", "get-url", "origin"], Some(factory))
+                .unwrap_or_else(|| factory.display().to_string())
+        };
         fs::write(
             fdir.join("installed.lock"),
             format!(
@@ -362,21 +577,37 @@ pub fn project(factory: &Path, target: &Path, no_attribution: bool) -> i32 {
                 util::now_utc_iso()
             ),
         )
-        .map_err(|e| e.to_string())
+        .map_err(|e| e.to_string())?;
+        if let Some(descriptor) = descriptor::find(&root).filter(|d| d.root == root) {
+            rules::sync(&descriptor).map_err(|e| e.to_string())?;
+        }
+        Ok(children)
     };
-    if let Err(e) = step() {
-        warn(e);
-        return 1;
+    let children = match step() {
+        Ok(children) => children,
+        Err(e) => {
+            warn(e);
+            return 1;
+        }
+    };
+    graph::install(&root);
+    for child in children {
+        if module(factory, &child, &root, no_attribution) != 0 {
+            return 1;
+        }
     }
     println!(
-        "Done. Nothing was committed. Next: open Claude Code in {}, run /factory init, review, commit.",
+        "Done. Open {} in your AI host and load the Factory coordinator for init.",
         root.display()
     );
+    println!(
+        "Claude Code: /factory init. Codex: $product-factory init. Other hosts: product-factory skill."
+    );
+    println!("Hermes: run hermes skills trust in the checkout to enable its project skill.");
+    println!("Monitor: pf job status or pf dashboard.");
     println!("Docs map: pf docs-map (add --fix to generate README links and the map).");
     if !util::has_cmd("pf") {
-        warn(
-            "pf is not on PATH: the guard hook will block Bash in this project until it is (cargo install --path cli).",
-        );
+        warn("Put pf on PATH before starting an agent session so the guard hook can run.");
     }
     0
 }

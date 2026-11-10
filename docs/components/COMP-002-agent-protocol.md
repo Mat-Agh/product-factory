@@ -5,6 +5,9 @@
 **Source:** [`kit/.claude/skills/factory/protocol.md`](../../kit/.claude/skills/factory/protocol.md)
 **Decisions:** [ADR-003](../decisions/ADR-003-files-not-conversation.md), [ADR-007](../decisions/ADR-007-truth-in-product-repo.md)
 
+Module-level documentation paths govern writes in a job worktree. The
+protocol also routes link updates through the module's documentation convention. In a shared Git history, module commands and edits use the module path inside the job worktree.
+
 ## Purpose
 
 The protocol holds the rules shared by all ten role agents, kept in one file so
@@ -39,6 +42,10 @@ A protocol change affects every agent. Re-read all ten role files for
 contradictions, and add an evolution-log entry. If the change alters how agents
 write artifacts, it is breaking: see
 [development/03-changing-the-factory.md](../development/03-changing-the-factory.md).
+
+For unfamiliar code, the protocol points agents to a bounded Graphify query
+in the job's own worktree. Agents verify graph results against the files
+and respect the assigned module boundaries.
 
 <!-- documentation-routing:start -->
 ## Documentation routing

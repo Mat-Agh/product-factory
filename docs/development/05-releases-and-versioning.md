@@ -1,7 +1,7 @@
 # 05 — Releases and versioning
 
 **Status:** Active
-**Last updated:** 2026-10-19
+**Last updated:** 2026-11-10
 
 ## Versions
 
@@ -13,18 +13,26 @@ The factory uses semantic versioning on its git tags: `vMAJOR.MINOR.PATCH`.
 | MINOR | New lane, agent, lens, command, descriptor key with a default, script |
 | PATCH | Wording, checklists, bug fixes, docs |
 
-Current: **unreleased v1** (no tag yet). The first tag, `v1.0.0`, is planned
-after the Phase 1 pilot passes.
+The first release uses the tag `v1.0.0`. See the [implementation status](../status/IMPLEMENTATION_STATUS.md) for verified features and remaining live runtime checks.
 
 ## Releasing the factory
 
 Tagging is human-only, here as everywhere.
 
 1. All gates pass ([04](04-testing-and-verification.md)).
-2. IMPLEMENTATION_STATUS is current. The evolution log has an entry headed with
-   the version.
-3. A human tags and pushes: `git tag -s vX.Y.Z -m "Product Factory vX.Y.Z" && git push origin vX.Y.Z`.
-4. Run `pf mirror push` so the tag reaches every mirror, then
+2. Review the release PR. The CLI version, implementation status and
+   evolution log must match the intended tag.
+3. Build from the reviewed commit with
+   `cargo build --release --locked --manifest-path cli/Cargo.toml`. Copy
+   the binary to a clean environment without the source checkout, verify
+   `pf --version`, install a scratch project and run its knowledge and
+   doctor checks. Repeat for every platform whose binary will be attached.
+4. After merge, a human signs and pushes the tag with
+   `git tag -s vX.Y.Z -m "Product Factory vX.Y.Z"` and
+   `git push origin vX.Y.Z`. Publish the GitHub release from that tag
+   with the verified binaries, their SHA-256 checksums, and install
+   instructions. Use the tagged checkout for source builds and user links.
+5. Run `pf mirror push` so the tag reaches every mirror, then
    `pf mirror bundle`.
 
 ## Updating products

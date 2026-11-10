@@ -22,5 +22,5 @@ Contract: [COMP-011](../components/COMP-011-adapters.md).
 - Agent guide: [AGENTS.md](../../AGENTS.md)
 - In this folder:
   - [Hermes adapter](hermes.md)
-  - [Codex, Cursor, Gemini CLI and other agents](other-agents.md)
+  - [Codex, Antigravity, Cursor, Gemini CLI and other agents](other-agents.md)
 <!-- documentation-routing:end -->

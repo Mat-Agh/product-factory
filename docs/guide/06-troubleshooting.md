@@ -57,6 +57,14 @@ find your symptom below.
 | The dashboard is empty | No jobs yet, or another `.factory/` was served | Check the folder `pf dashboard` printed |
 | Opening `dashboard.html` as a file shows nothing | Browsers block `fetch` from `file://` | Use the HTTP server |
 
+## Runtime setup
+
+If Graphify is missing, rerun `pf install project <repo> --install-graphify`
+with `uv` on PATH. If a routed role blocks, run `pf providers check` from
+the same environment as the IDE. A key set in a terminal may need to be
+inherited by the IDE at launch. For Hermes project skills, trust the checkout
+with `hermes skills trust`.
+
 <!-- documentation-routing:start -->
 ## Documentation routing
 

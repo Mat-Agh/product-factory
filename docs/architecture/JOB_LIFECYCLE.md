@@ -3,15 +3,16 @@
 **Status:** Active
 **Last updated:** 2026-10-19
 
-The executable procedure is
-[`SKILL.md`](../../kit/.claude/skills/factory/SKILL.md). This page explains
-its model: states, transitions, guards and the contracts that make the
-procedure deterministic.
+The shared coordinator procedure is
+[`SKILL.md`](../../kit/.claude/skills/factory/SKILL.md).
+[`pf job`](../../cli/src/job.rs) owns job claims, lane selection, local Git
+preparation and evidence transitions.
 
 ## State machine
 
-`job.json.stage` is the state. Only the coordinator changes it, and it does so
-only after reading an artifact's verdict.
+`job.json.stage` is the state. The coordinator invokes `pf job advance` with
+the expected stage and round. The CLI reads the exact verdicts, checks the
+worktree commit and atomically persists the result.
 
 ```mermaid
 stateDiagram-v2
@@ -62,15 +63,17 @@ stateDiagram-v2
 
 | Guard | Enforced by |
 |---|---|
-| A stage starts only after the previous artifact exists and its first line is a valid verdict | coordinator. Anything else stops the job |
-| A review round finishes only when every required lens file exists | coordinator ("wait for all"). The engineer is never resumed mid-round |
+| A stage starts only after the previous artifact exists and its first line is a valid verdict | `pf job advance`. Missing or invalid evidence leaves the stage unchanged |
+| A review round finishes only when every required lens file exists | `pf job advance` waits for valid verdicts from all required lenses on the pinned commit |
 | `resumes ≤ limits.max_resumes` (default 2) | `job.json.resumes` counter, shared by review and QA failures |
-| Concurrency ≤ `limits.max_parallel_jobs` | the coordinator counts active jobs before claiming |
-| Job ids are unique | `mkdir` without `-p` is atomic. On failure, take the next number |
-| Backlog lines are claimed once | one exact-line Edit (`- [ ]` → `- [x] … → claimed`). On failure, take the next line |
+| Concurrency ≤ `limits.max_parallel_jobs` | workspace file lock and active-job count |
+| Job ids are unique | workspace lock and monotonic numbering |
+| Backlog lines are claimed once | workspace lock. The claimed line records its job ID |
 | PRs never merge automatically | guard hook plus branch protection. The gate's best outcome is "PR open" |
 
 ## Lanes
+
+The route is enforced by `pf job prepare`. A pause can occur during setup or a stage. Human rework returns to the role that owns the blocked artifact.
 
 | Type | trivial | standard | cross-cutting |
 |---|---|---|---|
@@ -92,7 +95,7 @@ UI when the surface is `ui`.
 
 | Artifact | Writer | First line | Read by |
 |---|---|---|---|
-| `job.json` | coordinator | (JSON) | coordinator, dashboard, `/factory status` |
+| `job.json` | `pf job` | (JSON) | coordinator, dashboard, `/factory status` |
 | `triage.md` | coordinator | `# Triage:` (no verdict; triage outcome is in `job.json`) | every agent |
 | `discovery.md` | product-manager | `STATUS: READY \| BLOCKED` | product-manager (spec), designer, tech-lead |
 | `spec.md` | product-manager | `STATUS: READY \| BLOCKED` | everyone downstream |
@@ -116,7 +119,7 @@ Changing any first-line format is a **breaking change** to the factory. See
 | Resource | Scheme |
 |---|---|
 | Branch | `vcs.branch_template` (default `factory/<job-id>`; `{kind}/{job-id}` for GitFlow repos) |
-| Worktree | single repo: `<repo>/../<repo-name>-factory/<job-id>/`; multi-repo: `<workspace>/../<workspace-name>-factory/<area>/<job-id>/`, always outside the workspace |
+| Worktree | root module: `../<name>-factory/<job-id>/`; module: `../<name>-factory/<area>/<job-id>/`, outside the workspace. A module in a shared Git history uses the owning repository worktree plus the module subpath |
 | Ports | `surfaces.ui.port_base + 10·n + k`, with k = 0 engineer, 1 ux, 2 ui, 3 tester, and n = the job number |
 | Browser sessions | `<job-id>-<role>` |
 | Engineer identity | named `engineer-<job-id>` so the coordinator can resume it with `SendMessage` |

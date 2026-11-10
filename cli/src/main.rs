@@ -5,16 +5,22 @@
 
 mod audit;
 mod backup;
+mod bundle;
 mod dashboard;
 mod descriptor;
 mod diagrams;
+mod discovery;
 mod docs_map;
 mod doctor;
+mod graph;
 mod guard;
 mod install;
+mod job;
 mod knowledge;
 mod memory;
+mod providers;
 mod rules;
+mod runtime;
 mod util;
 
 use std::path::PathBuf;
@@ -30,7 +36,7 @@ use clap::{Parser, Subcommand};
 )]
 struct Cli {
     /// Product Factory checkout (default: $PRODUCT_FACTORY_HOME, an ancestor of the current
-    /// directory, or the source tree pf was built from)
+    /// directory, or the build checkout). Project commands can use the embedded kit.
     #[arg(long, global = true)]
     factory: Option<PathBuf>,
     #[command(subcommand)]
@@ -94,7 +100,7 @@ enum Cmd {
         /// Machine-readable output
         #[arg(long)]
         json: bool,
-        /// Also audit every module of a multi-repo descriptor
+        /// Also audit configured modules or discovered submodules and stack roots
         #[arg(long)]
         modules: bool,
     },
@@ -112,6 +118,20 @@ enum Cmd {
         #[arg(long)]
         json: bool,
     },
+    /// Configure or run project model routes without storing credentials
+    Providers {
+        #[arg(long, global = true)]
+        root: Option<PathBuf>,
+        #[command(subcommand)]
+        action: providers::Action,
+    },
+    /// Build or query a worktree-local Graphify code graph
+    Graph {
+        #[arg(long, global = true)]
+        root: Option<PathBuf>,
+        #[command(subcommand)]
+        action: graph::Action,
+    },
     /// Path-scoped Claude Code rules generated from the descriptor
     Rules {
         #[command(subcommand)]
@@ -119,6 +139,13 @@ enum Cmd {
         /// Folder at or below the descriptor (default: current directory)
         #[arg(long, global = true)]
         root: Option<PathBuf>,
+    },
+    /// Claim, prepare, and advance a job using its on-disk evidence
+    Job {
+        #[arg(long, global = true)]
+        root: Option<PathBuf>,
+        #[command(subcommand)]
+        action: job::Action,
     },
     /// Serve a product's .factory/ folder so dashboard.html can show live jobs (loopback only)
     Dashboard {
@@ -143,13 +170,28 @@ enum InstallCmd {
     /// Copy the kit into a product repo (or a multi-repo workspace root) for you to commit there
     Project {
         path: PathBuf,
+        /// Provision the pinned Graphify CLI with uv if it is missing
+        #[arg(long)]
+        install_graphify: bool,
         /// Hide AI attribution in commits and PRs (same as vcs.attribution: none)
         #[arg(long)]
         no_ai_attribution: bool,
+        /// Also install independent workspace modules (the default)
+        #[arg(long, conflicts_with = "root_only")]
+        modules: bool,
+        /// Install only the workspace root
+        #[arg(long)]
+        root_only: bool,
+        /// Ask for project model routes after installing the project
+        #[arg(long)]
+        configure_models: bool,
     },
     /// Install into one module repo of a multi-repo workspace, so sessions opened there use the factory
     Module {
         path: PathBuf,
+        /// Provision the pinned Graphify CLI with uv if it is missing
+        #[arg(long)]
+        install_graphify: bool,
         /// The workspace folder that holds .factory/factory.yaml
         #[arg(long)]
         workspace: PathBuf,
@@ -178,13 +220,13 @@ enum KnowledgeCmd {
     Plan {
         #[arg(long)]
         root: Option<PathBuf>,
-        /// Override the stack (default: descriptor module `stack`, else generic)
+        /// Override the stack (default: descriptor module `stack`, else manifest detection)
         #[arg(long)]
         stack: Option<String>,
-        /// Override the docs root (default: module `docs_root`, else docs)
+        /// Override the docs root (default: module `docs_root`, else existing layout)
         #[arg(long)]
         docs: Option<String>,
-        /// Also every module of a multi-repo descriptor
+        /// Also configured modules or discovered submodules and stack roots
         #[arg(long)]
         modules: bool,
     },
@@ -227,6 +269,20 @@ fn factory(cli_factory: &Option<PathBuf>) -> Result<PathBuf, i32> {
     })
 }
 
+fn kit_source(cli_factory: &Option<PathBuf>) -> Result<bundle::Source, i32> {
+    bundle::Source::resolve(cli_factory.as_deref()).map_err(|e| {
+        eprintln!("pf: {e}");
+        2
+    })
+}
+
+fn provision_graphify() -> Result<(), i32> {
+    graph::provision().map_err(|e| {
+        util::warn(e);
+        1
+    })
+}
+
 fn run(cli: Cli) -> Result<i32, i32> {
     Ok(match cli.cmd {
         Cmd::Guard { self_test: false } => guard::main(),
@@ -249,24 +305,68 @@ fn run(cli: Cli) -> Result<i32, i32> {
             diagrams::main(root, matches!(action, DiagramCmd::Validate))
         }
         Cmd::Install { target } => {
-            let f = factory(&cli.factory)?;
+            let source;
+            let checkout;
+            let f = if matches!(target, InstallCmd::User { .. } | InstallCmd::All { .. }) {
+                checkout = factory(&cli.factory)?;
+                checkout.as_path()
+            } else {
+                source = kit_source(&cli.factory)?;
+                source.path()
+            };
             match target {
                 InstallCmd::Project {
                     path,
                     no_ai_attribution,
-                } => install::project(&f, &path, no_ai_attribution),
+                    modules: _,
+                    root_only,
+                    install_graphify,
+                    configure_models,
+                } => {
+                    if install_graphify {
+                        provision_graphify()?;
+                    }
+                    let result = install::project(f, &path, no_ai_attribution, !root_only);
+                    if result == 0
+                        && (configure_models || providers::first_interactive_setup(&path))
+                    {
+                        providers::main(
+                            Some(path),
+                            providers::Action::Setup {
+                                build: None,
+                                deep: None,
+                                economy: None,
+                            },
+                        )
+                    } else {
+                        if result == 0 {
+                            println!(
+                                "Optional API routing: pf providers setup (native sign-in stays in your AI host)."
+                            );
+                        }
+                        result
+                    }
+                }
                 InstallCmd::Module {
                     path,
                     workspace,
                     no_ai_attribution,
-                } => install::module(&f, &path, &workspace, no_ai_attribution),
-                InstallCmd::User { with_guard } => install::user(&f, with_guard),
+                    install_graphify,
+                } => {
+                    if install_graphify {
+                        provision_graphify()?;
+                    }
+                    install::module(f, &path, &workspace, no_ai_attribution)
+                }
+                InstallCmd::User { with_guard } => install::user(f, with_guard),
                 InstallCmd::All { path, with_guard } => {
-                    install::user(&f, with_guard).max(install::project(&f, &path, false))
+                    install::user(f, with_guard).max(install::project(f, &path, false, true))
                 }
             }
         }
-        Cmd::Doctor { project } => doctor::main(&factory(&cli.factory)?, project.as_deref()),
+        Cmd::Doctor { project } => {
+            doctor::main(kit_source(&cli.factory)?.path(), project.as_deref())
+        }
         Cmd::Mirror { action } => {
             let f = factory(&cli.factory)?;
             match action {
@@ -275,18 +375,22 @@ fn run(cli: Cli) -> Result<i32, i32> {
                 MirrorCmd::Bundle { dir } => backup::mirror_bundle(&f, dir),
             }
         }
+        Cmd::Providers { root, action } => providers::main(root, action),
+        Cmd::Graph { root, action } => graph::main(root, action),
+        Cmd::Job { root, action } => job::main(root, action),
         Cmd::Export => backup::export(&factory(&cli.factory)?),
         Cmd::Dashboard { dir, port } => dashboard::main(dir, port),
         Cmd::Audit {
             path,
             json,
             modules,
-        } => audit::main(path, json, modules),
+        } => audit::main(kit_source(&cli.factory)?.path(), path, json, modules),
         Cmd::Knowledge { action } => {
-            let f = factory(&cli.factory)?;
+            let source = kit_source(&cli.factory)?;
+            let f = source.path();
             match action {
                 KnowledgeCmd::Stacks => {
-                    for s in knowledge::stacks(&f) {
+                    for s in knowledge::stacks(f) {
                         println!("{s}");
                     }
                     0
@@ -296,14 +400,14 @@ fn run(cli: Cli) -> Result<i32, i32> {
                     stack,
                     docs,
                     modules,
-                } => knowledge::main_plan(&f, root, stack, docs, modules, false, false),
+                } => knowledge::main_plan(f, root, stack, docs, modules, false, false),
                 KnowledgeCmd::Init {
                     root,
                     stack,
                     docs,
                     modules,
                     files_only,
-                } => knowledge::main_plan(&f, root, stack, docs, modules, true, files_only),
+                } => knowledge::main_plan(f, root, stack, docs, modules, true, files_only),
             }
         }
         Cmd::Memory { root, json } => memory::main(root, json),

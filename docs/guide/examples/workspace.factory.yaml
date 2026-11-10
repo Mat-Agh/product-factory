@@ -1,14 +1,15 @@
-# Product Factory descriptor for the Daria Connect workspace ($HOME/Work/Connect).
-# Copy to ~/Work/Connect/.factory/factory.yaml after `pf install project ~/Work/Connect`,
-# then check every `# verify` line against the live repos. See docs/guide/07-workspace-connect.md.
+# pf: draft descriptor (review with factory init/adopt)
+# Example Product Factory descriptor for an independent-checkout workspace.
+# Copy to ~/Work/MyWorkspace/.factory/factory.yaml after `pf install project ~/Work/MyWorkspace`,
+# then check every `# verify` line against the live repos. See docs/guide/07-multi-repo-workspaces.md.
 
 factory:
   version: 1
   source: https://github.com/Mat-Agh/product-factory
 
 product:
-  name: Daria Connect
-  one_liner: Self-hosted team communication for organisations, with a vendor Federation plane.   # verify
+  name: Example Workspace
+  one_liner: Example product with web, service, mobile and planning modules.   # verify
   locales: [en, fa]
   themes: [dark, light]
 
@@ -17,51 +18,44 @@ workspace_root: .                 # the GitHub workspace; it holds gitlinks only
 
 modules:
   - area: product
-    path: Daria-Connect-Product
+    path: planning
     stack: product-docs
-    docs_root: product            # Product keeps its docs under product/
+    docs_root: product            # The handbook is separately rooted at development/
+    docs: { prd_dir: product/requirements, adr_dir: product/decisions, design_dir: design }
     owner_role: product-manager   # PRDs, packets, business docs; no runtime code
     agents_md: AGENTS.md
     gates: see AGENTS.md
     tests: no
   - area: frontend
-    path: Daria-Connect-Front-End
+    path: web
     stack: typescript-web
     docs_root: doc
-    owner_role: engineer          # customer Dashboard + vendor Federation Dashboard
+    owner_role: engineer
     agents_md: AGENTS.md
     gates: see AGENTS.md (Quality gate)
     tests: yes                    # verify
   - area: backend
-    path: Daria-Connect-Back-End
+    path: api
     stack: spring-kotlin-service
     docs_root: docs
-    owner_role: engineer          # customer self-hosted services and installer
+    owner_role: engineer
     agents_md: AGENTS.md
     gates: see AGENTS.md (Required review gate)
-    tests: no                     # no-unit/in-process-test policy
+    tests: no                     # example project policy
   - area: client
-    path: Daria-Connect
+    path: mobile
     stack: kmp-android-client
     docs_root: docs
-    owner_role: engineer          # Android/KMP member client; call it Client, never Frontend
+    owner_role: engineer
     agents_md: AGENTS.md
     gates: see AGENTS.md
     tests: yes                    # verify
-  - area: federation
-    path: Daria-Connect-Federation
-    stack: spring-kotlin-service
-    docs_root: docs
-    owner_role: engineer          # vendor Registry, OAuth, Administration; never shipped to customers
-    agents_md: AGENTS.md
-    gates: see AGENTS.md (Quality gate)
-    tests: no                     # no-unit/in-process-test policy
 
 vcs:
-  host: gitlab                    # gitrnd.dariarnd.ir; glab must be logged in to that host
+  host: gitlab
   remote: origin
   base_branch: develop            # factory MRs target each child's develop; humans approve and merge
-  branch_template: "{kind}/{job-id}"   # Connect hooks and CI accept only GitFlow names: feature/, fix/, docs/, chore/ …
+  branch_template: "{kind}/{job-id}"   # example GitFlow naming
   branch_kinds: { feature: feature, bug: fix, design: feature, docs: docs, chore: chore, spike: docs, idea: docs, release: chore }
   commit_convention: conventional   # ciValidateGitConventions: type(scope)!: lowercase subject
   open_pr: true
@@ -70,15 +64,15 @@ vcs:
 
 docs:
   root: docs                      # Front-End uses doc/: run `pf docs-map --docs doc` there
-  prd_dir: docs/product           # verify against Daria-Connect-Product's layout
+  prd_dir: docs/prd               # verify in the owning software checkout before writing
   adr_dir: docs/decisions
   design_dir: docs/design
   changelog: CHANGELOG.md
   index: docs/README.md
 
 design:
-  source: figma:7dFw79xlDSW27YSsFosBaO
-  require_source: true            # designer stops when a frame is missing; never invents pixels
+  source: repo
+  require_source: false            # designer stops when a frame is missing; never invents pixels
 
 surfaces:
   ui:

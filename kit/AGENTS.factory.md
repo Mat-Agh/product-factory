@@ -6,15 +6,6 @@ This repo is run by the [Product Factory](https://github.com/Mat-Agh/product-fac
 Its descriptor is `.factory/factory.yaml`, and its rules are in
 `.claude/skills/factory/CONSTITUTION.md`.
 
-- **Claude Code:** `/factory <request>` runs the whole pipeline (triage → spec →
-  design → plan → build → review lenses → QA → gate → PR). See
-  `.claude/skills/factory/SKILL.md`.
-- **Any other agent (Codex, Cursor, Gemini, Hermes):** act as one role at a time.
-  Read `.claude/skills/factory/protocol.md`, then the role file
-  `.claude/agents/<role>.md`, and follow it exactly. Roles are
-  `product-manager`, `designer`, `tech-lead`, `engineer`, `reviewer-code`,
-  `reviewer-security`, `reviewer-ux`, `reviewer-ui`, `tester` and
-  `release-manager`. Job state lives in `.factory/jobs/<job-id>/`.
 - **Documentation:** all docs live under `docs/`, one folder per area, each
   with a `README.md`. After adding or moving a doc, run
   `pf docs-map --fix`, which regenerates the README links and
@@ -36,3 +27,21 @@ The factory needs these sections to exist in this file:
   module forbids (for example "no unit tests").
 - **Conventions**: architecture rules, living samples to copy, naming.
 - **Docs map**: which doc to read for which area.
+
+
+<!-- product-factory-entrypoints -->
+
+### Product Factory in your AI session
+
+For a change request, load the coordinator before editing. Use `/factory` in
+Claude Code or `$product-factory` in Codex. In Hermes, Antigravity or Gemini CLI, load the
+`product-factory` project skill from `.agents/skills/`. In an IDE that only
+loads this file, read `.claude/skills/factory/SKILL.md` directly. For status,
+use `pf job status` or open the local board with `pf dashboard`. When a Factory
+coordinator assigns you a role for an existing job, follow that role’s
+handoff and write its assigned artifact.
+
+In a workspace module, locate the parent workspace descriptor before claiming
+a job. Follow the installed constitution and protocol referenced by the
+coordinator. Codex role definitions are in `.codex/agents/factory-*.toml`.
+For configured API workers, follow the coordinator's model routing procedure.

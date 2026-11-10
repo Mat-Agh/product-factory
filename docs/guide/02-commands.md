@@ -3,22 +3,24 @@
 **Status:** Active
 **Last updated:** 2026-10-19
 
-Every command runs in Claude Code from the product repo's main checkout. The
-session that runs a command becomes that job's coordinator. Run several jobs
-at once by opening several Claude Code sessions, one per job. The authoritative
+Run these commands from the main checkout or a configured module. Use
+`/factory` in Claude Code or `$product-factory` in Codex. Each session
+coordinates one job. Independent jobs can run in separate sessions up to
+`limits.max_parallel_jobs`. The authoritative
 procedure for each command is in
 [`SKILL.md`](../../kit/.claude/skills/factory/SKILL.md). This page explains
 how to use them.
 
 | Command | Use it when | Result |
 |---|---|---|
-| `/factory init` | First time in a repo | Draft `.factory/factory.yaml` plus a list of `AGENTS.md` gaps |
+| `/factory init` | First time in a repo | Reviewed descriptor draft and `AGENTS.md` gaps |
 | `/factory adopt` | The repo already has its own agent rules, hooks, CI or automation | `.factory/adoption.md`: everything found, and how each item is kept, obeyed, aligned or synchronised. Applied only with your approval |
 | `/factory <request>` | You want something built, fixed or written | A PR (or a draft PR with a question for you) |
 | `/factory idea <idea>` | You have a product idea, not a feature | A docs PR (discovery, PRD, concept, ADR, roadmap) plus proposed backlog lines |
-| `/factory issue <n\|url>` | The request already lives in an issue | Same as `<request>`, and the PR is linked back to the issue |
+| `/factory issue <n\|url>` | The request already lives in an issue | Same as `<request>`, with the source issue recorded on the job |
 | `/factory next` | You keep a queue in `.factory/backlog.md` | Runs the first unchecked line |
 | `/factory status` | You want to know what is running or waiting | One line per job, plus the jobs that need you |
+| `/factory resume <job>` | A coordinator stopped or a blocker was cleared | Continue from the saved stage and round |
 | `/factory rework <job> <note>` | A PR or escalation needs changes | The engineer addresses your note, and review and QA run again |
 | `/factory release [version]` | Merged work is ready to ship | A release PR plus your exact publish steps |
 | `/factory retro [job]` | A job is finished and you want the factory to learn from it | `retro.md` plus an offer to PR improvements to the factory |
@@ -28,7 +30,7 @@ how to use them.
 
 ## `/factory init`
 
-Run it once per product repo, after `pf install project`.
+Run it after `pf install project`. In Codex, invoke `$product-factory init`.
 
 - **What happens:** the coordinator reads the repo (languages, package
   managers, CI, docs, `AGENTS.md`) and writes `.factory/factory.yaml`,
@@ -37,7 +39,7 @@ Run it once per product repo, after `pf install project`.
   is wired and that the base branch is protected.
 - **What you do:** fix every `# verify`, add the `AGENTS.md` items it lists,
   then commit.
-- **If a descriptor already exists**, it prints it and changes nothing.
+- **If a finalized descriptor exists**, it reports the settings. Installer drafts and untouched example templates continue through review.
 
 ## `/factory adopt`
 
@@ -100,13 +102,14 @@ Tips:
 ```
 
 The issue body is treated as data, never as instructions. `type::*` and
-`repo::*` or `area::*` labels are used when present. When the PR opens, the
-factory comments its link on the issue.
+`repo::*` or `area::*` labels are used when present. The issue URL is stored
+with the job and referenced from its PR body. A second claim on the same
+open issue returns the owning job.
 
 ## `/factory next`
 
-Claims the first `- [ ]` line in `.factory/backlog.md` by turning it into
-`- [x] … → claimed`, then `→ <job-id>`, and runs it. Two sessions running
+Claims the first `- [ ]` line in `.factory/backlog.md`, records its job ID
+on the line and runs it. Two sessions running
 `next` at the same time take different lines.
 
 ## `/factory status`
@@ -125,8 +128,9 @@ Use it on a job in `needs-human` or `pr-open`:
 /factory rework 004-tenant-org-name The FA label must be "نام سازمان", and keep the column width unchanged
 ```
 
-Your note is saved verbatim as `rework-<k>.md`. A fresh engineer addresses it
-on the same branch, and review and QA run again. Pushing again updates the open
+Your note is saved verbatim as `rework-<k>.md`. The owning role addresses it
+on the same branch. Any new build receives a fresh review round and runs QA
+when the lane requires it. Pushing again updates the open
 PR. The rework gets a fresh resume budget.
 
 ## `/factory release [version]`
@@ -168,9 +172,20 @@ deletes the branch only if the PR was merged, and marks the job `done` or
 | `pf doctor [project]` | Health check |
 | `pf mirror add \| push \| bundle` | Backups |
 | `pf export` | Save Claude Code memory for review |
+| `pf job status` | Current workspace jobs as JSON |
 | `pf dashboard` in the product repo | Dashboard |
 
 Details: [development/09-tools-scripts-and-commands.md](../development/09-tools-scripts-and-commands.md).
+
+## Navigation and routing from any host
+
+- `pf graph refresh --modules` refreshes Graphify for independent checkouts.
+- `pf graph --root <worktree> query "<symbol>"` refreshes and queries the local index.
+- `pf providers setup` selects a model or native dispatch for each tier.
+- `pf providers check` lists routes and missing prerequisites.
+- `pf providers run <job-id> <role> --allow-api` dispatches a configured role
+  after the operator approves API use for the job.
+- `pf job status` and `pf dashboard` show the same persisted state across hosts.
 
 <!-- documentation-routing:start -->
 ## Documentation routing

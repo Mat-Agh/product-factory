@@ -38,6 +38,12 @@ rm -rf "$T"
 
 ## 3. End-to-end pilot
 
+The local v1 integration fixtures run with `cargo test --release --test jobs`.
+They use disposable Git repositories and fixture verdicts to verify serialized
+backlog claims, worktree isolation, diff scope, parallel review barriers,
+rework, QA, gating and local completion. The fixtures do not call a model or
+contact a Git host.
+
 This is the only level that verifies the coordinator and agents. Run it in the
 sandbox (or on a real product, with your approval) after any change to the
 skill, protocol or agents. Phase 1 of the roadmap requires all of the following

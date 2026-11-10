@@ -1,6 +1,6 @@
 # COMP-018 — Knowledge structure per stack
 
-**Status:** Implemented — one development knowledge library (`docs/knowledge/`) imported through stack pack maps; plan and import verified on copies of the five Connect repositories, never on the originals (2026-10-20)
+**Status:** Implemented — stack pack imports verified in scratch workspaces
 **Last updated:** 2026-10-19
 **Source:** [`docs/knowledge/`](../knowledge/README.md) (the library), [`kit/knowledge/`](../../kit/knowledge/) (scaffolds and `pack.map`), [`cli/src/knowledge.rs`](../../cli/src/knowledge.rs), `/factory knowledge` in [`SKILL.md`](../../kit/.claude/skills/factory/SKILL.md), knowledge upkeep in [`protocol.md`](../../kit/.claude/skills/factory/protocol.md)
 **Rule:** [CONSTITUTION §1](../governance/CONSTITUTION.md)
@@ -15,7 +15,7 @@ Every repo the factory runs keeps the same kind of knowledge, in the same shape:
   samples;
 - what was decided, and what is built.
 
-The shape is the one already used across Daria Connect. The factory imports it
+The factory imports this structure
 wherever it is missing, adds what an existing doc lacks, keeps it true through
 every job, and refreshes the stack knowledge against upstream changes.
 
@@ -79,15 +79,25 @@ pf knowledge plan  [--root <repo>] [--stack <s>] [--docs <dir>] [--modules]
 pf knowledge init  [--root <repo>] [--stack <s>] [--docs <dir>] [--modules] [--files-only]
 ```
 
-The stack and docs root come from the descriptor (`modules[].stack`,
-`modules[].docs_root`), and flags override them. `plan` changes nothing and
-reports:
+Flags override descriptor values. Without either, the planner uses local
+Gradle, TypeScript and product handbook evidence, falling back to `generic`.
+With `--modules`, it uses the workspace descriptor or discovers checked-out
+Git submodules and stack directories with supported manifests. Same-stack
+packages inherit the nearest handbook unless they carry their own
+`AGENTS.md`. An unavailable checkout is reported before any workspace-wide
+import. Pass an explicit `--root` to target a stack directory in a shared Git
+history.
+
+New handbooks use `<docs_root>/development`. An existing flat handbook with a
+root link map stays flat. A product-docs module with its own top-level
+`development/README.md` keeps that handbook in `development/`, independently
+of the product area. `plan` reports:
 - `+` **missing**: no equivalent exists, so the file will be imported;
 - `=` **plays**: an equivalent exists under another name and covers the pack;
 - `~` **missing sections**: an existing (or equivalent) knowledge file lacks some
   of the pack's `##` sections, listed by heading;
 - `!` **numbering conflicts**: the chapter number is used for another topic.
-  Nothing is imported for these; the operator renumbers or records the mapping.
+  Resolve the filenames and update inbound links as part of adoption.
 
 An existing file is **equivalent** when it has the same path, the same chapter
 number on a shared topic word (in the handbook folder or flat in the docs root),
@@ -134,23 +144,6 @@ escalated jobs.
 | release-manager | builds release notes from `DEVELOPMENT_LOG.md` |
 | `pf audit`, `pf doctor` | report knowledge gaps per repo |
 
-## Connect today (plan and import on copies, 2026-10-20)
-
-Run against copies of the repositories' docs in a temporary directory; the
-originals were not touched.
-
-| Repo | Stack | Present | Missing (imported) | Files missing sections (merged) | Conflicts |
-|---|---|---|---|---|---|
-| Back-End | spring-kotlin-service | 33 | 37 | 8 (`api/ERRORS.md`, `02`, `03`, `04`, `05`, `07`, `08`, `09`) | 0 |
-| Federation | spring-kotlin-service | 9 | 61 | 3 (`00`, `09`, `15`) | 0 |
-| Client | kmp-android-client | 24 | 42 | 4 (`07`, `15`, `17`, acceptance) | 2 (`03`, `09` used for other topics) |
-| Front-End | typescript-web (`doc/`, flat) | 9 | 48 | 3 (`01`, `04`, `07`) | 4 (`02`, `03`, `08`, `09`) |
-| Product | product-docs (`product/`) | 16 | 37 | 0 | 0 |
-
-Most of the missing files are the cross-cutting knowledge under
-`docs/development/knowledge/`. Every link added by the import resolved, and a
-second run changed nothing.
-
 ## Known limitations
 
 - Equivalence and coverage are heuristics on file names and headings, not on
@@ -159,7 +152,18 @@ second run changed nothing.
   name and number is reported missing, and the operator maps it.
 - Merged sections are generic. They are a starting point for the docs job, not
   verified facts about the repo.
-- Templates need the factory checkout. `pf` finds it as it does for `install`.
+- The standalone binary carries the stack packs and knowledge library. A
+  Factory checkout supplies the current editable versions when available.
+
+## Local code graph
+
+Graphify indexes supported files locally using code-only extraction. The
+Factory skips its own runtime directories and indexes Git submodules
+separately. It builds during install and job preparation, refreshes after
+plan, build and release, and refreshes before a query to include uncommitted
+changes. Empty projects are indexed when supported files appear. Graphs
+live in the checkout's ignored `.factory/graphify/` directory. Source files
+and the stack handbook remain authoritative. [Graph commands](../guide/02-commands.md)
 
 <!-- documentation-routing:start -->
 ## Documentation routing

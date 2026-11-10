@@ -7,8 +7,8 @@
 
 ## Purpose
 
-Ten Claude Code subagents. Each is one markdown file with frontmatter (`name`,
-`description`, `tools`, `model`) and a body that says what it reads, what it
+Ten role definitions for Claude Code and Codex. Each is one markdown file with frontmatter (`name`,
+`description`, `tools`, `model`, `effort`) and a body that says what it reads, what it
 writes, and the exact format and verdict of its artifact. They carry nothing
 project-specific. Everything project-specific comes from the descriptor and
 `AGENTS.md`.
@@ -28,8 +28,11 @@ project-specific. Everything project-specific comes from the descriptor and
 | [tester](../../kit/.claude/agents/tester.md) | sonnet | Read, Grep, Glob, Bash, Write | repro, qa | `repro.md`, `qa.md` | `REPRODUCED…` / `VERDICT: PASS \| FAIL` |
 | [release-manager](../../kit/.claude/agents/release-manager.md) | opus | Read, Grep, Glob, Bash, Write, Edit, WebSearch, WebFetch | release | `release.md`, release files in branch | `STATUS: READY \| BLOCKED` |
 
-Model classes follow the Hermes routing: deep for thinking, planning, security
-and gating; build for execution and the routine lenses.
+Deep roles use high effort for product, design, planning, security and release.
+Build roles use medium effort for implementation, testing and the routine
+lenses. The Claude defaults are Opus and Sonnet, respectively. Codex inherits
+the session model unless the descriptor supplies its own route. The installer
+renders both runtimes from these role files.
 
 ## Separation of duties
 
@@ -52,8 +55,7 @@ installation.
 
 ## Known limitations
 
-- Every agent runs on Claude, so there is no cross-vendor review yet. A Codex
-  lens is planned ([ROADMAP](../status/ROADMAP.md) phase 5).
+- Codex custom agents inherit its session tool permissions. The role instructions carry scope and artifact restrictions.
 - UX and UI lenses depend on a browser CLI and a working dev-server section in
   `AGENTS.md`. Without them, they review by reading code only.
 

@@ -1,44 +1,25 @@
 # Hermes adapter
 
 **Status:** Active
-**Last updated:** 2026-10-19
+**Last updated:** 2026-11-10
 
-`Mat-Agh/Hermes` (`$HOME/Work/Hermes`) is the earlier implementation of the same
-philosophy on Hermes Agent, 9Router and GitLab. Use it when you want cron
-intake, Telegram control or multi-provider routing. Use Claude Code `/factory`
-when you want the officially supported runtime and parallel worktrees.
+Open the installed checkout in Hermes and run `hermes skills trust` for the
+project. Start a new session and load the `product-factory` skill. The project
+context points Hermes to the same coordinator, constitution and roles as the
+other runtimes. The session accepts work, claims jobs and monitors their
+artifacts through `pf job status` or `pf dashboard`.
+[Hermes project skills](https://hermes-agent.nousresearch.com/docs/user-guide/features/skills)
 
-## Role mapping
+Native roles can use Hermes’s `delegate_task` with the installed role file and
+Factory handoff. For cross-provider workers, configure model routes for the workspace.
+`pf providers run` starts a Hermes worker with the assigned role's canonical
+instructions, worktree and artifact path. Use a direct provider key or a
+9Router-compatible endpoint. [Model routing](../guide/01-getting-started.md#model-routing)
 
-| Product Factory agent | Hermes profile | Hermes skill |
-|---|---|---|
-| coordinator (`/factory` session) | `default` (Coordinator) | `factory-delivery`, `factory-decompose` |
-| product-manager | `product_manager` | `<slug>-pm` |
-| designer | `designer` | `<slug>-design` |
-| tech-lead (plan + gate) | `technical_lead` | `factory-tech-lead`, `factory-vcs-mr` |
-| engineer | `software_engineer <area>` | `factory-engineer-execute` |
-| reviewer-code + reviewer-security | `reviewer` | `factory-code-review` (+ built-in `security-review`) |
-| reviewer-ux + reviewer-ui | `tester` (flow/UX walk) | `factory-qa` |
-| tester | `tester` | `factory-qa` |
-| release-manager | `technical_lead` | `factory-release-readiness` |
-
-## Running a Product Factory role inside Hermes
-
-In a project where the kit is installed, start the matching profile and tell it:
-
-> Act as the Product Factory `<role>`. Read `.claude/skills/factory/protocol.md`
-> and `.claude/agents/<role>.md`, then follow them for job `<job-id>`.
-
-Both factories use the same verdict lines and job folder, so a Hermes reviewer
-can review a Claude Code build (the cross-vendor lens on the roadmap).
-
-## Converging
-
-The goal is one source of roles. The planned direction (roadmap, phase 5) is to
-generate Hermes profile `SOUL.md` files and skills from `kit/.claude/agents/*.md`,
-and to retire the duplicated Hermes role text. Until then, a rule change goes
-into `CONSTITUTION.md` first and is mirrored into Hermes `docs/06-invariants.md`
-in the same session.
+Hermes loads `SOUL.md` from its own instance or profile. Factory's
+project coordinator instructions and per-worker role prompts are scoped to the
+checkout, so opening another project uses that project's rules.
+[Hermes context files](https://hermes-agent.nousresearch.com/docs/user-guide/features/context-files)
 
 <!-- documentation-routing:start -->
 ## Documentation routing

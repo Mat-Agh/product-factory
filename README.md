@@ -42,16 +42,23 @@ expected output. Terms are explained in the
 
 ## Start on any machine or account
 
+A standalone `pf` binary can install the project kit and import stack
+handbooks. Download the Linux x86-64 binary and checksum from the
+[v1.0.0 release](https://github.com/Mat-Agh/product-factory/releases/tag/v1.0.0).
+Put `pf` on `PATH`, then run `pf install project <repo>`.
+Build from a Factory checkout with Cargo when you need a binary for a new
+platform or want to link your personal Claude Code configuration.
+
 ```bash
 git clone git@github.com:Mat-Agh/product-factory.git "$HOME/Work/ProductFactory"
 cd "$HOME/Work/ProductFactory"
 cargo install --path cli         # builds pf, the factory's Rust CLI (needs a Rust toolchain)
 pf install user                  # /factory + agents in every project, your operator profile imported
-pf install project ~/Work/MyApp  # put the kit inside a product repo (commit it there)
+pf install project ~/Work/MyApp --install-graphify
 pf doctor ~/Work/MyApp           # verify
 ```
 
-Then, in Claude Code inside the product repo:
+Then, in Claude Code inside the product repo. In Codex, invoke the same commands with `$product-factory` instead of `/factory`.
 
 ```
 /factory init                       draft .factory/factory.yaml from the repo
@@ -60,6 +67,7 @@ Then, in Claude Code inside the product repo:
 /factory issue <n|url>              same, from a GitHub/GitLab issue
 /factory next                       first unchecked line of .factory/backlog.md
 /factory status                     what is running, what needs you
+/factory resume <job>               continue a job from its saved stage
 /factory rework <job> <note>        send a job back with your feedback
 /factory release [version]          readiness brief + launch kit (release PR)
 /factory retro [job]                propose factory/AGENTS.md improvements
@@ -67,11 +75,21 @@ Then, in Claude Code inside the product repo:
 /factory clean                      remove worktrees of merged/closed jobs
 ```
 
-The dashboard is `pf dashboard`, then open
-<http://127.0.0.1:8000/dashboard.html>.
+Run `pf dashboard` and open [the local board](http://127.0.0.1:8000/).
+It shows the Markdown backlog, jobs by stage and module, review verdicts,
+artifacts and links to PRs. Submit requests through the skill, a GitHub or
+GitLab issue, or the backlog.
 
-Codex, Cursor, Gemini or Hermes can run the same roles. See
-[docs/adapters/](docs/adapters/README.md).
+A single install prepares the project for Claude Code, Codex, Antigravity,
+Hermes and Gemini CLI. Claude Code, Codex and Antigravity have generated
+native roles. Hermes can coordinate from the same project skill. All hosts
+with terminal access can use the Factory worker routes for Claude, GPT,
+Gemini or an OpenAI-compatible router such as 9Router. Run
+`pf providers setup` to choose models and `pf providers check` for local
+requirements. [Runtime setup](docs/guide/01-getting-started.md#model-routing)
+
+Graphify builds a local index when installed. Run `pf graph query "<symbol>"`
+to navigate the current checkout, including uncommitted source.
 
 ## What is where
 

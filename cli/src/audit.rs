@@ -59,6 +59,7 @@ const INSTRUCTION_FILES: &[&str] = &[
 const AGENT_DIRS: &[&str] = &[
     ".cursor/rules",
     ".codex/rules",
+    ".codex/agents",
     ".agents/rules",
     ".agents/skills",
     ".junie",
@@ -215,7 +216,7 @@ pub fn sample_branch(d: Option<&descriptor::Descriptor>) -> String {
         .replace("{job-id}", "001-sample-change")
 }
 
-pub fn audit(root: &Path) -> (Vec<Finding>, Value) {
+pub fn audit(factory: &Path, root: &Path) -> (Vec<Finding>, Value) {
     let mut f: Vec<Finding> = Vec::new();
     let mut add = |severity, area, message: String, action: &str| {
         f.push(Finding {
@@ -656,26 +657,24 @@ pub fn audit(root: &Path) -> (Vec<Finding>, Value) {
     }
 
     // 10. Knowledge structure for the module's stack.
-    if let Ok(factory) = util::factory_root(None) {
-        let t = crate::knowledge::target(root, None, None);
-        if let Ok(p) = crate::knowledge::plan(&factory, &t) {
-            let gaps = p.present.iter().filter(|x| !x.gaps.is_empty()).count();
-            if !p.missing.is_empty() || !p.conflicts.is_empty() || gaps > 0 {
-                add(
-                    Severity::Warn,
-                    "knowledge",
-                    format!(
-                        "knowledge structure ({} stack, {}/): {} present, {} missing, {} missing sections, {} numbering conflicts",
-                        t.stack,
-                        t.docs_root,
-                        p.present.len(),
-                        p.missing.len(),
-                        gaps,
-                        p.conflicts.len()
-                    ),
-                    "Initialize: pf knowledge plan shows the gaps; pf knowledge init imports missing files and appends missing sections for review (never overwrites); then adapt them in a docs job.",
-                );
-            }
+    let t = crate::knowledge::target(root, None, None);
+    if let Ok(p) = crate::knowledge::plan(factory, &t) {
+        let gaps = p.present.iter().filter(|x| !x.gaps.is_empty()).count();
+        if !p.missing.is_empty() || !p.conflicts.is_empty() || gaps > 0 {
+            add(
+                Severity::Warn,
+                "knowledge",
+                format!(
+                    "knowledge structure ({} stack, {}/): {} present, {} missing, {} missing sections, {} numbering conflicts",
+                    t.stack,
+                    t.docs_root,
+                    p.present.len(),
+                    p.missing.len(),
+                    gaps,
+                    p.conflicts.len()
+                ),
+                "Initialize: pf knowledge plan shows the gaps; pf knowledge init imports missing files and appends missing sections for review (never overwrites); then adapt them in a docs job.",
+            );
         }
     }
 
@@ -702,22 +701,17 @@ pub fn audit(root: &Path) -> (Vec<Finding>, Value) {
     (f, report)
 }
 
-pub fn main(path: Option<PathBuf>, as_json: bool, modules: bool) -> i32 {
+pub fn main(factory: &Path, path: Option<PathBuf>, as_json: bool, modules: bool) -> i32 {
     let start =
-        util::git_root(&path.unwrap_or_else(|| std::env::current_dir().unwrap_or_default()));
-    let mut roots = vec![start.clone()];
-    if modules && let Some(d) = descriptor::find(&start).filter(|d| d.multi_repo()) {
-        roots.extend(
-            d.modules
-                .iter()
-                .filter_map(|m| m.get("path"))
-                .map(|p| d.root.join(p)),
-        );
+        path.unwrap_or_else(|| util::git_root(&std::env::current_dir().unwrap_or_default()));
+    let (roots, missing) = crate::discovery::roots(&start, modules);
+    for path in &missing {
+        util::warn(format!("module unavailable: {}", path.display()));
     }
-    let mut blockers = 0;
+    let mut blockers = missing.len();
     let mut reports = Vec::new();
     for r in &roots {
-        let (f, report) = audit(r);
+        let (f, report) = audit(factory, r);
         blockers += f.iter().filter(|x| x.severity == Severity::Blocker).count();
         if !as_json {
             println!("Audit {}", r.display());

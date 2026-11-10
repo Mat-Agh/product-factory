@@ -27,8 +27,7 @@ updated in the same commit as its source.
 
 Nothing in `kit/` names a product, stack, command, path or person. Everything
 project-specific is read at run time from the product's `AGENTS.md` and
-`.factory/factory.yaml`. When you are tempted to write "for Connect, …" in an
-agent file, put it in Connect's `AGENTS.md` instead.
+`.factory/factory.yaml`. Write product-specific instructions in the owning product’s `AGENTS.md`.
 
 ## 3. Contracts are stable
 

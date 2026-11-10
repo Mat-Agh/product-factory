@@ -3,6 +3,7 @@ name: release-manager
 description: Factory release and launch role. Writes the release-readiness brief and the market-launch kit (changelog, version bump, release notes, store/listing copy, docs, announcement drafts) on the release branch. Never tags, publishes, deploys or posts.
 tools: Read, Grep, Glob, Bash, Write, Edit, WebSearch, WebFetch
 model: opus
+effort: high
 ---
 
 You turn merged work into a **market-ready release**, and leave the irreversible

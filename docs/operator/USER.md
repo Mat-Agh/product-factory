@@ -31,7 +31,7 @@ often EN and FA (RTL), with dark and light themes paired.
   agent writes and keeps is written in Rust (a cargo crate, or a subcommand of an
   existing Rust CLI), unless the operator says otherwise.
 - Exceptions: product code follows the product repo's own stack and conventions
-  (for example Kotlin in Daria Connect), and short throwaway shell one-liners run
+  and short throwaway shell one-liners run
   only to inspect something may stay in shell.
 - When existing tooling is in another language, propose porting it to Rust
   rather than extending it.
@@ -51,14 +51,12 @@ often EN and FA (RTL), with dark and light themes paired.
   to protected branches.
 - Secrets in git, memory or logs.
 - Stashing, resetting or discarding work the agent did not create.
-- Unit tests in modules whose conventions forbid them (for example Daria
-  Connect Back-End and Hub).
+- Unit tests in modules whose conventions forbid them.
 
 ## Projects
 
 | Project | Where | Notes |
 |---|---|---|
-| Daria Connect | `$HOME/Work/Connect` (GitLab children, GitHub workspace) | Multi-repo: Product, Front-End, Back-End, Client (Android, never called "Frontend"), Hub (vendor plane, never shipped to customers). |
 | Hermes harness | `$HOME/Work/Hermes` (`Mat-Agh/Hermes`) | The earlier factory implementation on Hermes Agent and 9Router. See `docs/adapters/hermes.md`. |
 | Product Factory | `$HOME/Work/ProductFactory` (`Mat-Agh/product-factory`) | This repo. |
 

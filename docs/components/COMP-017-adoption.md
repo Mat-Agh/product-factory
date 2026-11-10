@@ -1,6 +1,6 @@
 # COMP-017 — Adoption of an existing project
 
-**Status:** Implemented — `pf audit` run read-only on the real Connect root, Back-End and Front-End; reconciliation flow verified on a scratch repo (2026-10-19)
+**Status:** Implemented — reconciliation verified on a scratch repository
 **Last updated:** 2026-10-19
 **Source:** [`cli/src/audit.rs`](../../cli/src/audit.rs), `/factory adopt` in [`SKILL.md`](../../kit/.claude/skills/factory/SKILL.md), project branch policy in [`cli/src/guard.rs`](../../cli/src/guard.rs)
 **Rule:** [CONSTITUTION §8](../governance/CONSTITUTION.md)
@@ -16,7 +16,11 @@ factory's rule has to be mirrored into the product's other agent surfaces.
 
 ## `pf audit [path] [--modules] [--json]`
 
-Read-only. The exit code is 1 when any BLOCKER is found.
+The project audit uses the bundled knowledge packs when a Factory checkout
+is unavailable. The exit code is 1 when any BLOCKER is found or a requested
+module checkout is unavailable. Before a descriptor exists, `--modules`
+discovers checked-out Git submodules recursively and stack directories with supported manifests.
+Same-stack packages inherit the nearest handbook unless they carry their own `AGENTS.md`.
 
 | Area | Detects | Typical class |
 |---|---|---|
@@ -42,7 +46,7 @@ Read-only. The exit code is 1 when any BLOCKER is found.
 ## Guard additions
 
 - Blocks setting hook-bypass variables (`*SKIP*`, `HUSKY`, `LEFTHOOK`, `SKIP`)
-  around git writes. For example `DARIA_HOOK_SKIP_GRADLE=1 git push` and
+  around git writes. For example `PROJECT_HOOK_SKIP_BUILD=1 git push` and
   `export HUSKY=0; git commit`.
 - Blocks `git -c core.hooksPath=…` and changing `core.hooksPath` with `git config`.
 - Pushes and branch deletes are limited to the project's job-branch shape.
@@ -64,12 +68,10 @@ The procedure in `SKILL.md`, which is step 0 of `/factory init`:
 
 - Unit tests: branch-regex extraction for Kotlin, Python and JS, the sample
   branch from the template, the guard's template policy and bypass cases.
-- Real data (read-only): Connect root (0 blockers, 3 conflicts); Back-End and
-  Front-End (1 blocker each: branch names), matching a manual review of their
-  hooks, CI and build logic.
+- A workspace audit checked the detected module branch conventions against its descriptor.
 - Scratch repo: a foreign agent was kept as `engineer.pre-factory.md`; the
   branch template cleared the blocker; the guard allowed `feature/004-…` and
-  refused `factory/…`, other branches, `develop` and `DARIA_HOOK_SKIP_GRADLE`.
+  refused `factory/…`, other branches, `develop` and `PROJECT_HOOK_SKIP_BUILD`.
 
 ## Known limitations
 

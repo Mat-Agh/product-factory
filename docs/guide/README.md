@@ -27,7 +27,7 @@ knowledge. Unfamiliar words are defined in the [glossary](GLOSSARY.md).
 | 04 | [add-a-project](04-add-a-project.md) | Installing into single-repo and multi-repo products, and updating them |
 | 05 | [portability-and-recovery](05-portability-and-recovery.md) | Mirrors, backups, and runbooks for a lost account, laptop or vendor |
 | 06 | [troubleshooting](06-troubleshooting.md) | Symptoms, causes and fixes |
-| 07 | [workspace-connect](07-workspace-connect.md) | A multi-repo workspace under the factory, step by step (Daria Connect) |
+| 07 | [multi-repo workspaces](07-multi-repo-workspaces.md) | A multi-repo workspace under the factory, step by step |
 | — | [GLOSSARY](GLOSSARY.md) | Terms |
 | — | [examples/AGENTS.example.md](examples/AGENTS.example.md) | A filled-in product `AGENTS.md` that the factory can work with |
 
@@ -44,7 +44,7 @@ knowledge. Unfamiliar words are defined in the [glossary](GLOSSARY.md).
   - [04 — Add a project](04-add-a-project.md)
   - [05 — Portability and recovery](05-portability-and-recovery.md)
   - [06 — Troubleshooting](06-troubleshooting.md)
-  - [07 — Putting a multi-repo workspace under the factory (Daria Connect)](07-workspace-connect.md)
+  - [07 — Install Product Factory in a multi-repo workspace](07-multi-repo-workspaces.md)
   - [Glossary](GLOSSARY.md)
 - Subfolders:
   - [Examples](examples/README.md)

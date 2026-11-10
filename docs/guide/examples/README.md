@@ -10,6 +10,8 @@ well. Copy the structure and replace every command and path with your own.
 |---|---|
 | [AGENTS.example.md](AGENTS.example.md) | A product `AGENTS.md` with the Setup, Dev server, Gates, Conventions and Docs map sections the agents look for, and why each one matters |
 
+| [workspace.factory.yaml](workspace.factory.yaml) | A generic multi-repo descriptor with stack and VCS overrides |
+
 <!-- documentation-routing:start -->
 ## Documentation routing
 

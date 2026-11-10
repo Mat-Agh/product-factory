@@ -4,8 +4,7 @@
 **Last updated:** 2026-10-20
 
 General engineering knowledge that applies to any project on these stacks,
-gathered from the products built so far (the Daria Connect repositories, the
-Hermes agent harness and this factory) and written without product-specific names.
+collected from established engineering practices and written without product-specific names.
 It is the single source: `pf knowledge init` imports the parts a repository's stack
 needs ([how](#how-projects-get-it)).
 

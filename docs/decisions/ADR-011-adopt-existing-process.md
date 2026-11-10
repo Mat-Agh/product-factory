@@ -6,12 +6,12 @@
 
 ## Context
 
-Real products, Daria Connect first, arrive with a working agentic process: rule
+Established products arrive with a working agentic process: rule
 files for several tools that are kept in sync by convention, git hooks, five CI
 pipelines with approval-triggered auto-merge, strict branch and commit
 conventions, a no-AI-attribution rule, an existing issue automation (Hermes),
 and plaintext credentials in local tool config. A naive install would break
-it. Connect's conventions reject the factory's `factory/<job-id>` branches
+it. Some repositories reject the factory's `factory/<job-id>` branches
 outright, and an install could overwrite same-named agents.
 
 ## Decision
@@ -40,7 +40,7 @@ outright, and an install could overwrite same-named agents.
 - **Require projects to adopt the factory's conventions** (for example, add a
   `factory/` branch pattern everywhere). This was rejected as the default: it
   edits five repos' CI before the factory has proven itself. It remains an
-  optional later step, with precedent in Connect's `.hermes/` and `codex/`
+  optional later step, using reviewed `.hermes/` or `codex/`
   patterns.
 - **Overwrite and let git history preserve the old files.** Rejected: silent
   loss of working process, and against CONSTITUTION §6.

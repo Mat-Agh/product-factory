@@ -11,7 +11,7 @@ inside a single child of a multi-repo workspace, to use the factory without
 being told. Claude Code has two kinds of project memory. The first is
 instruction files (`CLAUDE.md`, `.claude/rules/`, `AGENTS.md`), which live in
 git. The second is auto memory (`~/.claude/projects/<project>/memory/`), which
-stays on one machine and is not loaded into subagents. In Connect, every child
+stays on one machine and is not loaded into subagents. In a multi-repo workspace, every child
 is a nested git repo, so Claude Code treats each one as its own project and
 looks for skills only up to that repo's root.
 

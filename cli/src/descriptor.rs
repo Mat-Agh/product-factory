@@ -168,12 +168,12 @@ layout: multi-repo             # comment
 workspace_root: .
 modules:
   - area: frontend
-    path: Daria-Connect-Front-End
+    path: apps/web
     gates: see AGENTS.md
     tests: yes
     vcs: { host: gitlab, base_branch: develop }
   - area: backend   # trailing
-    path: "Daria-Connect-Back-End"
+    path: "services/api"
     tests: no
 vcs:
   host: gitlab
@@ -190,10 +190,10 @@ docs:
         assert!(d.attribution_none());
         assert_eq!(d.get("factory.version"), Some("1"));
         assert_eq!(d.modules.len(), 2);
-        assert_eq!(d.modules[0]["path"], "Daria-Connect-Front-End");
+        assert_eq!(d.modules[0]["path"], "apps/web");
         assert_eq!(d.modules[0]["vcs.base_branch"], "develop");
         assert_eq!(d.modules[1]["area"], "backend");
-        assert_eq!(d.modules[1]["path"], "Daria-Connect-Back-End");
+        assert_eq!(d.modules[1]["path"], "services/api");
         assert_eq!(d.modules[1]["tests"], "no");
         assert_eq!(d.module_vcs(&d.modules[1], "host"), Some("gitlab"));
         assert_eq!(d.get("docs.root"), Some("docs"));

@@ -16,7 +16,7 @@
   changes, and anything touching production installers or signing stop and ask.
 - **Fail closed.** Missing guard, missing config, ambiguous identity: block.
 - **Local services.** Model routers and agent gateways listen on loopback, or behind
-  HTTPS with authentication; never expose them otherwise, and never connect
+  HTTPS with authentication; never expose them otherwise, and never attach
   untrusted models or messaging users.
 - **Stop and ask** on missing design sources, secrets, production installer changes,
   or anything outside the plan.

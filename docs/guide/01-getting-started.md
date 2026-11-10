@@ -11,15 +11,19 @@ should see. If you see something else, go to
 Time: about 30 minutes for setup, then 10–40 minutes for the first job,
 depending on its size.
 
+If you already have the matching `pf` binary, put it on `PATH` and use
+`pf install project <repo>`. Follow the source-build instructions below
+when building the binary or setting up the checkout-linked user profile.
+
 ## 1. What you need
 
 | Need | Why | Check |
 |---|---|---|
-| A Claude account with Claude Code access (Pro, Max, Team or Enterprise, or an API key) | Runs the agents | `claude --version` |
+| Claude Code or Codex with an available model | Runs the coordinator and installed roles | `claude auth status` or `codex login status` |
 | A GitHub (or GitLab) account | Hosts the factory repo and your product, and receives the PRs | — |
 | `git` 2.40+ | Branches and worktrees | `git --version` |
 | `gh` (GitHub CLI), or `glab` for GitLab | Opens PRs and reads issues | `gh --version` |
-| Rust toolchain (`cargo`) 1.85+ | Builds `pf`, the factory's one tool (guard hook, docs map, installer, doctor, dashboard) | `cargo --version` |
+| Rust toolchain (`cargo`) 1.89+ | Builds `pf`, the factory's one tool (guard hook, docs map, installer, doctor, dashboard) | `cargo --version` |
 | A C linker (`build-essential` on Ubuntu, Xcode tools on macOS) | Needed by `cargo` to build `pf` | `cc --version` |
 | Node.js 18+ (only if you install Claude Code with npm, or your product is a web app) | Claude Code, dev servers | `node --version` |
 | A browser-automation CLI (optional, for products with pages) | Lets the UX/UI reviewers and QA look at the running app | see step 2 |
@@ -56,7 +60,7 @@ npm install -g @anthropic-ai/claude-code
 claude          # first run opens a browser to sign in; then type /exit
 ```
 
-## 2. Connect GitHub
+## 2. Set up GitHub access
 
 ```bash
 gh auth login        # choose GitHub.com → SSH → generate or pick a key → log in with browser
@@ -122,12 +126,57 @@ gh repo create hello-factory --private --source . --remote origin --push
 Install the kit into it:
 
 ```bash
-pf install project ~/Work/hello-factory
+pf install project ~/Work/hello-factory --install-graphify
 ```
 
-The installer copies `.claude/` (skill, agents, guard hook) and `.factory/`
-(descriptor, backlog, dashboard), appends a Product Factory section to
-`AGENTS.md`, and commits nothing.
+The installer adds all project entry points and appends a Product Factory
+section to `AGENTS.md`. It drafts `.factory/factory.yaml` from the stack and
+docs layout and adds the backlog and dashboard. The installer includes independent
+checkouts by default. Use `--root-only` to limit it to the workspace root. `--install-graphify` provisions the pinned
+Graphify CLI using `uv` if needed. Run `hermes skills trust` in each checkout
+you want Hermes to trust, then reopen the project. Antigravity uses the shared
+project skill and its installed Factory subagents.
+
+## Model routing
+
+On the first terminal install, Factory asks for a model route for each tier.
+Run `pf providers setup` to revisit the choices, and `pf providers check` to
+check the local prerequisites. In automation, pass `--build`, `--deep` and
+`--economy` with the tiers you want to set. Each accepts `native` or
+`provider:model-id`.
+
+- `deep` covers product, design, tech lead, security and release roles.
+  Routed workers request high reasoning effort.
+- `build` covers engineering, QA and other review roles. Routed workers
+  request medium effort.
+- `economy` is optional and covers the code lens for trivial docs-only
+  work with no security review. Routed workers request low effort.
+
+Use model IDs or gateway aliases available on your account. Put credentials
+in the environment of the IDE or terminal that launches `pf`.
+
+| Route prefix | Local environment |
+|---|---|
+| `anthropic:` | `ANTHROPIC_API_KEY` |
+| `openai-api:` | `OPENAI_API_KEY` |
+| `gemini:` | `GEMINI_API_KEY` or `GOOGLE_API_KEY` |
+| `router:` | `PF_ROUTER_URL` and `PF_ROUTER_API_KEY` |
+
+The router endpoint can be [9Router](https://github.com/decolua/9router/blob/master/gitbook/content/en/integration/other-tools.md)
+or an OpenAI-compatible gateway that supports tool calling. For a local 9Router,
+set `PF_ROUTER_URL=http://localhost:20128/v1` and enter the tier aliases from
+its dashboard. The endpoint belongs to the machine's environment so a project
+checkout cannot redirect a key. Native sign-in is handled by each host.
+Project configuration stores model routes in `.factory/model-routes.json`.
+
+For configured routes, `pf providers run <job-id> <role> --allow-api` launches
+an independent Hermes worker in the job's module worktree. The coordinator
+supplies `--allow-api` after the operator approves billable use. The worker
+uses the installed role instructions and writes the normal stage artifact.
+`pf job advance` remains the gate. Configured routes require Hermes on PATH,
+and a missing dependency or credential blocks the role. `pf providers check`
+checks local configuration. Model entitlement, tool support and the actual
+cost depend on the provider. The worker has a turn and time limit.
 
 ## 6. Describe the product to the factory
 
@@ -147,8 +196,10 @@ cd ~/Work/hello-factory && claude
 /factory init
 ```
 
-Claude inspects the repo, fills `.factory/factory.yaml`, marks guesses with
-`# verify`, and lists anything `AGENTS.md` is missing. Fix those items, then
+In Codex, use `$product-factory init` in a new session. The coordinator verifies
+the descriptor against the repo, flags assumptions and lists gaps in
+`AGENTS.md`. Use `pf knowledge plan` to review the handbook and templates
+before importing them. Fix those items, then
 quit Claude and run:
 
 ```bash

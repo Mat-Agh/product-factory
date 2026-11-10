@@ -1,38 +1,57 @@
-# Codex, Cursor, Gemini CLI and other agents
+# Codex, Antigravity, Cursor, Gemini CLI and other agents
 
 **Status:** Active
-**Last updated:** 2026-10-19
+**Last updated:** 2026-11-10
 
 The role files are plain markdown. The Claude Code frontmatter (`name`, `tools`,
 `model`) is metadata that other agents can ignore. Any agent that reads
 `AGENTS.md` sees the Product Factory section the installer appended, and that
 section points it to the roles.
 
-## One role at a time
+## Codex
 
-There is no orchestrator outside Claude Code, so you act as the coordinator:
+Run `pf install project <repo>` to include independent workspace checkouts. In a new Codex session with the project configuration trusted,
+invoke `$product-factory init` to review the draft, or
+`$product-factory <request>` to coordinate work. The installed skill reads the
+shared coordinator and dispatches the `factory-<role>` custom agents under
+`.codex/agents/`. [Codex subagents](https://learn.chatgpt.com/docs/agent-configuration/subagents)
 
-1. Create the job by hand:
-   ```bash
-   id=001-my-change; mkdir -p .factory/jobs/$id
-   git worktree add -b factory/$id ../$(basename $PWD)-factory/$id main
-   ```
-2. Prompt the agent once per stage:
-   > You are the Product Factory `product-manager`. Read
-   > `.claude/skills/factory/protocol.md` and `.claude/agents/product-manager.md`.
-   > Job folder: `<abs>/.factory/jobs/001-my-change/`. Worktree: `<abs worktree>`.
-   > Branch: `factory/001-my-change`. Descriptor: `<abs>/.factory/factory.yaml`.
-   > Stage: spec. Request: "…".
-3. Read the artifact's first line, and pick the next stage from the lane table
-   in `.claude/skills/factory/SKILL.md`.
+Deep roles request high reasoning effort and build roles request medium. Both
+inherit the session model by default. Set `models.codex_deep` and
+`models.codex_build` to model IDs available on your configured provider,
+then reinstall the kit. The selected models must support the role's effort
+level and the runtime's tools.
 
-## Codex as a cross-vendor reviewer
+The coordinator needs an approved path for Git metadata writes during
+`pf job prepare` and commits. The job files live in the main checkout and
+the job worktree lives in a sibling directory. In a restricted session,
+use the runtime's approval prompts for the fixture or product's worktree
+and Git commands. If the runtime cannot request approval, run the reported
+`pf job prepare` command in the workspace terminal and resume the recorded
+job. Build and gate commands still need the relevant worktree permissions.
 
-After a Claude Code build round, run the code lens with a different model family:
+Use a model available on the signed-in account. Codex's model picker or
+`codex debug models` can help diagnose a stale default. The Factory descriptor
+controls optional role overrides, while the runtime selects the coordinator's
+model.
 
-```bash
-codex exec "You are the Product Factory reviewer-code. Read .claude/skills/factory/protocol.md and .claude/agents/reviewer-code.md. Job folder: … Worktree: … Branch: … Review round 1. Write review-code-codex.md instead of review-code.md."
-```
+## Antigravity
+
+The installed `AGENTS.md` and `.agents/skills/product-factory/SKILL.md` are
+discovered at the workspace. Use the Factory skill for a change. The
+coordinator can dispatch `factory-<role>` subagents generated under
+`.agents/agents/`, with Pro for deep roles and Flash for build roles, or use
+the configured cross-provider route.
+[Antigravity custom subagents](https://antigravity.google/docs/subagents?tab=cli)
+
+## Gemini CLI, Cursor and other compatible hosts
+
+Load the `product-factory` skill or follow the instructions in `AGENTS.md`.
+Use `pf job` for state and `pf providers run` for independent routed roles.
+A host needs project filesystem access and a terminal that can invoke `pf`.
+For a native role in a host without subagent dispatch, run the role from a
+separate session using the coordinator's handoff, then validate the result
+with `pf job advance`.
 
 ## Guard outside Claude Code
 

@@ -461,7 +461,7 @@ pub fn main() -> i32 {
 
 /// Commands the guard must block. Shared by `cargo test` and `pf doctor`.
 pub const BLOCK: &[&str] = &[
-    "DARIA_HOOK_SKIP_GRADLE=1 git push origin factory/001-x",
+    "PROJECT_HOOK_SKIP_BUILD=1 git push origin factory/001-x",
     "export HUSKY=0; git commit -m x",
     "git -c core.hooksPath=/dev/null commit -m x",
     "git config core.hooksPath /dev/null",

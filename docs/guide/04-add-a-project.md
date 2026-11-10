@@ -6,7 +6,9 @@
 0. **If the project already has a process** (agent rules, hooks, CI, other
    automation), audit it first: `pf audit <path>`, then `/factory adopt` after
    install. See [COMP-017](../components/COMP-017-adoption.md).
-1. **Install the kit** into the product repo:
+1. **Install the kit** into the product repo. A standalone `pf` binary
+   carries the kit, and a Factory checkout lets you test kit changes before
+   building a release:
    ```bash
    pf install project ~/Work/MyApp
    ```
@@ -16,10 +18,10 @@
    hook into `.claude/settings.json` by merging rather than overwriting, and
    commits nothing.
 
-2. **Run `/factory init`** in Claude Code inside the repo. It drafts
-   `.factory/factory.yaml` from what it finds and marks guesses with
-   `# verify`. It then lists what `AGENTS.md` is missing: setup, dev server and
-   port flag, gates, conventions, docs map.
+2. **Review the draft** with `/factory init` in Claude Code or
+   `$product-factory init` in Codex. Verify the detected stack and docs root,
+   then fill in conventions, gates and VCS settings from the project. Preview
+   the handbook import with `pf knowledge plan`.
 
 3. **Fill `AGENTS.md`** with the real commands. The agents carry nothing
    project-specific. Everything they know about the repo comes from `AGENTS.md`
@@ -34,28 +36,39 @@
    ```bash
    pf doctor ~/Work/MyApp
    ```
-   Then commit `.claude/`, `.factory/` (without `jobs/`), `AGENTS.md` and
+   Then commit `.claude/`, `.codex/agents/`, the factory skill under `.agents/`, `.factory/` (without `jobs/`), `AGENTS.md` and
    `CLAUDE.md` in the product repo yourself. A filled example of the `AGENTS.md`
    the factory needs is in [examples/AGENTS.example.md](examples/AGENTS.example.md).
 
-6. **Pilot.** Run one trivial job and one standard job end to end before you use
-   the factory for anything larger. Run `/factory retro` on both.
+6. **Start work.** Send a bounded request with an outcome and acceptance
+   criteria, or use `issue` for an existing GitHub/GitLab issue. Use `next`
+   for items queued in `.factory/backlog.md`. Open `pf dashboard` for the
+   Kanban-style view of backlog, module progress, reviews and artifacts.
+   A separate task board is optional. For Codex, confirm project trust and
+   the worktree permissions described in [the runtime adapter](../adapters/other-agents.md).
 
-## Multi-repo products (Daria Connect style)
+## Multi-repo products
 
-The full walkthrough, with commands, is [07-workspace-connect.md](07-workspace-connect.md). In short:
-`pf install project <workspace>`, then a `layout: multi-repo` descriptor, then
-`pf install module <child> --workspace <workspace>` for each child, then `pf rules sync`.
+The full walkthrough, with commands, is [Multi-repo workspace guide](07-multi-repo-workspaces.md). In short:
+Audit with `pf audit <workspace> --modules`. Install the workspace root,
+review the generated module descriptor, then run
+`pf install project <workspace>` from the workspace. The installer generates the module rules.
 
 Set `layout: multi-repo` and `workspace_root` to the folder that holds the
 module clones. Then add one `modules[]` entry per child repo, with its `area`
 (used for the `repo::<area>` label), `path`, `agents_md`, `gates` and `tests`.
-Example for Connect: `product` (no runtime code), `frontend`, `backend`
-(`tests: no`), `client` (Android, never called Frontend) and `hub` (`tests: no`,
-never shipped to customers). Install the kit at `workspace_root` and run
+The [example descriptor](examples/workspace.factory.yaml) uses a docs module, a web app, a service and a mobile client. Install the kit at `workspace_root` and run
 `/factory` there. Triage picks the module, and the job's worktree is created
 from that module's clone, with the module's `vcs` settings, so the PR targets
 that child repo.
+
+## Several stacks in one Git history
+
+Review the installer draft's module paths. Each job gets a separate worktree
+and branch even when the modules share a Git repository. The job diff is checked
+against its module path. Keep shared contracts, root lockfiles and other
+cross-module changes in a root job and sequence their dependents. Worktrees
+isolate changes on disk. They can still conflict when branches are integrated.
 
 ## Updating a project to a newer factory
 
@@ -66,6 +79,15 @@ pf install project ~/Work/MyApp
 ```
 Your `factory.yaml` and `backlog.md` are kept. Review the diff in the product
 repo and commit it.
+
+## Runtime entry points and code graphs
+
+Run `pf install project <repo> --install-graphify` from any shell.
+It installs all runtime entry points in one pass. Independently opened module
+repos get their own project instructions and generated roles. Shared-history
+modules use the Git root's runtime kit and graph. For an existing install,
+rerun the installer to pick up the entry points and run `pf providers setup`
+to configure workspace model routes. [Setup](01-getting-started.md#model-routing)
 
 <!-- documentation-routing:start -->
 ## Documentation routing

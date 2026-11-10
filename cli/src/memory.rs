@@ -185,8 +185,8 @@ mod tests {
     #[test]
     fn sanitizes_like_claude_code() {
         assert_eq!(
-            sanitize(Path::new("/home/matin-aghalarkhani/Work/Connect")),
-            "-home-matin-aghalarkhani-Work-Connect"
+            sanitize(Path::new("/home/operator/work/example-app")),
+            "-home-operator-work-example-app"
         );
         assert_eq!(
             sanitize(Path::new("/home/a/.config/x_y")),

@@ -5,7 +5,8 @@ use std::fs;
 use std::path::Path;
 
 use crate::{
-    audit, descriptor, diagrams, docs_map, guard, install, knowledge, memory, rules, util,
+    audit, bundle, descriptor, diagrams, docs_map, graph, guard, install, knowledge, memory, rules,
+    runtime, util,
 };
 
 #[derive(Default)]
@@ -42,13 +43,18 @@ pub fn main(factory: &Path, project: Option<&Path>) -> i32 {
         util::has_cmd("pf"),
         "pf on PATH (the guard hook calls it)",
         format!(
-            "pf not on PATH: cargo install --path {}",
-            factory.join("cli").display()
+            "pf not on PATH: put the pf binary on PATH or install from {}",
+            bundle::SOURCE_URL
         ),
     );
-    for t in ["gh", "glab", "claude", "node"] {
+    for t in ["gh", "glab", "claude", "codex", "hermes", "node"] {
         d.soft(util::has_cmd(t), t, format!("{t} not installed (optional)"));
     }
+    d.soft(
+        graph::available(),
+        "Graphify code indexing available",
+        "Graphify missing (pf install project <repo> --install-graphify)",
+    );
     if util::has_cmd("gh") {
         d.soft(
             util::output("gh", &["auth", "status"], None).is_some(),
@@ -62,57 +68,61 @@ pub fn main(factory: &Path, project: Option<&Path>) -> i32 {
         format!("guard policy self-test {passed}/{total}"),
         format!("guard policy self-test {passed}/{total} (cargo test)"),
     );
-    let dm = docs_map::run(&docs_map::Options {
-        root: factory.to_path_buf(),
-        docs: "docs".into(),
-        fix: false,
-        strict: true,
-        allow: vec!["kit/".into()],
-    });
-    d.check(
-        dm.errors.is_empty(),
-        format!("factory {}", dm.summary()),
-        "factory docs map stale or broken (pf docs-map --strict --allow kit/)",
-    );
-    let (n, df) = diagrams::check(factory);
-    d.check(
-        df.is_empty(),
-        format!("{n} mermaid blocks lint clean"),
-        "mermaid blocks fail lint (pf diagrams check)",
-    );
-
-    println!("Factory repo");
-    let remotes = util::output("git", &["remote"], Some(factory))
-        .map(|o| o.lines().count())
-        .unwrap_or(0);
-    d.soft(
-        remotes >= 2,
-        format!("{remotes} remotes (mirrored)"),
-        format!("only {remotes} remote; add a mirror: pf mirror add <name> <url>"),
-    );
-    d.soft(
-        util::output("git", &["status", "--porcelain"], Some(factory))
-            .is_some_and(|o| o.is_empty()),
-        "clean",
-        "uncommitted changes in the factory repo",
-    );
-    if util::output(
-        "git",
-        &["rev-parse", "-q", "--verify", "@{u}"],
-        Some(factory),
-    )
-    .is_some()
-    {
-        let _ = util::output("git", &["fetch", "-q"], Some(factory));
-        let behind = util::output("git", &["rev-list", "--count", "HEAD..@{u}"], Some(factory))
-            .unwrap_or_default();
-        d.soft(
-            behind == "0",
-            "up to date with upstream",
-            format!("{behind} commit(s) behind upstream; git pull"),
-        );
+    if let Some(revision) = bundle::revision(factory) {
+        d.ok(format!("embedded Factory kit {revision}"));
     } else {
-        d.note("no upstream branch set");
+        let dm = docs_map::run(&docs_map::Options {
+            root: factory.to_path_buf(),
+            docs: "docs".into(),
+            fix: false,
+            strict: true,
+            allow: vec!["kit/".into()],
+        });
+        d.check(
+            dm.errors.is_empty(),
+            format!("factory {}", dm.summary()),
+            "factory docs map stale or broken (pf docs-map --strict --allow kit/)",
+        );
+        let (n, df) = diagrams::check(factory);
+        d.check(
+            df.is_empty(),
+            format!("{n} mermaid blocks lint clean"),
+            "mermaid blocks fail lint (pf diagrams check)",
+        );
+
+        println!("Factory repo");
+        let remotes = util::output("git", &["remote"], Some(factory))
+            .map(|o| o.lines().count())
+            .unwrap_or(0);
+        d.soft(
+            remotes >= 2,
+            format!("{remotes} remotes (mirrored)"),
+            format!("only {remotes} remote; add a mirror: pf mirror add <name> <url>"),
+        );
+        d.soft(
+            util::output("git", &["status", "--porcelain"], Some(factory))
+                .is_some_and(|o| o.is_empty()),
+            "clean",
+            "uncommitted changes in the factory repo",
+        );
+        if util::output(
+            "git",
+            &["rev-parse", "-q", "--verify", "@{u}"],
+            Some(factory),
+        )
+        .is_some()
+        {
+            let _ = util::output("git", &["fetch", "-q"], Some(factory));
+            let behind = util::output("git", &["rev-list", "--count", "HEAD..@{u}"], Some(factory))
+                .unwrap_or_default();
+            d.soft(
+                behind == "0",
+                "up to date with upstream",
+                format!("{behind} commit(s) behind upstream; git pull"),
+            );
+        } else {
+            d.note("no upstream branch set");
+        }
     }
     let home = util::claude_home();
     d.soft(
@@ -186,13 +196,17 @@ pub fn main(factory: &Path, project: Option<&Path>) -> i32 {
                 d.note(format!("drift: {rel} differs from factory kit"));
             }
         };
-        for a in install::agent_files(factory) {
-            let rel = format!(
-                ".claude/agents/{}",
-                a.file_name().unwrap().to_string_lossy()
-            );
-            compare(&a, &rel, None);
-        }
+        let routing = descriptor::find(&p).unwrap_or_default();
+        let role_error = match runtime::roles(factory, &routing) {
+            Ok(roles) => {
+                for role in roles {
+                    let rel = format!(".claude/agents/{}", role.filename.display());
+                    compare(Path::new(&rel), &rel, Some(role.claude));
+                }
+                None
+            }
+            Err(e) => Some(e),
+        };
         for f in ["SKILL.md", "protocol.md"] {
             compare(
                 &kit.join(".claude/skills/factory").join(f),
@@ -218,6 +232,20 @@ pub fn main(factory: &Path, project: Option<&Path>) -> i32 {
             ".claude/rules/product-factory.md",
             None,
         );
+        if let Some(e) = role_error {
+            d.bad(e);
+        }
+        match runtime::stale_shared(factory, &p, &routing) {
+            Ok(files) => d.check(
+                files.is_empty(),
+                "Shared skill and Codex/Antigravity roles match the kit",
+                format!(
+                    "{} runtime files missing or stale (pf install project)",
+                    files.len()
+                ),
+            ),
+            Err(e) => d.bad(e),
+        }
         d.soft(
             !drift,
             format!("kit matches factory @ {}", install::revision(factory)),
@@ -236,6 +264,19 @@ pub fn main(factory: &Path, project: Option<&Path>) -> i32 {
                 .ok()
                 .is_some_and(|v| v.get("attribution") == Some(&install::no_attribution_value()))
         };
+        let descriptor_text =
+            fs::read_to_string(p.join(".factory/factory.yaml")).unwrap_or_default();
+        d.check(
+            !descriptor_text.starts_with("# pf: draft descriptor")
+                && !(descriptor_text.contains("name: Example Product")
+                    && descriptor_text.contains("one_liner: What it is, for whom")),
+            "descriptor reviewed",
+            "review the descriptor with factory init/adopt before running a delivery lane",
+        );
+        let (audit_roots, missing_modules) = crate::discovery::roots(&p, true);
+        for module in missing_modules {
+            d.bad(format!("module unavailable: {}", module.display()));
+        }
         if let Some(desc) = descriptor::find(&p).filter(|x| x.root == p) {
             if desc.attribution_none() {
                 d.check(
@@ -248,14 +289,18 @@ pub fn main(factory: &Path, project: Option<&Path>) -> i32 {
                 for f in rules::check(&desc) {
                     d.bad(format!("{f} missing or stale (pf rules sync)"));
                 }
-                for m in &desc.modules {
-                    let Some(path) = m.get("path") else { continue };
-                    let mp = p.join(path);
+                for mp in audit_roots
+                    .iter()
+                    .filter(|m| *m != &p && m.join(".git").exists())
+                {
+                    let path = util::rel(&p, mp);
                     let mset =
                         fs::read_to_string(mp.join(".claude/settings.json")).unwrap_or_default();
                     let ok = mp.join(".claude/skills/factory/SKILL.md").exists()
                         && mp.join(".claude/rules/product-factory.md").exists()
                         && mset.contains("pf guard")
+                        && runtime::stale_shared(factory, mp, &desc)
+                            .is_ok_and(|files| files.is_empty())
                         && (!desc.attribution_none() || attribution_off(&mset));
                     d.check(
                         ok,
@@ -265,17 +310,8 @@ pub fn main(factory: &Path, project: Option<&Path>) -> i32 {
                 }
             }
         }
-        let mut audit_roots = vec![p.clone()];
-        if let Some(desc) = descriptor::find(&p).filter(|x| x.root == p && x.multi_repo()) {
-            audit_roots.extend(
-                desc.modules
-                    .iter()
-                    .filter_map(|m| m.get("path"))
-                    .map(|x| p.join(x)),
-            );
-        }
         for r in &audit_roots {
-            let (findings, _) = audit::audit(r);
+            let (findings, _) = audit::audit(factory, r);
             let blockers: Vec<&audit::Finding> = findings
                 .iter()
                 .filter(|f| f.severity == audit::Severity::Blocker)

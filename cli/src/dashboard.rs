@@ -6,6 +6,8 @@ use std::io::{BufRead, BufReader, Write};
 use std::net::{TcpListener, TcpStream};
 use std::path::{Component, Path, PathBuf};
 
+use crate::{descriptor, discovery, job};
+
 fn content_type(p: &Path) -> &'static str {
     match p.extension().and_then(|e| e.to_str()).unwrap_or("") {
         "html" => "text/html; charset=utf-8",
@@ -55,9 +57,32 @@ fn resolve(root: &Path, url_path: &str) -> Option<PathBuf> {
     Some(p)
 }
 
+fn visible(relative: &Path) -> bool {
+    if matches!(
+        relative.to_str(),
+        Some("dashboard.html" | "backlog.md" | "jobs")
+    ) {
+        return true;
+    }
+    let parts: Vec<_> = relative.iter().filter_map(|p| p.to_str()).collect();
+    let round = |s: &str| {
+        s.strip_prefix("round-")
+            .is_some_and(|n| !n.is_empty() && n.bytes().all(|b| b.is_ascii_digit()))
+    };
+    let markdown = |s: &str| !s.starts_with('.') && s.ends_with(".md");
+    match parts.as_slice() {
+        ["jobs", id] => job::valid_id(id),
+        ["jobs", id, name] => {
+            job::valid_id(id) && (*name == "job.json" || markdown(name) || round(name))
+        }
+        ["jobs", id, stage, name] => job::valid_id(id) && round(stage) && markdown(name),
+        _ => false,
+    }
+}
+
 fn respond(mut s: &TcpStream, status: &str, ctype: &str, body: &[u8]) {
     let head = format!(
-        "HTTP/1.1 {status}\r\nContent-Type: {ctype}\r\nContent-Length: {}\r\nCache-Control: no-store\r\nConnection: close\r\n\r\n",
+        "HTTP/1.1 {status}\r\nContent-Type: {ctype}\r\nContent-Length: {}\r\nCache-Control: no-store\r\nX-Content-Type-Options: nosniff\r\nConnection: close\r\n\r\n",
         body.len()
     );
     let _ = s.write_all(head.as_bytes()).and_then(|_| s.write_all(body));
@@ -73,9 +98,14 @@ fn handle(root: &Path, stream: TcpStream) {
     if method != "GET" {
         return respond(&stream, "405 Method Not Allowed", "text/plain", b"GET only");
     }
+    let path = if path == "/" { "/dashboard.html" } else { path };
     let Some(p) = resolve(root, path) else {
         return respond(&stream, "403 Forbidden", "text/plain", b"forbidden");
     };
+    let relative = p.strip_prefix(root).unwrap();
+    if !visible(relative) || !discovery::local_path(root, relative) {
+        return respond(&stream, "404 Not Found", "text/plain", b"not found");
+    }
     if p.is_dir() {
         if !path.ends_with('/') {
             let loc = format!("{path}/");
@@ -89,6 +119,11 @@ fn handle(root: &Path, stream: TcpStream) {
             .into_iter()
             .flatten()
             .flatten()
+            .filter(|e| {
+                let path = e.path();
+                let relative = path.strip_prefix(root).unwrap();
+                visible(relative) && discovery::local_path(root, relative)
+            })
             .map(|e| {
                 let n = e.file_name().to_string_lossy().into_owned();
                 if e.path().is_dir() {
@@ -121,7 +156,11 @@ fn handle(root: &Path, stream: TcpStream) {
 }
 
 pub fn main(dir: Option<PathBuf>, port: u16) -> i32 {
-    let root = dir.unwrap_or_else(|| PathBuf::from(".factory"));
+    let root = dir.unwrap_or_else(|| {
+        descriptor::find(&std::env::current_dir().unwrap_or_default())
+            .map(|d| d.root.join(".factory"))
+            .unwrap_or_else(|| PathBuf::from(".factory"))
+    });
     if !root.join("dashboard.html").exists() {
         eprintln!(
             "pf: no dashboard.html in {} (run from a product repo, or pass --dir)",
@@ -137,7 +176,7 @@ pub fn main(dir: Option<PathBuf>, port: u16) -> i32 {
         }
     };
     println!(
-        "Dashboard: http://127.0.0.1:{port}/dashboard.html  (serving {}; Ctrl+C to stop)",
+        "Dashboard: http://127.0.0.1:{port}/dashboard.html  (workspace {}; Ctrl+C to stop)",
         root.display()
     );
     for s in listener.incoming().flatten() {

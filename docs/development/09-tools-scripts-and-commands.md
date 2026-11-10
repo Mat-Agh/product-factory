@@ -15,10 +15,11 @@ print usage.
 | `pf guard --self-test` | Run the 80 policy cases | [COMP-004](../components/COMP-004-guard-hook.md) |
 | `pf docs-map` | Docs tree check and live map generator | [COMP-012](../components/COMP-012-docs-gate.md) |
 | `pf diagrams check \| validate` | Lint inline Mermaid blocks; parse them with the Mermaid CLI | [COMP-014](../components/COMP-014-diagrams.md) |
-| `pf install project \| user \| all` | Put the factory into a product (copy) or a user config (links) | [COMP-007](../components/COMP-007-installer.md) |
+| `pf install project [--modules] \| user \| all` | Put the factory into a product (copy) or a user config (links) | [COMP-007](../components/COMP-007-installer.md) |
 | `pf doctor [project]` | Health check; exit code = failures | [COMP-008](../components/COMP-008-doctor.md) |
 | `pf mirror add \| push \| bundle` | Backup remotes and offline bundles | [COMP-009](../components/COMP-009-backup-tools.md) |
 | `pf export` | Copy Claude Code memory into the repo for review | [COMP-009](../components/COMP-009-backup-tools.md) |
+| `pf job` | Workspace intake, worktree preparation and persisted stage transitions | [Job lifecycle](../architecture/JOB_LIFECYCLE.md) |
 | `pf dashboard` | Serve a product's `.factory/` on loopback | [COMP-006](../components/COMP-006-backlog-and-dashboard.md) |
 | `pf install module` | Kit for one module repo of a multi-repo workspace | [COMP-016](../components/COMP-016-session-integration.md) |
 | `pf rules sync` | Path-scoped module rules from the descriptor | [COMP-016](../components/COMP-016-session-integration.md) |
@@ -38,15 +39,16 @@ pf install user
 pf install user --with-guard           # also guard every project on this machine
 pf install project ~/Work/MyApp
 pf install all ~/Work/MyApp
-pf install project ~/Work/Connect --no-ai-attribution   # workspace root
-pf install module Daria-Connect-Back-End --workspace ~/Work/Connect
+pf install project ~/Work/MyWorkspace --no-ai-attribution   # draft workspace descriptor
+pf install project ~/Work/MyWorkspace --modules             # after descriptor review
+pf install module services/api --workspace ~/Work/MyWorkspace
 pf rules sync                           # in the workspace
 pf memory                               # this repo's auto memory
-pf audit ~/Work/Connect/Daria-Connect-Back-End   # adoption inventory (read-only)
+pf audit ~/Work/MyWorkspace/services/api   # adoption inventory (read-only)
 pf audit . --modules --json             # whole workspace
 pf knowledge plan --modules             # knowledge gaps per repo
-pf knowledge init --root Daria-Connect-Federation   # import missing files and sections (inside a docs job worktree)
-pf memory --json --root ~/Work/Connect
+pf knowledge init --root services/api   # import missing files and sections (inside a docs job worktree)
+pf memory --json --root ~/Work/MyWorkspace
 CLAUDE_CONFIG_DIR=/tmp/h pf install user
 
 # Health
@@ -83,10 +85,20 @@ git worktree list
 
 | Variable | Read by | Effect |
 |---|---|---|
-| `PRODUCT_FACTORY_HOME` | `pf install`, `doctor`, `mirror`, `export` | Factory checkout (or pass `--factory <path>`) |
+| `PRODUCT_FACTORY_HOME` | `pf install`, `doctor`, `mirror`, `export` | Factory checkout override (or pass `--factory <path>`). Project installs and knowledge can use the bundled kit |
 | `CLAUDE_CONFIG_DIR` | `pf install user`, `doctor`, `export` | Claude config dir (default `~/.claude`) |
 | `FACTORY_GUARD=off` | `pf guard` | Disable the guard for a human-driven session (set before starting `claude`) |
 | `MMDC`, `MERMAID_CHROME` | `pf diagrams validate` | Mermaid CLI binary and Chrome binary to use |
+
+## Cross-runtime commands
+
+`pf install project <repo> [--root-only] [--install-graphify] [--configure-models]`
+installs the runtime kits, can provision Graphify and can prompt for routing.
+`pf graph refresh [--modules]` and `pf graph query <question>` operate on the
+checkout selected by `--root` or the current directory. `pf providers setup`,
+`pf providers check` and `pf providers run <job-id> <role> --allow-api` select,
+validate and dispatch the active role's route. Pass `--root` to select the
+workspace. [Model routing](../guide/01-getting-started.md#model-routing)
 
 <!-- documentation-routing:start -->
 ## Documentation routing

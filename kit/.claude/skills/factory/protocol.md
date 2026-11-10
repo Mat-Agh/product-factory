@@ -4,10 +4,20 @@ Every factory agent reads this file first. It is installed at
 `.claude/skills/factory/protocol.md` in the product repo, or at
 `~/.claude/skills/factory/protocol.md`.
 
+## Code navigation
+
+For unfamiliar code, start with `pf graph --root <worktree> query "<symbol or relationship>"`.
+Use results to find source and tests, and verify them by reading the files. For
+shared-history modules, keep results within the assigned module and its
+documented dependencies. If Graphify is unavailable or the graph is empty,
+locate files with ordinary source search.
+
+
 ## Where you work
 
 Your prompt gives the **job folder**, the **worktree**, the **branch** and the
-**descriptor**.
+**descriptor**, and the owning module's **module worktree** path when its
+scope is a subdirectory.
 
 - The worktree is a checkout of the job branch, outside the main checkout you
   start in. The shell returns to the main checkout after every command, so begin
@@ -17,7 +27,8 @@ Your prompt gives the **job folder**, the **worktree**, the **branch** and the
   nothing else in the main checkout, because it belongs to the user and to other
   jobs.
 - Product-repo files you are allowed to change, such as code, a PRD or an ADR,
-  are changed **in the worktree** and committed on the job branch.
+  are changed **in the module worktree** and committed on the job branch.
+  Stay inside the selected module's scope in a shared Git history.
 
 ## Read first, in this order
 
@@ -48,12 +59,18 @@ docs. Never read whole `docs/` trees.
   reset or clean work you did not create. Never write secrets anywhere.
 - Copy the patterns already in the code (living samples) instead of inventing
   layout. Match the surrounding idiom, naming and comment density.
-- Documentation goes under the descriptor's `docs.root` (default `docs/`), in the
-  folder for its area. A new folder needs a `README.md` with a title,
-  `**Status:**` and `**Last updated:**`. After you add, move or rename any doc
-  in the worktree, run `cd <worktree> && pf docs-map --fix` and
-  commit the regenerated links together with your change. Never put new docs at
-  the repo root.
+- The owning module's `docs_root` overrides `docs.root` (default `docs`).
+  For `prd_dir`, `adr_dir` and `design_dir`, take the owning module's explicit
+  `docs` override first. Otherwise rebase a workspace path under `docs.root`
+  onto the module's `docs_root`. Treat the resulting paths as relative to
+  the job worktree. If a path is outside the worktree or conflicts with the
+  module's established layout, stop and report the mismatch.
+- Put each document in the folder for its area. A new folder needs a
+  `README.md` with a title, `**Status:**` and `**Last updated:**`. After a
+  document is added, moved or renamed, update the links using the module's
+  own routing convention. For Factory-format maps, run
+  `pf docs-map --root <worktree> --docs <docs_root> --fix`. Commit the link
+  updates with the change.
 - **Knowledge upkeep.** Every repo keeps the knowledge structure of its stack
   (`pf knowledge plan`), under the descriptor's `docs_root`. Keep it true in the
   same branch as your change:
