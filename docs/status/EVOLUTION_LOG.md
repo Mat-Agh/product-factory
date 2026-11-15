@@ -6,6 +6,10 @@
 Append-only. One dated entry for each factory-level change: what changed, why,
 and its evidence.
 
+## 2026-11-15 — Single v1 production release
+
+- Consolidated the published production line under signed `v1`, retaining the tested CLI 1.2.0 binary and its checksum. Historical versioned release records and tags were retired at the operator's request; Git commit history remains available.
+
 ## 2026-11-15 — Combined workspace code network
 
 - `pf graph view --modules` joins independent repository indexes in a local 3D view, with repository and workspace hubs. The browser preserves hub links when limiting other visible edges.

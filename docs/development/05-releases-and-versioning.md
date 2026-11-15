@@ -5,7 +5,7 @@
 
 ## Versions
 
-The factory uses semantic versioning on its git tags: `vMAJOR.MINOR.PATCH`.
+The factory uses semantic versions internally. The published production release is the immutable `v1` tag; its bundled CLI reports its tested internal version.
 
 | Bump | When |
 |---|---|
@@ -13,7 +13,7 @@ The factory uses semantic versioning on its git tags: `vMAJOR.MINOR.PATCH`.
 | MINOR | New lane, agent, lens, command, descriptor key with a default, script |
 | PATCH | Wording, checklists, bug fixes, docs |
 
-The current release is [`v1.2.0`](https://github.com/Mat-Agh/product-factory/releases/tag/v1.2.0). It adds `pf graph view --modules` for a combined local multi-repository network while preserving the thought-sphere and brain-cloud views. Existing product docs and SQL migrations remain in their owning repositories. The Linux x86-64 binary and SHA-256 checksum are attached to the signed release. See the [implementation status](../status/IMPLEMENTATION_STATUS.md) for verified features and remaining live runtime checks.
+The current release is [`v1`](https://github.com/Mat-Agh/product-factory/releases/tag/v1), containing CLI 1.2.0. It adds `pf graph view --modules` for a combined local multi-repository network while preserving the thought-sphere and brain-cloud views. Existing product docs and SQL migrations remain in their owning repositories. The Linux x86-64 binary and SHA-256 checksum are attached to the signed release. See the [implementation status](../status/IMPLEMENTATION_STATUS.md) for verified features and remaining live runtime checks.
 
 ## Releasing the factory
 
