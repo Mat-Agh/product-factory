@@ -51,7 +51,8 @@ pub fn roles(factory: &Path, d: &Descriptor) -> Result<Vec<Role>, String> {
             // JSON quoting for these strings is compatible with TOML basic strings.
             let quoted = |s: &str| serde_json::Value::String(s.into()).to_string();
             let instructions = format!(
-                "Read the installed Factory protocol and constitution at the paths supplied by the coordinator, then read the target checkout’s AGENTS.md and the owning module’s instructions. Follow the role’s artifact and scope restrictions. For code navigation, follow the protocol’s Graphify instructions.\n{body}"
+                "Read the installed Factory protocol and constitution at the paths supplied by the coordinator, then read the target checkout’s AGENTS.md and the owning module’s instructions. Follow the role’s artifact and scope restrictions. For code navigation, follow the protocol’s Graphify instructions.\n{}",
+                body.trim_end()
             );
             let mut codex = format!(
                 "{MARK}\nname = {}\ndescription = {}\nmodel_reasoning_effort = {}\ndeveloper_instructions = {}\n",
@@ -163,5 +164,7 @@ mod tests {
         assert!(build.claude.contains("model: sonnet\neffort: medium"));
         assert!(build.codex.contains("model_reasoning_effort = \"medium\""));
         assert!(build.codex.contains("model = \"custom-gpt\""));
+        assert!(roles.iter().all(|role| role.antigravity.ends_with('\n')
+            && !role.antigravity.ends_with("\n\n")));
     }
 }

@@ -10,6 +10,7 @@
 Adapters keep the factory usable without Claude Code. Role files are plain
 markdown, so any capable agent can run one role at a time against the same job
 folder and verdict contract.
+Generated role files end with one newline so a fresh installation passes Git whitespace checks.
 
 | Adapter | Covers |
 |---|---|
