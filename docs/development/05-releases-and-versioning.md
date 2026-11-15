@@ -13,14 +13,7 @@ The factory uses semantic versioning on its git tags: `vMAJOR.MINOR.PATCH`.
 | MINOR | New lane, agent, lens, command, descriptor key with a default, script |
 | PATCH | Wording, checklists, bug fixes, docs |
 
-The current release is `v1.0.0`. It includes knowledge capture and the
-updated CLI guide. Verify the installer checksum and reinstall its project
-kit to enable capture for new jobs. See the [implementation status](../status/IMPLEMENTATION_STATUS.md) for verified features and remaining live runtime checks.
-
-`v1.0.1` is prepared as a patch release candidate. It adds private local
-router configuration for Factory workers. It becomes a release only after the
-review PR is merged and a human signs the tag and publishes its verified
-binary and checksum.
+The current release is [`v1.0.1`](https://github.com/Mat-Agh/product-factory/releases/tag/v1.0.1). It adds private local router configuration for Factory workers. The Linux x86-64 binary and SHA-256 checksum are attached to the signed release. See the [implementation status](../status/IMPLEMENTATION_STATUS.md) for verified features and remaining live runtime checks.
 
 ## Releasing the factory
 
