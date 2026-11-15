@@ -6,6 +6,12 @@
 Append-only. One dated entry for each factory-level change: what changed, why,
 and its evidence.
 
+## 2026-11-15 — Combined workspace code network
+
+- `pf graph view --modules` joins independent repository indexes in a local 3D view, with repository and workspace hubs. The browser preserves hub links when limiting other visible edges.
+- Source symbols and locations remain searchable; hub links represent topology rather than inferred cross-repository calls.
+- Release candidate version: `1.2.0`.
+
 ## 2026-11-15 — Topology-aware installation and code graph view
 
 - Project installation now prepares missing stack-pack pages for each

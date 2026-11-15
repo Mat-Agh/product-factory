@@ -182,6 +182,7 @@ Details: [development/09-tools-scripts-and-commands.md](../development/09-tools-
 - `pf graph refresh --modules` refreshes Graphify for independent checkouts.
 - `pf graph --root <worktree> query "<symbol>"` refreshes and queries the local index.
 - `pf graph --root <worktree> view` refreshes and writes an interactive local 3D file network with symbol search.
+- `pf graph --root <workspace> view --modules` joins independently indexed repository files under repository and workspace hubs in `.factory/graphify/workspace-view.html`. The hubs show topology; they do not imply cross-repository call relationships.
 - `pf providers setup` selects a model or native dispatch for each tier.
 - `pf providers check` lists routes and missing prerequisites.
 - `pf providers run <job-id> <role> --allow-api` dispatches a configured role

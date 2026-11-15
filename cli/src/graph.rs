@@ -1,10 +1,12 @@
 //! Local Graphify code indexes, scoped to the Git worktree being inspected.
 
+use std::collections::{BTreeMap, BTreeSet};
 use std::fs::{self, File, OpenOptions};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
 
 use clap::Subcommand;
+use serde_json::{Value, json};
 
 use crate::{discovery, util};
 
@@ -23,7 +25,11 @@ pub enum Action {
     /// Refresh the graph and search a small slice of it
     Query { question: String },
     /// Write a local interactive 3D view of the current code graph
-    View,
+    View {
+        /// Connect independent module graphs in a workspace overview
+        #[arg(long)]
+        modules: bool,
+    },
 }
 
 pub fn available() -> bool {
@@ -67,14 +73,99 @@ fn graph_file(root: &Path) -> PathBuf {
     root.join(OUT).join("graph.json")
 }
 
-fn write_view(root: &Path) -> Result<PathBuf, String> {
+fn write_view_data(root: &Path, graph: &str, name: &str) -> Result<PathBuf, String> {
     let _lock = output_folder(root)?;
-    let graph = fs::read_to_string(graph_file(root)).map_err(|e| e.to_string())?;
     let safe_graph = graph.replace('<', "\\u003c").replace('>', "\\u003e");
     let page = include_str!("../assets/graph-view.html").replace("__GRAPH_JSON__", &safe_graph);
-    let path = root.join(OUT).join("view.html");
+    let path = root.join(OUT).join(name);
     fs::write(&path, page).map_err(|e| e.to_string())?;
     Ok(path)
+}
+
+fn write_view(root: &Path) -> Result<PathBuf, String> {
+    let graph = fs::read_to_string(graph_file(root)).map_err(|e| e.to_string())?;
+    write_view_data(root, &graph, "view.html")
+}
+
+fn write_workspace_view(root: &Path) -> Result<PathBuf, String> {
+    let (roots, missing) = discovery::roots(root, true);
+    if !missing.is_empty() {
+        return Err(format!(
+            "Check out modules before building the workspace view: {missing:?}"
+        ));
+    }
+    let mut nodes = Vec::new();
+    let mut edges = BTreeSet::new();
+    let mut symbol_count = 0usize;
+    let workspace_id = "@workspace";
+    nodes.push(
+        json!({"id":workspace_id,"label":"Workspace","source_file":workspace_id,"symbols":[]}),
+    );
+    for checkout in roots.into_iter().filter(|path| path != root) {
+        if index(&checkout)? == State::Empty {
+            continue;
+        }
+        write_view(&checkout)?;
+        let name = checkout
+            .strip_prefix(root)
+            .map_err(|e| e.to_string())?
+            .to_string_lossy()
+            .replace('/', "-");
+        let graph: Value = serde_json::from_str(
+            &fs::read_to_string(graph_file(&checkout)).map_err(|e| e.to_string())?,
+        )
+        .map_err(|e| e.to_string())?;
+        let mut file_by_id = BTreeMap::new();
+        let mut symbols: BTreeMap<String, Vec<Value>> = BTreeMap::new();
+        for node in graph["nodes"]
+            .as_array()
+            .ok_or("Graphify nodes are missing")?
+        {
+            let Some(file) = node["source_file"].as_str() else {
+                continue;
+            };
+            let Some(id) = node["id"].as_str() else {
+                continue;
+            };
+            let file_id = format!("{name}/{file}");
+            file_by_id.insert(id.to_owned(), file_id.clone());
+            symbols.entry(file_id).or_default().push(json!({
+                "label": node["label"], "source_location": node["source_location"]
+            }));
+            symbol_count += 1;
+        }
+        let hub = format!("{name}/@module");
+        nodes.push(json!({"id":hub,"label":name,"source_file":hub,"symbols":[]}));
+        edges.insert((workspace_id.to_owned(), hub.clone()));
+        for (file, list) in symbols {
+            let label = file.rsplit('/').next().unwrap_or(&file);
+            nodes.push(json!({"id":file,"label":label,"source_file":file,"symbols":list}));
+            edges.insert((hub.clone(), file));
+        }
+        for link in graph["links"]
+            .as_array()
+            .ok_or("Graphify links are missing")?
+        {
+            let Some(source) = link["source"].as_str().and_then(|id| file_by_id.get(id)) else {
+                continue;
+            };
+            let Some(target) = link["target"].as_str().and_then(|id| file_by_id.get(id)) else {
+                continue;
+            };
+            if source != target {
+                edges.insert((source.clone(), target.clone()));
+            }
+        }
+    }
+    if nodes.len() <= 1 {
+        return Err("No module graphs to visualize".into());
+    }
+    let links: Vec<Value> = edges
+        .into_iter()
+        .map(|(source, target)| json!({"source":source,"target":target}))
+        .collect();
+    let data = json!({"nodes":nodes,"links":links,"symbol_count":symbol_count});
+    write_view_data(root, &data.to_string(), "workspace-view.html")
 }
 
 fn output_folder(root: &Path) -> Result<File, String> {
@@ -244,8 +335,12 @@ pub fn main(root: Option<PathBuf>, action: Action) -> i32 {
         return 1;
     }
     match action {
-        Action::View => {
+        Action::View { modules } => {
             let view = || -> Result<(), String> {
+                if modules {
+                    println!("{}", write_workspace_view(&root)?.display());
+                    return Ok(());
+                }
                 if index(&root)? == State::Empty {
                     return Err("No supported source to visualize".into());
                 }

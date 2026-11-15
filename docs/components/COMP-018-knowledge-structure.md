@@ -172,6 +172,7 @@ Installation also generates `view.html` there: a local interactive 3D
 projection of file relationships with symbol and source-location search.
 The view caps visible files for browser responsiveness; `pf graph query`
 retrieves a bounded relevant slice for agents.
+`pf graph view --modules` also writes `workspace-view.html` at a multi-repository root. It joins files under repository and workspace hubs, with both brain-cloud and thought-sphere layouts. These hub links describe repository membership, not inferred calls between repositories.
 
 ## Capture new knowledge during a job
 

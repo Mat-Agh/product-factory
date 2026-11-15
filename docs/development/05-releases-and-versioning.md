@@ -15,6 +15,8 @@ The factory uses semantic versioning on its git tags: `vMAJOR.MINOR.PATCH`.
 
 The current release is [`v1.1.0`](https://github.com/Mat-Agh/product-factory/releases/tag/v1.1.0). It prepares missing stack docs, trusts a detected routed Hermes project skill, and adds local thought-sphere and brain-cloud Graphify views. Existing product docs and SQL migrations remain in their owning repositories. The Linux x86-64 binary and SHA-256 checksum are attached to the signed release. See the [implementation status](../status/IMPLEMENTATION_STATUS.md) for verified features and remaining live runtime checks.
 
+The next candidate is `v1.2.0`, adding `pf graph view --modules` for a combined local multi-repository network.
+
 ## Releasing the factory
 
 Tagging is human-only, here as everywhere.
