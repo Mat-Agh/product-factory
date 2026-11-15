@@ -334,6 +334,8 @@ fn install_runtimes(
 
 fn install_entrypoints(factory: &Path, root: &Path) -> Result<(), String> {
     const MARKER: &str = "<!-- product-factory-entrypoints -->";
+    const OLD_DOCS: &str = "- **Documentation:** all docs live under `docs/`, one folder per area, each\n  with a `README.md`. After adding or moving a doc, run\n  `pf docs-map --fix`, which regenerates the README links and\n  the map in `docs/README.md`.";
+    const NEW_DOCS: &str = "- **Documentation:** preserve this repository's existing documentation root\n  and authority map. Run `pf docs-map --docs <root> --fix` only when that\n  folder uses the Factory's README routing format; review inherited links.";
     for path in ["AGENTS.md", "CLAUDE.md"] {
         if !discovery::local_path(root, Path::new(path)) {
             return Err(format!(
@@ -366,6 +368,9 @@ fn install_entrypoints(factory: &Path, root: &Path) -> Result<(), String> {
         let sep = if current.is_empty() { "" } else { "\n\n" };
         fs::write(agents, format!("{current}{sep}{marker}{section}")).map_err(|e| e.to_string())?;
         say("installed Product Factory entrypoints in AGENTS.md");
+    } else if current.contains(OLD_DOCS) {
+        fs::write(agents, current.replace(OLD_DOCS, NEW_DOCS)).map_err(|e| e.to_string())?;
+        say("updated Product Factory documentation guidance in AGENTS.md");
     }
     append_entrypoint(root, "GEMINI.md", "@./AGENTS.md")?;
     // A Hermes-specific context file takes precedence over AGENTS.md.

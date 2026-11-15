@@ -131,8 +131,9 @@ pf install project ~/Work/hello-factory --install-graphify
 
 The installer adds all project entry points and appends a Product Factory
 section to `AGENTS.md`. It drafts `.factory/factory.yaml` from the stack and
-docs layout and adds the backlog and dashboard. The installer includes independent
-checkouts by default. Use `--root-only` to limit it to the workspace root. `--install-graphify` provisions the pinned
+docs layout and adds the backlog and dashboard. It preserves each repository's
+documentation root and authority map. Independent checkouts are included by
+default. Use `--root-only` to limit it to the workspace root. `--install-graphify` provisions the pinned
 Graphify CLI using `uv` if needed. Installation prepares missing stack-pack
 documentation in each independent checkout and builds a local 3D code network
 at `.factory/graphify/view.html`. Existing docs remain intact; review reported

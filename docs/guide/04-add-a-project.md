@@ -101,6 +101,7 @@ to configure workspace model routes. [Setup](01-getting-started.md#model-routing
 The install prepares missing generic stack documentation in each repository
 and leaves existing pages intact. It reports chapter numbering conflicts for
 review. If Hermes and model routes are present, it trusts the project skill.
+The installed agent guide keeps each repository's existing documentation root and authority map. Use `pf docs-map --docs <root>` only for a documentation tree that follows Factory's README routing format.
 Use `pf graph --root <repo> view` to open the local 3D code network and
 `pf graph --root <repo> query "<symbol>"` for bounded agent context.
 For a workspace with independent repositories, run `pf graph --root <workspace> view --modules` and open `.factory/graphify/workspace-view.html`. Switch between Brain cloud and Thought sphere in the viewer.

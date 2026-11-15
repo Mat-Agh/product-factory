@@ -6,10 +6,9 @@ This repo is run by the [Product Factory](https://github.com/Mat-Agh/product-fac
 Its descriptor is `.factory/factory.yaml`, and its rules are in
 `.claude/skills/factory/CONSTITUTION.md`.
 
-- **Documentation:** all docs live under `docs/`, one folder per area, each
-  with a `README.md`. After adding or moving a doc, run
-  `pf docs-map --fix`, which regenerates the README links and
-  the map in `docs/README.md`.
+- **Documentation:** preserve this repository's existing documentation root
+  and authority map. Run `pf docs-map --docs <root> --fix` only when that
+  folder uses the Factory's README routing format; review inherited links.
 - **Tooling:** the `pf` CLI must be on PATH. The guard hook calls `pf guard` and
   blocks Bash (fail closed) when `pf` is missing. Install it with
   `cargo install --git ssh://git@github.com/Mat-Agh/product-factory.git pf`.

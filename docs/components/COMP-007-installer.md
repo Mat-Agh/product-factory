@@ -39,7 +39,7 @@ Claude Code's symlinks and operator profile keep working across updates.
 | `.factory/dashboard.html` | Overwritten |
 | `.factory/installed.lock` | Source URL, factory revision, UTC timestamp |
 | `.gitignore` | `.factory/jobs/` is appended if absent |
-| `AGENTS.md` | Appends the Factory section and cross-runtime entry point once. Existing Factory sections receive the entry point on upgrade |
+| `AGENTS.md` | Appends the Factory section and cross-runtime entry point once. Upgrades replace only the obsolete Factory guidance that assumed every product uses `docs/`; the owning repository keeps its documentation root |
 | `GEMINI.md` and existing `.hermes.md` or `HERMES.md` | Adds a reference to the shared project instructions |
 | `.agents/agents/factory-*.md` | Antigravity subagents generated from the canonical roles |
 | `.claude/rules/modules/*.md` | Generated from the workspace descriptor. Unmanaged files at the same paths are preserved and reported |

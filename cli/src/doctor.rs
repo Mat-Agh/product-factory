@@ -5,8 +5,8 @@ use std::fs;
 use std::path::Path;
 
 use crate::{
-    audit, bundle, descriptor, diagrams, docs_map, graph, guard, install, knowledge, memory, rules,
-    runtime, util,
+    audit, bundle, descriptor, diagrams, discovery, docs_map, graph, guard, install, knowledge,
+    memory, rules, runtime, util,
 };
 
 #[derive(Default)]
@@ -357,10 +357,11 @@ pub fn main(factory: &Path, project: Option<&Path>) -> i32 {
                 mem["dir"].as_str().unwrap_or("")
             ),
         );
-        if p.join("docs").is_dir() {
+        let docs_root = discovery::docs_root(&p, discovery::infer_stack(&p));
+        if p.join(docs_root).is_dir() {
             let r = docs_map::run(&docs_map::Options {
                 root: util::git_root(&p),
-                docs: "docs".into(),
+                docs: docs_root.into(),
                 fix: false,
                 strict: false,
                 allow: vec![],
@@ -368,10 +369,15 @@ pub fn main(factory: &Path, project: Option<&Path>) -> i32 {
             d.soft(
                 r.errors.is_empty(),
                 r.summary(),
-                format!("docs: {} (pf docs-map --fix)", r.summary()),
+                format!(
+                    "{docs_root}: {} (pf docs-map --docs {docs_root} --fix)",
+                    r.summary()
+                ),
             );
         } else {
-            d.note("no docs/ folder yet (pf docs-map --fix creates it)");
+            d.note(format!(
+                "no {docs_root}/ folder yet (pf docs-map --docs {docs_root} --fix creates it)"
+            ));
         }
         let is_github = util::output("git", &["remote", "get-url", "origin"], Some(&p))
             .is_some_and(|u| u.contains("github"));
