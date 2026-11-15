@@ -11,6 +11,7 @@ and its evidence.
 - `pf graph view --modules` joins independent repository indexes in a local 3D view, with repository and workspace hubs. The browser preserves hub links when limiting other visible edges.
 - Source symbols and locations remain searchable; hub links represent topology rather than inferred cross-repository calls.
 - Release candidate version: `1.2.0`.
+- Published signed `v1.2.0` with a checksum-verified Linux binary; installed in Connect and generated the combined workspace view from the released CLI.
 
 ## 2026-11-15 — Topology-aware installation and code graph view
 
