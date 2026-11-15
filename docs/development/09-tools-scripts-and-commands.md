@@ -95,8 +95,8 @@ git worktree list
 `pf install project <repo> [--root-only] [--install-graphify] [--configure-models]`
 installs the runtime kits, can provision Graphify and can prompt for routing.
 `pf graph refresh [--modules]`, `pf graph query <question>` and `pf graph view [--modules]` operate on the
-checkout selected by `--root` or the current directory. `pf providers setup`,
-`pf providers check` and `pf providers run <job-id> <role> --allow-api` select,
+checkout selected by `--root` or the current directory. The local graph view provides source previews, symbol-level directed relations, search, focus and zoom controls.
+`pf providers setup`, `pf providers check` and `pf providers run <job-id> <role> --allow-api` select,
 validate and dispatch the active role's route. Pass `--root` to select the
 workspace. [Model routing](../guide/01-getting-started.md#model-routing)
 The router route accepts private local router configuration when the launching

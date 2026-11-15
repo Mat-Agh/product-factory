@@ -95,6 +95,7 @@ Graphify builds a local index when installed. Run `pf graph query "<symbol>"`
 to navigate the current checkout, including uncommitted source. Open the
 locally generated `.factory/graphify/view.html` for a 3D file network.
 For a multi-repository workspace, `pf graph view --modules` writes `.factory/graphify/workspace-view.html` with brain-cloud and thought-sphere layouts.
+The graph inspector shows source previews, symbols and directed uses/used-by relationships; its controls support search, focus, pan and zoom.
 
 ## What is where
 
