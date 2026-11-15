@@ -12,6 +12,10 @@ and its evidence.
 - Added search, focus, pan, zoom slider and buttons, reset and keyboard controls to both brain-cloud and thought-sphere layouts. Verified against Connect's multi-repository graph.
 - Prepared CLI `1.3.0` for a fresh `v1` production release.
 
+## 2026-11-15 — Respect adopted documentation layouts
+
+- Project entrypoints no longer tell repositories with `doc/` or `product/` to move documentation under `docs/`. Installation replaces only that obsolete Factory paragraph; doctor checks the inferred documentation root.
+
 ## 2026-11-15 — Single v1 production release
 
 - Consolidated the published production line under signed `v1`, retaining the tested CLI 1.2.0 binary and its checksum. Historical versioned release records and tags were retired at the operator's request; Git commit history remains available.

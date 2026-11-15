@@ -25,7 +25,7 @@ lines are advice that does not fail the check.
 | Project | `AGENTS.md` has Setup, Dev server and Gates headings | note |
 | Project | Claude agent routes match the descriptor. Skill, protocol, constitution and dashboard match the kit | note |
 | Project | Shared skill and generated Codex and Antigravity agent definitions match the descriptor at the root and in installed modules | FAIL |
-| Project | product docs map status | note |
+| Project | product docs map status at the inferred `docs/`, `doc/`, or `product/` root | note |
 | Project | base branch protected on GitHub | note |
 
 From a standalone binary, doctor checks the machine and the embedded kit
