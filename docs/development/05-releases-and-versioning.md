@@ -5,7 +5,7 @@
 
 ## Versions
 
-The factory uses semantic versions internally. The published production release is the immutable `v1` tag; its bundled CLI reports its tested internal version.
+The factory uses semantic versions internally. The production release uses the `v1` tag; its bundled CLI reports its tested internal version. Reissuing `v1` is an explicit operator action that replaces its prior release and tag after verifying the replacement assets.
 
 | Bump | When |
 |---|---|

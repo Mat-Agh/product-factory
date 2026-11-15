@@ -1,7 +1,8 @@
 //! Local Graphify code indexes, scoped to the Git worktree being inspected.
 
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeMap;
 use std::fs::{self, File, OpenOptions};
+use std::io::{BufRead, BufReader};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
 
@@ -84,7 +85,39 @@ fn write_view_data(root: &Path, graph: &str, name: &str) -> Result<PathBuf, Stri
 
 fn write_view(root: &Path) -> Result<PathBuf, String> {
     let graph = fs::read_to_string(graph_file(root)).map_err(|e| e.to_string())?;
-    write_view_data(root, &graph, "view.html")
+    let mut data: Value = serde_json::from_str(&graph).map_err(|e| e.to_string())?;
+    data["root_path"] = json!(root.to_string_lossy());
+    let mut previews = serde_json::Map::new();
+    if let Some(nodes) = data["nodes"].as_array() {
+        for node in nodes {
+            if let Some(file) = node["source_file"].as_str()
+                && !previews.contains_key(file)
+                && let Some(preview) = source_preview(root, file)
+            {
+                previews.insert(file.to_owned(), json!(preview));
+            }
+        }
+    }
+    data["previews"] = Value::Object(previews);
+    write_view_data(root, &data.to_string(), "view.html")
+}
+
+fn source_preview(root: &Path, file: &str) -> Option<String> {
+    let relative = Path::new(file);
+    if !discovery::local_path(root, relative) {
+        return None;
+    }
+    let source = File::open(root.join(relative)).ok()?;
+    let mut lines = String::new();
+    for line in BufReader::new(source).lines().take(16) {
+        let line = line.ok()?;
+        if lines.chars().count() + line.chars().count() > 900 {
+            break;
+        }
+        lines.push_str(&line);
+        lines.push('\n');
+    }
+    (!lines.trim().is_empty()).then_some(lines)
 }
 
 fn write_workspace_view(root: &Path) -> Result<PathBuf, String> {
@@ -95,7 +128,9 @@ fn write_workspace_view(root: &Path) -> Result<PathBuf, String> {
         ));
     }
     let mut nodes = Vec::new();
-    let mut edges = BTreeSet::new();
+    let mut edges: BTreeMap<(String, String, String), usize> = BTreeMap::new();
+    let mut symbol_links = Vec::new();
+    let mut previews = serde_json::Map::new();
     let mut symbol_count = 0usize;
     let workspace_id = "@workspace";
     nodes.push(
@@ -116,6 +151,7 @@ fn write_workspace_view(root: &Path) -> Result<PathBuf, String> {
         )
         .map_err(|e| e.to_string())?;
         let mut file_by_id = BTreeMap::new();
+        let mut symbol_by_id = BTreeMap::new();
         let mut symbols: BTreeMap<String, Vec<Value>> = BTreeMap::new();
         for node in graph["nodes"]
             .as_array()
@@ -129,18 +165,31 @@ fn write_workspace_view(root: &Path) -> Result<PathBuf, String> {
             };
             let file_id = format!("{name}/{file}");
             file_by_id.insert(id.to_owned(), file_id.clone());
+            let symbol_id = format!("{name}/{id}");
+            symbol_by_id.insert(id.to_owned(), symbol_id.clone());
             symbols.entry(file_id).or_default().push(json!({
-                "label": node["label"], "source_location": node["source_location"]
+                "id": symbol_id, "label": node["label"],
+                "source_location": node["source_location"],
+                "callable": node["_callable"], "class": node["_callable_class"]
             }));
             symbol_count += 1;
         }
         let hub = format!("{name}/@module");
         nodes.push(json!({"id":hub,"label":name,"source_file":hub,"symbols":[]}));
-        edges.insert((workspace_id.to_owned(), hub.clone()));
+        *edges
+            .entry((workspace_id.to_owned(), hub.clone(), "contains".into()))
+            .or_default() += 1;
         for (file, list) in symbols {
             let label = file.rsplit('/').next().unwrap_or(&file);
+            if let Some(relative) = file.strip_prefix(&format!("{name}/"))
+                && let Some(preview) = source_preview(&checkout, relative)
+            {
+                previews.insert(file.clone(), json!(preview));
+            }
             nodes.push(json!({"id":file,"label":label,"source_file":file,"symbols":list}));
-            edges.insert((hub.clone(), file));
+            *edges
+                .entry((hub.clone(), file, "contains".into()))
+                .or_default() += 1;
         }
         for link in graph["links"]
             .as_array()
@@ -152,8 +201,18 @@ fn write_workspace_view(root: &Path) -> Result<PathBuf, String> {
             let Some(target) = link["target"].as_str().and_then(|id| file_by_id.get(id)) else {
                 continue;
             };
+            let relation = link["relation"].as_str().unwrap_or("references");
+            if let (Some(source_id), Some(target_id)) = (
+                link["source"].as_str().and_then(|id| symbol_by_id.get(id)),
+                link["target"].as_str().and_then(|id| symbol_by_id.get(id)),
+            ) {
+                symbol_links
+                    .push(json!({"source":source_id,"target":target_id,"relation":relation}));
+            }
             if source != target {
-                edges.insert((source.clone(), target.clone()));
+                *edges
+                    .entry((source.clone(), target.clone(), relation.to_owned()))
+                    .or_default() += 1;
             }
         }
     }
@@ -162,9 +221,10 @@ fn write_workspace_view(root: &Path) -> Result<PathBuf, String> {
     }
     let links: Vec<Value> = edges
         .into_iter()
-        .map(|(source, target)| json!({"source":source,"target":target}))
+        .map(|((source, target, relation), count)| json!({"source":source,"target":target,"relation":relation,"count":count}))
         .collect();
-    let data = json!({"nodes":nodes,"links":links,"symbol_count":symbol_count});
+    let data = json!({"nodes":nodes,"links":links,"symbol_links":symbol_links,"previews":previews,
+        "symbol_count":symbol_count,"root_path":root.to_string_lossy()});
     write_view_data(root, &data.to_string(), "workspace-view.html")
 }
 
@@ -425,9 +485,15 @@ mod tests {
             r#"{"nodes":[{"id":"a","label":"</script>","source_file":"a.rs"}],"links":[]}"#,
         )
         .unwrap();
+        fs::write(
+            root.join("a.rs"),
+            "// concise source context\nfn inspect() {}\n",
+        )
+        .unwrap();
         let page = fs::read_to_string(write_view(&root).unwrap()).unwrap();
         assert!(page.contains("\\u003c/script\\u003e"));
-        assert!(page.contains("Rotatable three dimensional code network"));
+        assert!(page.contains("Interactive three dimensional code network"));
+        assert!(page.contains("concise source context"));
         fs::remove_dir_all(root).unwrap();
     }
 }

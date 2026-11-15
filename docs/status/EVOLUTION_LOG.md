@@ -6,6 +6,12 @@
 Append-only. One dated entry for each factory-level change: what changed, why,
 and its evidence.
 
+## 2026-11-15 — Code network context and controls
+
+- Local graph views now show bounded source previews and directed extracted relationships for files and symbols. Workspace graph data retains symbol links and relation names while keeping repository membership distinct.
+- Added search, focus, pan, zoom slider and buttons, reset and keyboard controls to both brain-cloud and thought-sphere layouts. Verified against Connect's multi-repository graph.
+- Prepared CLI `1.3.0` for a fresh `v1` production release.
+
 ## 2026-11-15 — Single v1 production release
 
 - Consolidated the published production line under signed `v1`, retaining the tested CLI 1.2.0 binary and its checksum. Historical versioned release records and tags were retired at the operator's request; Git commit history remains available.

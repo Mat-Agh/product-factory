@@ -104,6 +104,7 @@ review. If Hermes and model routes are present, it trusts the project skill.
 Use `pf graph --root <repo> view` to open the local 3D code network and
 `pf graph --root <repo> query "<symbol>"` for bounded agent context.
 For a workspace with independent repositories, run `pf graph --root <workspace> view --modules` and open `.factory/graphify/workspace-view.html`. Switch between Brain cloud and Thought sphere in the viewer.
+Select a node to inspect its source preview, contained symbols, outgoing uses and incoming references. Shift+drag pans; the buttons and wheel control zoom.
 
 <!-- documentation-routing:start -->
 ## Documentation routing
