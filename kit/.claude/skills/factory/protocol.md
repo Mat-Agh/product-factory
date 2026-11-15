@@ -11,6 +11,14 @@ Use results to find source and tests, and verify them by reading the files. For
 shared-history modules, keep results within the assigned module and its
 documented dependencies. If Graphify is unavailable or the graph is empty,
 locate files with ordinary source search.
+Use `pf graph --root <worktree> view` for a local 3D file network when a
+relationship is unclear. Search its symbol list, then open the source at the
+reported location. The graph is an index, not authority for code behaviour.
+Document public functions and classes, stateful contracts, important variables,
+and non-obvious algorithms where they are defined. Keep repository and module
+relationships in the owning docs and link to the source. A comment on every
+line would duplicate the code and obscure changes; use source locations in the
+graph for line-level navigation instead.
 
 
 ## Capture new knowledge

@@ -4,13 +4,14 @@
 
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::process::{Command, Stdio};
 use std::sync::LazyLock;
 
 use regex::Regex;
 use serde_json::{Value, json};
 
 use crate::util::{self, say, warn};
-use crate::{bundle, descriptor, discovery, graph, rules, runtime};
+use crate::{bundle, descriptor, discovery, docs_map, graph, knowledge, rules, runtime};
 
 /// The hook command. It fails closed: without `pf` on PATH every Bash call is blocked
 /// with an install hint, rather than silently running unguarded.
@@ -591,11 +592,19 @@ pub fn project(factory: &Path, target: &Path, no_attribution: bool, modules: boo
         }
     };
     graph::install(&root);
+    if descriptor::find(&root).is_some_and(|d| d.multi_repo()) {
+        say("multi-repo workspace: keeping stack knowledge in child repositories");
+        prepare_docs_map(&root, "docs");
+    } else {
+        prepare_knowledge(factory, &root);
+    }
     for child in children {
         if module(factory, &child, &root, no_attribution) != 0 {
             return 1;
         }
+        prepare_knowledge(factory, &child);
     }
+    prepare_hermes(&root);
     println!(
         "Done. Open {} in your AI host and load the Factory coordinator for init.",
         root.display()
@@ -603,13 +612,84 @@ pub fn project(factory: &Path, target: &Path, no_attribution: bool, modules: boo
     println!(
         "Claude Code: /factory init. Codex: $product-factory init. Other hosts: product-factory skill."
     );
-    println!("Hermes: run hermes skills trust in the checkout to enable its project skill.");
+    println!(
+        "Hermes: existing routed projects are trusted automatically; otherwise run hermes skills trust in the checkout."
+    );
     println!("Monitor: pf job status or pf dashboard.");
-    println!("Docs map: pf docs-map (add --fix to generate README links and the map).");
+    println!(
+        "Docs map: generated during install; run pf docs-map to inspect remaining inherited links."
+    );
     if !util::has_cmd("pf") {
         warn("Put pf on PATH before starting an agent session so the guard hook can run.");
     }
     0
+}
+
+fn prepare_knowledge(factory: &Path, root: &Path) {
+    let t = knowledge::target(root, None, None);
+    match knowledge::plan(factory, &t) {
+        Ok(plan) if !plan.conflicts.is_empty() => warn(format!(
+            "{} has {} handbook numbering conflict(s); review pf knowledge plan before importing",
+            root.display(),
+            plan.conflicts.len()
+        )),
+        Ok(plan) => {
+            if !plan.missing.is_empty() {
+                match knowledge::init(factory, &t, true) {
+                    Ok(applied) => say(format!(
+                        "prepared {} missing {} documentation files in {}",
+                        applied.created.len(),
+                        t.stack,
+                        root.display()
+                    )),
+                    Err(e) => warn(format!("knowledge preparation for {}: {e}", root.display())),
+                }
+            }
+        }
+        Err(e) => warn(format!("knowledge plan for {}: {e}", root.display())),
+    }
+    prepare_docs_map(root, &t.docs_root);
+}
+
+fn prepare_docs_map(root: &Path, docs: &str) {
+    let report = docs_map::run(&docs_map::Options {
+        root: root.to_path_buf(),
+        docs: docs.into(),
+        fix: true,
+        strict: false,
+        allow: vec![],
+    });
+    if !report.errors.is_empty() {
+        warn(format!(
+            "{}: {} documentation issue(s) remain",
+            root.display(),
+            report.errors.len()
+        ));
+    }
+}
+
+fn prepare_hermes(root: &Path) {
+    if !root.join(".factory/model-routes.json").is_file() || !util::has_cmd("hermes") {
+        return;
+    }
+    match Command::new("hermes")
+        .args(["skills", "trust"])
+        .arg(root)
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .status()
+    {
+        Ok(status) if status.success() => say(format!(
+            "Hermes project skills trusted at {}",
+            root.display()
+        )),
+        Ok(status) => warn(format!(
+            "Hermes skills trust exited with {status}; run hermes skills trust {}",
+            root.display()
+        )),
+        Err(e) => warn(format!("Hermes skills trust failed: {e}")),
+    }
 }
 
 #[cfg(unix)]

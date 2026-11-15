@@ -13,6 +13,10 @@ protocol also routes link updates through the module's documentation convention.
 The protocol holds the rules shared by all ten role agents, kept in one file so
 the role files contain only what differs between them. Every role file tells
 its agent to read the protocol first.
+Agents use the local graph to locate code, then verify the owning source.
+They document public contracts and non-obvious state at definitions and keep
+cross-module relationships in the owning docs. Source locations provide
+line-level navigation without narrating every line in comments.
 
 ## Contents
 

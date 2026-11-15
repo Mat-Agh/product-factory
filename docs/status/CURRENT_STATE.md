@@ -25,7 +25,8 @@ It contains:
   Workspaces can route independent workers through Hermes to Claude, GPT,
   Gemini or a gateway such as 9Router by task effort.
 - **Code navigation:** Graphify builds and refreshes a local graph for each
-  Git checkout and job worktree. The protocol uses it for bounded navigation.
+  Git checkout and job worktree. The protocol uses it for bounded navigation;
+  installation also writes an interactive local 3D file network.
 - **Discovery:** audit and knowledge planning can discover checked-out Git
   submodules and stack directories without a descriptor. Project install
   drafts a descriptor and can install both kits into independent modules.
@@ -57,6 +58,9 @@ It contains:
   imports; `pf knowledge init` imports missing pages and appends the sections an
   existing doc lacks, never overwriting, and every job keeps it true
   ([COMP-018](../components/COMP-018-knowledge-structure.md)).
+  Installation creates missing stack pages per independent checkout and
+  regenerates documentation maps, while preserving existing content and
+  reporting handbook numbering conflicts for review.
 - **Documentation:** everything is under `docs/`, one connected tree generated
   and checked by `pf docs-map`. It covers governance, the operator guide,
   architecture, component contracts, the development handbook, ADRs, status

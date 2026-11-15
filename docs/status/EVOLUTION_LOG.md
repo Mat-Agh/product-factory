@@ -6,6 +6,21 @@
 Append-only. One dated entry for each factory-level change: what changed, why,
 and its evidence.
 
+## 2026-11-15 — Topology-aware installation and code graph view
+
+- Project installation now prepares missing stack-pack pages for each
+  independent repository, regenerates its docs map, and stops automatic import
+  when chapter numbers conflict. Existing pages and SQL migrations are not
+  overwritten.
+- When an installed project has model routes and Hermes on PATH, the installer
+  trusts its project skill. Graphify now produces a local interactive 3D file
+  network with symbol and source-location search; bounded CLI queries remain
+  the agent navigation path.
+- The shared protocol asks agents to document public code contracts and
+  non-obvious state at definitions, then link lasting relationships from the
+  owning repository's docs. Source locations support line-level navigation.
+- Release candidate version: `1.1.0`.
+
 ## 2026-11-15 — Private local router configuration
 
 - `pf providers` now reads a regular owner-private local router config when

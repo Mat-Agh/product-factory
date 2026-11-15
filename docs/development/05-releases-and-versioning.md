@@ -15,6 +15,10 @@ The factory uses semantic versioning on its git tags: `vMAJOR.MINOR.PATCH`.
 
 The current release is [`v1.0.1`](https://github.com/Mat-Agh/product-factory/releases/tag/v1.0.1). It adds private local router configuration for Factory workers. The Linux x86-64 binary and SHA-256 checksum are attached to the signed release. See the [implementation status](../status/IMPLEMENTATION_STATUS.md) for verified features and remaining live runtime checks.
 
+`v1.1.0` is the next minor release candidate. It prepares missing stack docs,
+trusts a detected Hermes project skill, and adds a local 3D Graphify view.
+Existing product docs and SQL migrations remain in their owning repositories.
+
 ## Releasing the factory
 
 Tagging is human-only, here as everywhere.

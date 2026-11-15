@@ -133,8 +133,13 @@ The installer adds all project entry points and appends a Product Factory
 section to `AGENTS.md`. It drafts `.factory/factory.yaml` from the stack and
 docs layout and adds the backlog and dashboard. The installer includes independent
 checkouts by default. Use `--root-only` to limit it to the workspace root. `--install-graphify` provisions the pinned
-Graphify CLI using `uv` if needed. Run `hermes skills trust` in each checkout
-you want Hermes to trust, then reopen the project. Antigravity uses the shared
+Graphify CLI using `uv` if needed. Installation prepares missing stack-pack
+documentation in each independent checkout and builds a local 3D code network
+at `.factory/graphify/view.html`. Existing docs remain intact; review reported
+numbering conflicts with `pf knowledge plan --modules`. If Hermes is installed
+and a project has model routes, installation trusts its shared project skill.
+Otherwise run `hermes skills trust` in each checkout you want Hermes to trust,
+then reopen the project. Antigravity uses the shared
 project skill and its installed Factory subagents.
 
 ## Model routing

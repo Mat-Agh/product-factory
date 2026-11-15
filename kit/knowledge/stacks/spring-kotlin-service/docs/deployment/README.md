@@ -24,3 +24,11 @@ required ports and external dependencies, and how each was measured.
 Record how images are built (JVM or native), how they are signed, where they are
 stored, and how a deployment pins them by digest. Production artifacts come only
 from the protected release pipeline.
+
+## Helm, when this repository deploys with it
+
+Record the chart path and version, every values file and environment overlay,
+the release and namespace names, pinned image digests, secret references,
+upgrade and rollback commands, and the CI job that applies them. Link the
+actual chart files; this guide does not invent a chart for a repository that
+deploys another way. Keep credentials outside values files committed to Git.

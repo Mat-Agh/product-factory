@@ -41,7 +41,7 @@ blocked with the install hint above.
 | `pf export` | Copy Claude Code memory into `.claude-export/<date>/` for review | [COMP-009](COMP-009-backup-tools.md) |
 | `pf job claim \| prepare \| advance \| status \| show \| pause \| resume \| rework \| finish` | Durable job control, Git worktrees and evidence transitions | [Job lifecycle](../architecture/JOB_LIFECYCLE.md) |
 | `pf job knowledge <id>` | Inspect committed change signals and candidate project docs for a prepared job | [Knowledge capture](../guide/02-commands.md#inspect-knowledge-capture) |
-| `pf graph refresh [--modules]` or `pf graph query <question>` | Build or query a local Graphify index | [Knowledge structure](COMP-018-knowledge-structure.md#local-code-graph) |
+| `pf graph refresh [--modules]`, `query <question>` or `view` | Build, query or visualize a local Graphify index | [Knowledge structure](COMP-018-knowledge-structure.md#local-code-graph) |
 | `pf providers setup`, `check` or `run <job-id> <role> --allow-api` | Configure or dispatch a model route | [Model routing](../guide/01-getting-started.md#model-routing) |
 | `pf dashboard [--dir .factory] [--port 8000]` | Serve the dashboard on loopback | [COMP-006](COMP-006-backlog-and-dashboard.md) |
 | `pf rules sync` | Generate path-scoped `.claude/rules/modules/<area>.md` from the descriptor | [COMP-016](COMP-016-session-integration.md) |

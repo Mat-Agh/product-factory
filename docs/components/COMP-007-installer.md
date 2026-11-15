@@ -43,7 +43,7 @@ Claude Code's symlinks and operator profile keep working across updates.
 | `GEMINI.md` and existing `.hermes.md` or `HERMES.md` | Adds a reference to the shared project instructions |
 | `.agents/agents/factory-*.md` | Antigravity subagents generated from the canonical roles |
 | `.claude/rules/modules/*.md` | Generated from the workspace descriptor. Unmanaged files at the same paths are preserved and reported |
-| `.factory/graphify/` | Ignored local graph if Graphify is installed and source is present |
+| `.factory/graphify/` | Ignored local graph and interactive 3D file network if Graphify is installed and source is present |
 | `CLAUDE.md` | Created as `@AGENTS.md` only if missing |
 
 Run `pf audit <path> --modules` before adopting existing projects. Review
@@ -52,6 +52,16 @@ VCS, hooks and gates. `pf knowledge plan --modules` previews the knowledge
 imports for review. Git branches, working trees and remote state stay in
 the operator's control. The install target must be a Git root.
 It warns when `pf` is not on `PATH`, because the hook would then block Bash.
+
+The installer creates missing stack-pack documentation files and regenerates
+the documentation map for each independent checkout. It leaves existing files
+untouched. When handbook chapter numbers conflict, it reports the conflict
+and waits for a reviewed `pf knowledge plan` before importing. Existing
+sections are never appended by installation; use `pf knowledge init` after
+reviewing its plan. A workspace root receives cross-repository guidance,
+while each child repository owns its stack and SQL migration documentation.
+If a project already has model routes and Hermes is installed, installation
+also trusts its shared project skill in Hermes.
 
 ## `user` writes
 
