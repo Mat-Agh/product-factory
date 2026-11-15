@@ -103,6 +103,8 @@ checkout selected by `--root` or the current directory. `pf providers setup`,
 `pf providers check` and `pf providers run <job-id> <role> --allow-api` select,
 validate and dispatch the active role's route. Pass `--root` to select the
 workspace. [Model routing](../guide/01-getting-started.md#model-routing)
+For local 9Router use, the CLI can read an owner-private router config from
+`~/.config/product-factory/router.json`; environment values override it.
 
 `pf job knowledge <id>` reports feature, spike and dependency signals, the
 inspected commit and the changed knowledge paths. The command is read-only.

@@ -1,7 +1,7 @@
 # Current repository state
 
 **Status:** Active
-**Last updated:** 2026-11-10
+**Last updated:** 2026-11-15
 
 This repository owns the Product Factory: an agentic pipeline that takes a product
 idea or request through triage, product, design, planning, build, parallel
@@ -64,9 +64,11 @@ It contains:
   operator profile. Diagrams are inline Mermaid blocks, linted and parsed by `pf diagrams`.
 
 **Verification state:** CLI tests include scratch worktree runs, Graphify
-updates and provider dispatch with a synthetic credential. Paid provider
-calls and live Antigravity dispatch are pending. **No job has run end to end
-on a real product yet.** That is the Phase 1 exit criterion. Details:
+updates and provider dispatch with a synthetic credential. The Connect
+installation resolves three configured private 9Router routes, and a separate
+Hermes live probe returned HTTP 200 for GPT, Gemini Flash, Qwen and all five
+combos on 2026-11-15. A complete Factory job through review and delivery has
+not yet run on a real product. That remains the Phase 1 exit criterion. Details:
 [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md).
 
 The repository is hosted at `Mat-Agh/product-factory` (private) with no mirror

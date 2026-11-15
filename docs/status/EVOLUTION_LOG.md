@@ -1,10 +1,19 @@
 # Evolution log
 
 **Status:** Active — append-only
-**Last updated:** 2026-11-10
+**Last updated:** 2026-11-15
 
 Append-only. One dated entry for each factory-level change: what changed, why,
 and its evidence.
+
+## 2026-11-15 — Private local router configuration
+
+- `pf providers` now reads a regular owner-private local router config when
+  the launching shell does not export router credentials. Environment values
+  still take precedence; the project descriptor and route file contain no key.
+- Hermes project registration writes this local file from its existing private
+  9Router credential. The Connect routes passed `pf providers check` without
+  exported variables. Rust unit and integration tests and Clippy passed.
 
 ## 2026-11-10 — Consolidated Product Factory v1 release
 

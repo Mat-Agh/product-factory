@@ -99,6 +99,8 @@ checkout selected by `--root` or the current directory. `pf providers setup`,
 `pf providers check` and `pf providers run <job-id> <role> --allow-api` select,
 validate and dispatch the active role's route. Pass `--root` to select the
 workspace. [Model routing](../guide/01-getting-started.md#model-routing)
+The router route accepts private local router configuration when the launching
+shell does not export `PF_ROUTER_URL` and `PF_ROUTER_API_KEY`.
 
 Use `pf job knowledge <id>` from a Factory workspace to see committed change
 signals and candidate documentation for the job. From a worktree, pass
