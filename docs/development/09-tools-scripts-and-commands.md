@@ -94,7 +94,7 @@ git worktree list
 
 `pf install project <repo> [--root-only] [--install-graphify] [--configure-models]`
 installs the runtime kits, can provision Graphify and can prompt for routing.
-`pf graph refresh [--modules]`, `pf graph query <question>` and `pf graph view` operate on the
+`pf graph refresh [--modules]`, `pf graph query <question>` and `pf graph view [--modules]` operate on the
 checkout selected by `--root` or the current directory. `pf providers setup`,
 `pf providers check` and `pf providers run <job-id> <role> --allow-api` select,
 validate and dispatch the active role's route. Pass `--root` to select the

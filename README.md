@@ -94,6 +94,7 @@ requirements. [Runtime setup](docs/guide/01-getting-started.md#model-routing)
 Graphify builds a local index when installed. Run `pf graph query "<symbol>"`
 to navigate the current checkout, including uncommitted source. Open the
 locally generated `.factory/graphify/view.html` for a 3D file network.
+For a multi-repository workspace, `pf graph view --modules` writes `.factory/graphify/workspace-view.html` with brain-cloud and thought-sphere layouts.
 
 ## What is where
 
