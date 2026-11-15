@@ -14,6 +14,9 @@ and its evidence.
 - Hermes project registration writes this local file from its existing private
   9Router credential. The Connect routes passed `pf providers check` without
   exported variables. Rust unit and integration tests and Clippy passed.
+- Prepared CLI version `1.0.1` for the next patch release. Connect received
+  the reviewed source revision as a local installation; published release
+  status depends on the human merge, signed tag and release procedure.
 
 ## 2026-11-10 — Consolidated Product Factory v1 release
 
