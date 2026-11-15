@@ -162,6 +162,13 @@ in the environment of the IDE or terminal that launches `pf`.
 | `gemini:` | `GEMINI_API_KEY` or `GOOGLE_API_KEY` |
 | `router:` | `PF_ROUTER_URL` and `PF_ROUTER_API_KEY` |
 
+For a local router, `pf` also accepts
+`~/.config/product-factory/router.json` (or the same path under
+`XDG_CONFIG_HOME`). It must be a regular, owner-private file (mode `0600`)
+with `url` and `api_key` fields. Environment variables take precedence.
+Hermes project registration can write this file from its existing private
+9Router credential; the project checkout never stores the key.
+
 The router endpoint can be [9Router](https://github.com/decolua/9router/blob/master/gitbook/content/en/integration/other-tools.md)
 or an OpenAI-compatible gateway that supports tool calling. For a local 9Router,
 set `PF_ROUTER_URL=http://localhost:20128/v1` and enter the tier aliases from

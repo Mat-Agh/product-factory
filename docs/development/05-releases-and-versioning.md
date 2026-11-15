@@ -1,7 +1,7 @@
 # 05 — Releases and versioning
 
 **Status:** Active
-**Last updated:** 2026-11-10
+**Last updated:** 2026-11-15
 
 ## Versions
 
@@ -16,6 +16,11 @@ The factory uses semantic versioning on its git tags: `vMAJOR.MINOR.PATCH`.
 The current release is `v1.0.0`. It includes knowledge capture and the
 updated CLI guide. Verify the installer checksum and reinstall its project
 kit to enable capture for new jobs. See the [implementation status](../status/IMPLEMENTATION_STATUS.md) for verified features and remaining live runtime checks.
+
+`v1.0.1` is prepared as a patch release candidate. It adds private local
+router configuration for Factory workers. It becomes a release only after the
+review PR is merged and a human signs the tag and publishes its verified
+binary and checksum.
 
 ## Releasing the factory
 

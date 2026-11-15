@@ -118,16 +118,44 @@ fn load(root: &Path) -> Result<Value, String> {
 }
 
 fn key(r: &Route<'_>) -> Option<(&'static str, std::ffi::OsString)> {
-    r.keys.iter().find_map(|name| {
+    let from_env = r.keys.iter().find_map(|name| {
         std::env::var_os(name)
             .filter(|value| !value.is_empty())
             .map(|value| (*name, value))
+    });
+    from_env.or_else(|| {
+        (r.provider == "router").then(|| {
+            local_router_config()
+                .and_then(|config| config["api_key"].as_str().map(std::ffi::OsString::from))
+                .filter(|value| !value.is_empty())
+                .map(|value| ("local router config", value))
+        })?
     })
 }
 
+fn local_router_config() -> Option<Value> {
+    let config_root = std::env::var_os("XDG_CONFIG_HOME")
+        .map(PathBuf::from)
+        .or_else(|| std::env::var_os("HOME").map(|home| PathBuf::from(home).join(".config")))?;
+    let path = config_root.join("product-factory/router.json");
+    let metadata = fs::symlink_metadata(&path).ok()?;
+    if !metadata.file_type().is_file() {
+        return None;
+    }
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        if metadata.permissions().mode() & 0o077 != 0 {
+            return None;
+        }
+    }
+    serde_json::from_str(&fs::read_to_string(path).ok()?).ok()
+}
+
 fn router_url() -> Result<String, String> {
-    let value = std::env::var("PF_ROUTER_URL")
-        .map_err(|_| "Set PF_ROUTER_URL to the router’s OpenAI-compatible /v1 endpoint")?;
+    let value = std::env::var("PF_ROUTER_URL").ok().or_else(|| {
+        local_router_config().and_then(|config| config["url"].as_str().map(str::to_owned))
+    }).ok_or("Set PF_ROUTER_URL or a private local router config with an OpenAI-compatible /v1 endpoint")?;
     let value = value.trim_end_matches('/');
     let authority = value.strip_suffix("/v1").and_then(|v| {
         v.strip_prefix("https://").or_else(|| {
