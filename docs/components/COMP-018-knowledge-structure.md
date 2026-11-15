@@ -70,6 +70,10 @@ existing equivalent. Scaffolds are created when missing and never merged.
 
 The numbers `00`, `09`, `15` and `16` mean the same thing in every stack. Stack
 chapters use the remaining numbers.
+The Spring stack also prepares `docs/data/README.md` for the SQL schema and
+migration map and `docs/deployment/README.md` for deployment topology and,
+when a real chart exists, its Helm release and values. It never generates
+product SQL or a Helm chart without product-owned source requirements.
 
 ## Interface
 
@@ -164,6 +168,10 @@ plan, build and release, and refreshes before a query to include uncommitted
 changes. Empty projects are indexed when supported files appear. Graphs
 live in the checkout's ignored `.factory/graphify/` directory. Source files
 and the stack handbook remain authoritative. [Graph commands](../guide/02-commands.md)
+Installation also generates `view.html` there: a local interactive 3D
+projection of file relationships with symbol and source-location search.
+The view caps visible files for browser responsiveness; `pf graph query`
+retrieves a bounded relevant slice for agents.
 
 ## Capture new knowledge during a job
 

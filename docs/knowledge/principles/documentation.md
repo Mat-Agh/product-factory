@@ -21,6 +21,14 @@ How knowledge is written, found and kept true in every repository.
 
 ## Routing
 
+Code documentation starts at the definition: describe the contract of public
+functions and classes, the meaning of non-obvious state and variables, and the
+reason for complex steps. Keep generated symbol and source-line indexes out of
+Git; refresh them from the code. Do not add prose that merely repeats each line.
+For cross-file and cross-module context, query the local Graphify index with
+`pf graph query` or rotate its file network with `pf graph view`, then verify
+the source and link durable decisions from the owning repository's docs.
+
 - A documentation link map (`development/16-documentation-link-map.md`) routes
   each kind of task to the smallest set of docs. Agents and people read that,
   not whole trees.

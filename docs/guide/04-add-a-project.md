@@ -98,6 +98,11 @@ repos get their own project instructions and generated roles. Shared-history
 modules use the Git root's runtime kit and graph. For an existing install,
 rerun the installer to pick up the entry points and run `pf providers setup`
 to configure workspace model routes. [Setup](01-getting-started.md#model-routing)
+The install prepares missing generic stack documentation in each repository
+and leaves existing pages intact. It reports chapter numbering conflicts for
+review. If Hermes and model routes are present, it trusts the project skill.
+Use `pf graph --root <repo> view` to open the local 3D code network and
+`pf graph --root <repo> query "<symbol>"` for bounded agent context.
 
 <!-- documentation-routing:start -->
 ## Documentation routing

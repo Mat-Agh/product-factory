@@ -22,6 +22,8 @@ pub enum Action {
     },
     /// Refresh the graph and search a small slice of it
     Query { question: String },
+    /// Write a local interactive 3D view of the current code graph
+    View,
 }
 
 pub fn available() -> bool {
@@ -63,6 +65,16 @@ fn command(executable: &Path, root: &Path) -> Command {
 
 fn graph_file(root: &Path) -> PathBuf {
     root.join(OUT).join("graph.json")
+}
+
+fn write_view(root: &Path) -> Result<PathBuf, String> {
+    let _lock = output_folder(root)?;
+    let graph = fs::read_to_string(graph_file(root)).map_err(|e| e.to_string())?;
+    let safe_graph = graph.replace('<', "\\u003c").replace('>', "\\u003e");
+    let page = include_str!("../assets/graph-view.html").replace("__GRAPH_JSON__", &safe_graph);
+    let path = root.join(OUT).join("view.html");
+    fs::write(&path, page).map_err(|e| e.to_string())?;
+    Ok(path)
 }
 
 fn output_folder(root: &Path) -> Result<File, String> {
@@ -210,10 +222,13 @@ pub fn refresh_if_available(root: &Path) {
 
 pub fn install(root: &Path) {
     match index(root) {
-        Ok(State::Ready) => util::say(format!(
-            "Graphify code graph ready at {}",
-            graph_file(root).display()
-        )),
+        Ok(State::Ready) => match write_view(root) {
+            Ok(path) => util::say(format!(
+                "Graphify code graph and 3D view ready at {}",
+                path.display()
+            )),
+            Err(e) => util::warn(e),
+        },
         Ok(State::Empty) => {
             util::say("Graphify will index this checkout when its first source files appear.")
         }
@@ -229,6 +244,23 @@ pub fn main(root: Option<PathBuf>, action: Action) -> i32 {
         return 1;
     }
     match action {
+        Action::View => {
+            let view = || -> Result<(), String> {
+                if index(&root)? == State::Empty {
+                    return Err("No supported source to visualize".into());
+                }
+                let path = write_view(&root)?;
+                println!("{}", path.display());
+                Ok(())
+            };
+            view().map_or_else(
+                |e| {
+                    util::warn(e);
+                    1
+                },
+                |()| 0,
+            )
+        }
         Action::Refresh { modules } => {
             let (roots, missing) = discovery::roots(&root, modules);
             for path in &missing {
@@ -237,7 +269,13 @@ pub fn main(root: Option<PathBuf>, action: Action) -> i32 {
             let mut result = i32::from(!missing.is_empty());
             for checkout in roots.into_iter().filter(|p| p.join(".git").exists()) {
                 match index(&checkout) {
-                    Ok(State::Ready) => println!("{}", graph_file(&checkout).display()),
+                    Ok(State::Ready) => match write_view(&checkout) {
+                        Ok(path) => println!("{}", path.display()),
+                        Err(e) => {
+                            util::warn(e);
+                            result = 1;
+                        }
+                    },
                     Ok(State::Empty) => {
                         println!("No supported source to index in {}", checkout.display())
                     }
@@ -275,5 +313,26 @@ pub fn main(root: Option<PathBuf>, action: Action) -> i32 {
                 1
             })
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn viewer_embeds_graph_without_html_script_breakout() {
+        let root = std::env::temp_dir().join(format!("pf-graph-view-{}", std::process::id()));
+        fs::create_dir_all(&root).unwrap();
+        drop(output_folder(&root).unwrap());
+        fs::write(
+            graph_file(&root),
+            r#"{"nodes":[{"id":"a","label":"</script>","source_file":"a.rs"}],"links":[]}"#,
+        )
+        .unwrap();
+        let page = fs::read_to_string(write_view(&root).unwrap()).unwrap();
+        assert!(page.contains("\\u003c/script\\u003e"));
+        assert!(page.contains("Rotatable three dimensional code network"));
+        fs::remove_dir_all(root).unwrap();
     }
 }
