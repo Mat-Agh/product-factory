@@ -6,11 +6,16 @@
 Append-only. One dated entry for each factory-level change: what changed, why,
 and its evidence.
 
+## 2026-11-15 — Clean generated role files
+
+- Runtime generation trims the extra trailing blank line from role files so a new child-repository install passes `git diff --check`. Prepared CLI 1.3.1 for the final `v1` rebuild.
+
 ## 2026-11-15 — Code network context and controls
 
 - Local graph views now show bounded source previews and directed extracted relationships for files and symbols. Workspace graph data retains symbol links and relation names while keeping repository membership distinct.
 - Added search, focus, pan, zoom slider and buttons, reset and keyboard controls to both brain-cloud and thought-sphere layouts. Verified against Connect's multi-repository graph.
 - Prepared CLI `1.3.0` for a fresh `v1` production release.
+- Rebuilt signed `v1` from the reviewed main commit with CLI 1.3.0 and a checksum-verified Linux binary.
 
 ## 2026-11-15 — Respect adopted documentation layouts
 
