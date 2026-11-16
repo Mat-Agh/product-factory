@@ -1,7 +1,7 @@
 # Product Factory implementation status
 
 **Status:** Active audit record
-**Last updated:** 2026-11-15
+**Last updated:** 2026-11-16
 **Factory revision:** `main` after v1 documentation (see [EVOLUTION_LOG](EVOLUTION_LOG.md))
 
 This page is the evidence map of what exists, what has been verified, and what is
@@ -16,7 +16,7 @@ there is recorded evidence that it works.
 | Rules, roles, procedure | Rust-backed state transitions verified with fixture artifacts. Live role execution remains open |
 | Mechanical enforcement | Guard hook (`pf guard`, Rust) passes 80/80 (the original 73 match the Python guard on 117 inputs); follows the project branch template and blocks hook bypasses; fails closed without `pf`. Branch protection depends on each product |
 | Distribution and portability | `pf install`, `pf doctor`, `pf mirror bundle` (with restore) and `pf export` verified on scratch setups. No second remote yet |
-| Documentation | All docs under `docs/`, one connected tree. `pf docs-map --strict` and `pf diagrams check` pass |
+| Documentation | All docs under `docs/`, one connected tree. The [Factory Atlas](../atlas/README.md) presents sourced English/Persian and visual views of current contracts and verified state; the [day-to-day guide](../guide/09-day-to-day-usage.md) connects installation, operation and PR review. `pf docs-map --strict` and `pf diagrams check` pass |
 | Tooling | One Rust CLI (`pf`); no Python, bash scripts or `jq`. 31 unit tests and 2 job integration tests, Clippy clean |
 | **Phase 1 exit (roadmap)** | **Open.** Codex reached a verified local gate after terminal-assisted Git preparation. Claude Code delivery and hosted PR acceptance remain open |
 
@@ -34,10 +34,10 @@ there is recorded evidence that it works.
 | [COMP-008](../components/COMP-008-doctor.md) Doctor | yes (Rust) | yes | Machine, factory and Connect runs, including Graphify and Hermes availability; the 1.3.0 candidate checks adopted `doc/` and `product/` roots | Verify after release installation |
 | [COMP-009](../components/COMP-009-backup-tools.md) Mirror and export | yes (Rust) | yes (local) | Bundle written, verified and cloned back; export against a scratch config (2026-10-19) | Add the first second-host mirror |
 | [COMP-010](../components/COMP-010-operator-profile.md) Operator profile | yes | n/a | Distilled from Hermes `USER.md`/`SOUL.md` | Keep current |
-| [COMP-011](../components/COMP-011-adapters.md) Adapters | Codex kit and manual adapters | partially | Generated Codex and Antigravity roles and shared Hermes/Gemini entry points. A synthetic Hermes worker exercised authorization, key checks and stage artifact handoff. The Hermes production guide documents router aliases and guarded Honcho context without project credentials. | The local Antigravity CLI listing did not show workspace agents in the scratch checkout. Verify discovery from an opened workspace, then run native dispatch and paid provider lanes |
+| [COMP-011](../components/COMP-011-adapters.md) Adapters | Codex kit and manual adapters | partially | Generated Codex and Antigravity roles and shared Hermes/Gemini entry points. A synthetic Hermes worker exercised authorization, key checks and stage artifact handoff. The Hermes production guide documents the verified `hermes-deep` default, Connect chat and project-skill prompt, router aliases and guarded Honcho context without project credentials. | The local Antigravity CLI listing did not show workspace agents in the scratch checkout. Verify discovery from an opened workspace, then run native dispatch and paid provider lanes |
 | [COMP-012](../components/COMP-012-docs-gate.md) Docs map | yes | yes | `pf docs-map --fix --strict` on this repo: 62 docs, every folder has a README, every doc is reachable from `docs/README.md` (2026-10-19) | Run on a real product (`/factory init`) |
 | [COMP-014](../components/COMP-014-diagrams.md) Diagrams | yes | yes | 29 inline Mermaid blocks lint clean and parse with Mermaid CLI 11; `validate` reports a broken block with file and line (2026-10-20) | Confirm live rendering on GitHub and in IntelliJ with the Mermaid extension |
-| [COMP-015](../components/COMP-015-pf-cli.md) `pf` CLI | yes | yes | CLI 1.3.5 bundles the responsive dashboard and concurrent local server; 39 Rust tests, Clippy, format, guard, diagrams, docs map and doctor passed | Live end-to-end job and inherited child-repo doc links remain |
+| [COMP-015](../components/COMP-015-pf-cli.md) `pf` CLI | yes | yes | CLI 1.5.0 bundles the responsive dashboard, concurrent local server, and verified provider fallback routing; 39 Rust tests, Clippy, format, guard, diagrams, docs map and doctor passed | Live end-to-end job and inherited child-repo doc links remain |
 | [COMP-016](../components/COMP-016-session-integration.md) Session integration and memory | yes | partially | Scratch workspace with two nested repos: workspace and module installs, `pf rules sync`, attribution off, doctor flags missing modules; `pf memory` read a project auto-memory directory; 15 cargo tests (2026-10-19) | Observe a live Claude session routing a request through `/factory`; run `/factory memory` on an adopted project |
 | [COMP-017](../components/COMP-017-adoption.md) Adoption | yes | partially | Read-only audit found five Connect modules. The real workspace descriptor now uses the accepted `codex/{job-id}` branch shape, attribution off, and generated module rules; `pf doctor` passed on 2026-11-15 | Resolve the knowledge import and docs-map notes, then run a live delivery and land the needed MRs |
 | [COMP-018](../components/COMP-018-knowledge-structure.md) Knowledge structure | yes | partially | Per-stack library and pack maps are covered by tests. The installer creates missing files without replacing existing docs and reports chapter conflicts for review; a fresh generic repo produced a valid map | Review existing Connect numbering conflicts and broken child-repo links; the real multi-repo import completed for conflict-free modules |

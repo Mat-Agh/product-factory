@@ -14,7 +14,8 @@ knowledge. Unfamiliar words are defined in the [glossary](GLOSSARY.md).
 |---|---|---|
 | 1 | [00-overview.md](00-overview.md) | What the factory does, from idea to market, and which steps stay yours |
 | 2 | [01-getting-started.md](01-getting-started.md) | From an empty machine to your first factory pull request |
-| 3 | [GLOSSARY.md](GLOSSARY.md) | Every term used in these docs |
+| 3 | [09-day-to-day-usage.md](09-day-to-day-usage.md) · [فارسی](09-day-to-day-usage.fa.md) | The short path for everyday jobs |
+| 4 | [GLOSSARY.md](GLOSSARY.md) | Every term used in these docs |
 
 ## Full index
 
@@ -29,6 +30,7 @@ knowledge. Unfamiliar words are defined in the [glossary](GLOSSARY.md).
 | 06 | [troubleshooting](06-troubleshooting.md) | Symptoms, causes and fixes |
 | 07 | [multi-repo workspaces](07-multi-repo-workspaces.md) | A multi-repo workspace under the factory, step by step |
 | 08 | [Hermes and Honcho](08-hermes-and-honcho.md) | Production routes, shared context and Factory jobs through Hermes |
+| 09 | [day-to-day usage](09-day-to-day-usage.md) · [فارسی](09-day-to-day-usage.fa.md) | Start views, give a job, inspect evidence and review its PR |
 | — | [GLOSSARY](GLOSSARY.md) | Terms |
 | — | [examples/AGENTS.example.md](examples/AGENTS.example.md) | A filled-in product `AGENTS.md` that the factory can work with |
 
@@ -47,6 +49,8 @@ knowledge. Unfamiliar words are defined in the [glossary](GLOSSARY.md).
   - [06 — Troubleshooting](06-troubleshooting.md)
   - [07 — Install Product Factory in a multi-repo workspace](07-multi-repo-workspaces.md)
   - [08 — Run Product Factory through Hermes and Honcho](08-hermes-and-honcho.md)
+  - [۰۹ — استفادهٔ روزمره از کارخانهٔ محصول](09-day-to-day-usage.fa.md)
+  - [09 — Use Product Factory day to day](09-day-to-day-usage.md)
   - [Glossary](GLOSSARY.md)
 - Subfolders:
   - [Examples](examples/README.md)

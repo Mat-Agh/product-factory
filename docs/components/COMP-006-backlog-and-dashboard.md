@@ -20,6 +20,8 @@
   `.factory/atlas.html` is the product explanation and dashboard directory.
   Both are overwritten on every install. `.factory/atlas.json` is
   project-owned and supplies its additional local or remote dashboard links.
+  The [Factory Atlas](../atlas/README.md) maps this repository's contracts and
+  verified state; it is distinct from the installed product page.
 - **Run:** `pf dashboard` from the product repo root, then open
   `http://127.0.0.1:8000/`. From a module, the server finds the workspace
   descriptor. It serves the board, backlog and job artifacts over loopback.

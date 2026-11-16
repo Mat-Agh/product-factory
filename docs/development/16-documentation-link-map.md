@@ -40,6 +40,8 @@ flowchart TB
 | Guard hook | `cli/src/guard.rs` (`pf guard`, `pf guard --self-test`) | [COMP-004](../components/COMP-004-guard-hook.md) |
 | Descriptor | `kit/.factory/factory.yaml` | [COMP-005](../components/COMP-005-project-descriptor.md) |
 | Dashboard / backlog | `kit/.factory/dashboard.html` | [COMP-006](../components/COMP-006-backlog-and-dashboard.md) |
+| Factory-wide Atlas and current operating picture | [docs/atlas/README.md](../atlas/README.md) | [English](../atlas/ATLAS.md), [فارسی](../atlas/ATLAS.fa.md), [visual](../atlas/ATLAS.html) |
+| Everyday Factory operation | [guide/09-day-to-day-usage.md](../guide/09-day-to-day-usage.md) | [فارسی](../guide/09-day-to-day-usage.fa.md), [commands](../guide/02-commands.md), [job evidence](../guide/03-reading-a-job.md) |
 | Install / update / doctor | `cli/src/install.rs`, `cli/src/doctor.rs` | [COMP-007](../components/COMP-007-installer.md), [COMP-008](../components/COMP-008-doctor.md), [05-releases](05-releases-and-versioning.md) |
 | Portability / backups | `pf mirror`, `pf export` | [guide/05](../guide/05-portability-and-recovery.md), [COMP-009](../components/COMP-009-backup-tools.md), [ADR-006](../decisions/ADR-006-portable-distribution.md) |
 | Operator preferences | `docs/operator/USER.md` | [COMP-010](../components/COMP-010-operator-profile.md) |

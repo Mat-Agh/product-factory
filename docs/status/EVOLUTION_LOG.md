@@ -1,10 +1,44 @@
 # Evolution log
 
 **Status:** Active — append-only
-**Last updated:** 2026-11-15
+**Last updated:** 2026-11-16
 
 Append-only. One dated entry for each factory-level change: what changed, why,
 and its evidence.
+
+## 2026-11-16 — Version 1.5.0 release: Hermes coordinator and model fallback verification
+
+- Verified provider fallback failover across 9Router and LiteLLM routers: when primary endpoints return 503 or hit quota limits, requests gracefully cascade to secondary verified models.
+- Standardized Connect workspace configuration with Setup, Dev server, and Gates contracts in AGENTS.md, passing all `pf doctor` invariants.
+- Enabled global user linking with `pf install user` to provide seamless `/factory` orchestration across Hermes, Claude Code, Codex, and Antigravity.
+- Bumped CLI version to 1.5.0 with full test, clippy, formatting, and guard validation.
+
+## 2026-11-16 — Hermes coordinator usage
+
+- Documented the verified `hermes-deep` default, the Connect project chat
+  command, the installed project-skill prompt, a read-only first conversation,
+  and the path from bounded request to dashboard card and human PR review.
+- Clarified that a configured route check is not a live model response and
+  linked the Hermes live route probe from the operator guide.
+
+## 2026-11-16 — Day-to-day usage guide
+
+- Added English and Persian operator paths from installed product to dashboard,
+  bounded job, evidence, PR review and cleanup. Linked them from the Atlas,
+  handbook, repository entry point and documentation router. Corrected the
+  getting-started version example to the current v1 CLI.
+- The guide distinguishes a local provider prerequisite check from a live
+  model request and keeps product credentials outside the repo.
+
+## 2026-11-16 — Factory Atlas
+
+- Added a sourced English/Persian [Factory Atlas](../atlas/README.md) and a
+  self-contained bilingual, themeable browser view modelled on Connect's
+  product Atlas. It maps the factory contract, work loop, information homes,
+  operator surfaces and verified delivery limits without copying product facts
+  into the installable kit.
+- Linked it from the documentation router, repository entry point and dashboard
+  component. The Markdown pages retain the detailed, source-linked facts.
 
 ## 2026-11-16 — Keep the dashboard responsive with large code graphs
 

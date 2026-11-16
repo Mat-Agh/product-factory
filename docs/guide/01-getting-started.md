@@ -81,7 +81,7 @@ following its README. Playwright works too (`npx playwright install`).
 git clone git@github.com:Mat-Agh/product-factory.git "$HOME/Work/ProductFactory"
 cd "$HOME/Work/ProductFactory"
 cargo install --path cli     # builds pf and puts it in ~/.cargo/bin (about a minute the first time)
-pf --version                 # expect: pf 0.2.0
+pf --version                 # expect: pf 1.3.5 for the current v1 release
 pf install user
 ```
 

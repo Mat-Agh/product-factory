@@ -33,6 +33,11 @@ lenses, worktree-per-job and machine-readable verdicts. See
 
 ## New here?
 
+Start with the [Product Factory Atlas](docs/atlas/ATLAS.html) for a visual,
+source-linked map of the system (English and Persian).
+Then follow the [day-to-day usage guide](docs/guide/09-day-to-day-usage.md)
+([فارسی](docs/guide/09-day-to-day-usage.fa.md)) when you are ready to run jobs.
+
 Read [docs/guide/00-overview.md](docs/guide/00-overview.md), then follow
 [docs/guide/01-getting-started.md](docs/guide/01-getting-started.md). It goes
 from an empty machine to your first factory PR, with every command and its

@@ -82,20 +82,62 @@ committing them.
 
 ## Start work from Hermes
 
-Open Connect in Hermes, or start a chat rooted in the workspace. Hermes reads
-the installed `AGENTS.md` and routes work through the Factory coordinator.
+Open Connect in Hermes, or start a chat rooted in the workspace. The current
+Hermes `default` profile uses `hermes-deep` through 9Router. That is the
+coordinator route; you do not need to switch the model before asking it to
+coordinate. The `software_engineer` and `tester` profiles use `hermes-build`,
+and the Factory's installed model routes assign `deep`, `build` and `economy`
+roles. A plain chat does not, by itself, create a Factory job.
+
+```bash
+cd "$HOME/Work/Hermes"
+./bin/agentctl chat Connect       # starts a new Hermes chat rooted in Connect
+```
+
+The Connect checkout has `.agents/skills/product-factory/SKILL.md`. Project
+skill trust was set during installation when routes were available. If Hermes
+does not list or load that skill, run
+`$HOME/Work/Hermes/bin/hermes skills trust "$HOME/Work/Connect"`, then start a
+new chat. In the Hermes desktop app, open a chat for the Connect workspace;
+the terminal command above is the unambiguous way to set its working directory.
+
+For a safe first conversation, paste this into the new chat:
+
+> Use the `product-factory` project skill in this Connect workspace. Read the
+> installed coordinator and `AGENTS.md`. Show the Factory status and available
+> routes. Do not claim an issue or start a job yet.
+
+When you are ready to assign work, give one bounded request:
+
+> Use the `product-factory` skill to run this as a Factory job: [outcome].
+> Keep these constraints: [constraints]. Acceptance: [observable checks].
+> Work in the owning Connect child repository and show me the job ID and
+> dashboard card.
+
+The coordinator should triage and prepare the job, dispatch the assigned roles,
+verify each artifact and eventually report a PR/MR or a specific blocker. It
+should not implement the entire request in the coordinator chat. To inspect
+progress in another terminal:
 
 ```bash
 cd "$HOME/Work/Connect"
-hermes skills trust .             # normally performed when routes already exist
+pf job status
 pf dashboard                      # open http://127.0.0.1:8000/dashboard.html
 ```
 
-Give the coordinator a product request, then use `pf job status` to see its
-durable stage. Use `pf providers run <job> <role> --allow-api` only after you
-approve billable routed work. A role switch preserves Factory job state in
-`.factory/jobs/<id>/`; Honcho adds guarded cross-session operator context, but
-does not replace job artifacts or repository documentation.
+Ask Hermes to “show Factory status” to inspect jobs in chat. For a stopped
+job, ask it to “resume Factory job `<job-id>`” after clearing the blocker. For
+an open PR needing changes, ask it to “rework Factory job `<job-id>`: [specific
+feedback]”. Open the dashboard card to review the request, stage artifacts,
+review verdicts, QA evidence and PR/MR. You decide whether to merge.
+
+`pf providers check` confirms local route prerequisites, not a live HTTP 200
+from each model. Use `./bin/agentctl test-routes` from the Hermes checkout for
+a live model probe. A routed role uses `pf providers run <job> <role>
+--allow-api` only after you authorize billable API use for that job. A role
+switch preserves Factory task state in `.factory/jobs/<id>/`; Honcho adds
+guarded cross-session operator context but does not replace job artifacts or
+repository documentation.
 
 ## Verify before the first task
 
