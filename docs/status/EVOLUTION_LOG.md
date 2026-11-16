@@ -6,6 +6,10 @@
 Append-only. One dated entry for each factory-level change: what changed, why,
 and its evidence.
 
+## 2026-11-16 — Preserve Product atlas hashes
+
+- Product-docs installations no longer run the Factory docs-map writer over Product's authoritative pages. This keeps English/Persian Atlas content hashes and Product's own documentation gate intact while still importing missing generic knowledge. Prepared CLI 1.3.2.
+
 ## 2026-11-15 — Clean generated role files
 
 - Runtime generation trims the extra trailing blank line from role files so a new child-repository install passes `git diff --check`. Prepared CLI 1.3.1 for the final `v1` rebuild.
