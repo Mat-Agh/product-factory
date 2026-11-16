@@ -653,7 +653,11 @@ fn prepare_knowledge(factory: &Path, root: &Path) {
         }
         Err(e) => warn(format!("knowledge plan for {}: {e}", root.display())),
     }
-    prepare_docs_map(root, &t.docs_root);
+    if t.stack == "product-docs" {
+        say("preserved the Product repository's own documentation map and atlas stamps");
+    } else {
+        prepare_docs_map(root, &t.docs_root);
+    }
 }
 
 fn prepare_docs_map(root: &Path, docs: &str) {
