@@ -39,6 +39,9 @@
   checkout and rebuilds its graph plus the combined workspace network after a
   code or Git-state change. `pf job` also refreshes a prepared worktree at the
   stages where implementation changes occur.
+- **Load behavior:** the 3D workspace network is requested only after opening
+  the Code network tab. The loopback server handles requests concurrently, so
+  serving a large graph does not hold up job status and dashboard requests.
 
 ## Verification
 

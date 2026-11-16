@@ -5,6 +5,8 @@ use std::fs;
 use std::io::{BufRead, BufReader, Write};
 use std::net::{TcpListener, TcpStream};
 use std::path::{Component, Path, PathBuf};
+use std::sync::Arc;
+use std::thread;
 
 use crate::{descriptor, discovery, job};
 
@@ -180,8 +182,10 @@ pub fn main(dir: Option<PathBuf>, port: u16) -> i32 {
         "Dashboard: http://127.0.0.1:{port}/dashboard.html  (workspace {}; Ctrl+C to stop)",
         root.display()
     );
+    let root = Arc::new(root);
     for s in listener.incoming().flatten() {
-        handle(&root, s);
+        let root = Arc::clone(&root);
+        thread::spawn(move || handle(&root, s));
     }
     0
 }

@@ -6,6 +6,13 @@
 Append-only. One dated entry for each factory-level change: what changed, why,
 and its evidence.
 
+## 2026-11-16 — Keep the dashboard responsive with large code graphs
+
+- Deferred the 30 MB Connect workspace network until the Code network tab is
+  opened. Served dashboard requests concurrently so a graph transfer cannot
+  block status refreshes. The graph remains enabled and available on demand.
+  Prepared CLI 1.3.5 for the installable kit.
+
 ## 2026-11-16 — Unified bilingual command centre
 
 - Refactored the shipped board into Overview, Work, Code network and Systems
