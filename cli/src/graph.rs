@@ -5,6 +5,8 @@ use std::fs::{self, File, OpenOptions};
 use std::io::{BufRead, BufReader};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
+use std::thread;
+use std::time::Duration;
 
 use clap::Subcommand;
 use serde_json::{Value, json};
@@ -30,6 +32,15 @@ pub enum Action {
         /// Connect independent module graphs in a workspace overview
         #[arg(long)]
         modules: bool,
+    },
+    /// Keep checkout and workspace graph views current while code changes
+    Watch {
+        /// Watch each independent checkout in the workspace
+        #[arg(long)]
+        modules: bool,
+        /// Polling interval; 10 seconds minimum to avoid repeated indexing
+        #[arg(long, default_value_t = 30, value_parser = clap::value_parser!(u64).range(10..=3600))]
+        interval_seconds: u64,
     },
 }
 
@@ -416,31 +427,24 @@ pub fn main(root: Option<PathBuf>, action: Action) -> i32 {
                 |()| 0,
             )
         }
-        Action::Refresh { modules } => {
-            let (roots, missing) = discovery::roots(&root, modules);
-            for path in &missing {
-                util::warn(format!("Module unavailable: {}", path.display()));
-            }
-            let mut result = i32::from(!missing.is_empty());
-            for checkout in roots.into_iter().filter(|p| p.join(".git").exists()) {
-                match index(&checkout) {
-                    Ok(State::Ready) => match write_view(&checkout) {
-                        Ok(path) => println!("{}", path.display()),
-                        Err(e) => {
-                            util::warn(e);
-                            result = 1;
-                        }
-                    },
-                    Ok(State::Empty) => {
-                        println!("No supported source to index in {}", checkout.display())
+        Action::Refresh { modules } => refresh(&root, modules),
+        Action::Watch {
+            modules,
+            interval_seconds,
+        } => {
+            println!("Watching Graphify indexes every {interval_seconds}s; Ctrl+C to stop.");
+            let mut previous = String::new();
+            loop {
+                let current = change_stamp(&root, modules);
+                if current != previous {
+                    let result = refresh(&root, modules);
+                    if result != 0 {
+                        util::warn("Graph refresh failed; will retry after the next source change");
                     }
-                    Err(e) => {
-                        util::warn(format!("{}: {e}", checkout.display()));
-                        result = 1;
-                    }
+                    previous = current;
                 }
+                thread::sleep(Duration::from_secs(interval_seconds));
             }
-            result
         }
         Action::Query { question } => {
             let query = || -> Result<i32, String> {
@@ -469,6 +473,58 @@ pub fn main(root: Option<PathBuf>, action: Action) -> i32 {
             })
         }
     }
+}
+
+fn refresh(root: &Path, modules: bool) -> i32 {
+    let (roots, missing) = discovery::roots(root, modules);
+    for path in &missing {
+        util::warn(format!("Module unavailable: {}", path.display()));
+    }
+    let mut result = i32::from(!missing.is_empty());
+    for checkout in roots.into_iter().filter(|p| p.join(".git").exists()) {
+        match index(&checkout) {
+            Ok(State::Ready) => match write_view(&checkout) {
+                Ok(path) => println!("{}", path.display()),
+                Err(e) => {
+                    util::warn(e);
+                    result = 1;
+                }
+            },
+            Ok(State::Empty) => {
+                println!("No supported source to index in {}", checkout.display())
+            }
+            Err(e) => {
+                util::warn(format!("{}: {e}", checkout.display()));
+                result = 1;
+            }
+        }
+    }
+    if modules && result == 0 {
+        match write_workspace_view(root) {
+            Ok(path) => println!("{}", path.display()),
+            Err(e) => {
+                util::warn(e);
+                result = 1;
+            }
+        }
+    }
+    result
+}
+
+fn change_stamp(root: &Path, modules: bool) -> String {
+    let (roots, missing) = discovery::roots(root, modules);
+    let mut values = missing
+        .into_iter()
+        .map(|path| format!("missing:{}", path.display()))
+        .collect::<Vec<_>>();
+    for checkout in roots.into_iter().filter(|path| path.join(".git").exists()) {
+        let head = util::output("git", &["rev-parse", "HEAD"], Some(&checkout)).unwrap_or_default();
+        let dirty =
+            util::output("git", &["status", "--porcelain"], Some(&checkout)).unwrap_or_default();
+        values.push(format!("{}\n{head}\n{dirty}", checkout.display()));
+    }
+    values.sort();
+    values.join("\n---\n")
 }
 
 #[cfg(test)]

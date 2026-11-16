@@ -1,7 +1,7 @@
 # COMP-006 — Backlog and dashboard
 
-**Status:** Implemented — local board and serialized backlog claims
-**Last updated:** 2026-10-19
+**Status:** Implemented — unified local command centre and serialized backlog claims
+**Last updated:** 2026-11-16
 **Source:** [`kit/.factory/backlog.md`](../../kit/.factory/backlog.md), [`kit/.factory/dashboard.html`](../../kit/.factory/dashboard.html), [`cli/src/dashboard.rs`](../../cli/src/dashboard.rs)
 
 ## Backlog
@@ -16,8 +16,10 @@
 
 ## Dashboard
 
-- **File:** `.factory/dashboard.html`, a single self-contained page. It is
-  overwritten on every install, so do not edit the project copy.
+- **Files:** `.factory/dashboard.html` is the live command centre and
+  `.factory/atlas.html` is the product explanation and dashboard directory.
+  Both are overwritten on every install. `.factory/atlas.json` is
+  project-owned and supplies its additional local or remote dashboard links.
 - **Run:** `pf dashboard` from the product repo root, then open
   `http://127.0.0.1:8000/`. From a module, the server finds the workspace
   descriptor. It serves the board, backlog and job artifacts over loopback.
@@ -25,10 +27,16 @@
   `pf dashboard` serves, fetches each `jobs/<id>/job.json`, and lists each job's
   files from the job folder's own listing. There is no build step, no
   dependencies and no writes. It refreshes every 3 seconds.
-- **View:** queued requests, a module filter and six columns (Product, Plan, Build, Review & QA, Gate/PR, Human & done),
-  review chips as lens artifacts arrive, blocking reasons, and job details
-  with artifacts and the pull request link. It supports light and dark colour schemes and works at phone
-  width.
+- **View:** queued requests, a labelled factory-state chip, module filter,
+  dashboard/graph links, embedded live workspace code network and six job
+  columns. Cards show the request description, source label, explicit review
+  verdict labels and blockers. Opening a card exposes its source issue, pull
+  request and every saved artifact. It supports light and dark colour schemes
+  and works at phone width.
+- **Graph freshness:** `pf graph watch --modules` polls every independent Git
+  checkout and rebuilds its graph plus the combined workspace network after a
+  code or Git-state change. `pf job` also refreshes a prepared worktree at the
+  stages where implementation changes occur.
 
 ## Verification
 

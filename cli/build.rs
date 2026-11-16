@@ -44,6 +44,8 @@ fn main() -> io::Result<()> {
         "kit/.claude/skills/factory/protocol.md",
         "kit/.factory/backlog.md",
         "kit/.factory/dashboard.html",
+        "kit/.factory/atlas.html",
+        "kit/.factory/atlas.json",
         "kit/.factory/factory.yaml",
         "kit/AGENTS.factory.md",
         "kit/knowledge",

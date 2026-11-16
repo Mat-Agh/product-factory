@@ -1,0 +1,7 @@
+{
+  "dashboards": [
+    {"label": "Factory board", "href": "dashboard.html", "description": "Jobs, review evidence, source issues and pull requests."},
+    {"label": "Workspace code network", "href": "graphify/workspace-view.html", "description": "Interactive current graph across independent repositories."},
+    {"label": "Repository code graph", "href": "graphify/view.html", "description": "Interactive graph for the workspace repository."}
+  ]
+}

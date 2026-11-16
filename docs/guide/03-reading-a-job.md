@@ -97,10 +97,12 @@ pf dashboard     # then open http://127.0.0.1:8000/dashboard.html
 ```
 
 Jobs appear as cards in six columns: Product, Plan, Build, Review & QA, Gate/PR,
-Human & done. Review chips are coloured by verdict (green for PASS, orange for
-CHANGES, grey for pending, faded for skipped). A red-edged card needs you.
-Click a card to read every file in its folder. The page refreshes every 3
-seconds.
+Human & done. Each card has a source label, explicit review verdict labels
+(`code: PASS`, for example), the request description and any blocker. A
+red-edged card needs you. Click a card to open its issue, pull request,
+description and every saved artifact. The same command centre exposes the
+current workspace code network and an Atlas link directory. The page refreshes
+every 3 seconds.
 
 ## Answering `needs-human`
 

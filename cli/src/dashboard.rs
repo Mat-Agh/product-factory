@@ -60,7 +60,7 @@ fn resolve(root: &Path, url_path: &str) -> Option<PathBuf> {
 fn visible(relative: &Path) -> bool {
     if matches!(
         relative.to_str(),
-        Some("dashboard.html" | "backlog.md" | "jobs")
+        Some("dashboard.html" | "atlas.html" | "atlas.json" | "backlog.md" | "jobs")
     ) {
         return true;
     }
@@ -71,6 +71,7 @@ fn visible(relative: &Path) -> bool {
     };
     let markdown = |s: &str| !s.starts_with('.') && s.ends_with(".md");
     match parts.as_slice() {
+        ["graphify", "view.html" | "workspace-view.html"] => true,
         ["jobs", id] => job::valid_id(id),
         ["jobs", id, name] => {
             job::valid_id(id) && (*name == "job.json" || markdown(name) || round(name))

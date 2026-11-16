@@ -6,6 +6,18 @@
 Append-only. One dated entry for each factory-level change: what changed, why,
 and its evidence.
 
+## 2026-11-16 — Product Factory command centre and live graph watch
+
+- Replaced the ambiguous board-only view with a Product Factory command centre:
+  factory-state status, labelled review chips, request details, source-issue and
+  pull-request links, artifacts, live workspace network and project-configured
+  dashboard links are available from one local UI.
+- Added a shipped Atlas page and an owner-maintained `atlas.json` link registry.
+  The static server exposes only those deliberate read-only surfaces.
+- Added `pf graph watch --modules`, which detects Git/source changes across all
+  independent checkouts and refreshes every graph plus the combined workspace
+  network. Prepared CLI 1.3.3.
+
 ## 2026-11-16 — Hermes and Honcho production operator guide
 
 - Added a production guide for installing and operating a Factory project

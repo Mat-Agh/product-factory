@@ -103,6 +103,7 @@ does not replace job artifacts or repository documentation.
 pf doctor "$HOME/Work/Connect"
 pf providers --root "$HOME/Work/Connect" check
 cd "$HOME/Work/Hermes" && ./bin/agentctl test-routes
+pf graph --root "$HOME/Work/Connect" watch --modules
 ```
 
 If a worker cannot see a previous decision, check `./bin/hermes honcho status`

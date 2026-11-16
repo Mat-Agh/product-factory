@@ -486,6 +486,8 @@ pub fn project(factory: &Path, target: &Path, no_attribution: bool, modules: boo
             ".factory/factory.yaml",
             ".factory/backlog.md",
             ".factory/dashboard.html",
+            ".factory/atlas.html",
+            ".factory/atlas.json",
             ".factory/installed.lock",
             ".gitignore",
             "AGENTS.md",
@@ -552,6 +554,13 @@ pub fn project(factory: &Path, target: &Path, no_attribution: bool, modules: boo
             fdir.join("dashboard.html"),
         )
         .map_err(|e| e.to_string())?;
+        fs::copy(kit.join(".factory/atlas.html"), fdir.join("atlas.html"))
+            .map_err(|e| e.to_string())?;
+        if !fdir.join("atlas.json").exists() {
+            fs::copy(kit.join(".factory/atlas.json"), fdir.join("atlas.json"))
+                .map_err(|e| e.to_string())?;
+            say("created .factory/atlas.json (add local dashboard links as needed)");
+        }
         remove_legacy(
             &fdir.join("docs-map.py"),
             "Python .factory/docs-map.py (now: pf docs-map)",

@@ -25,8 +25,10 @@ It contains:
   Workspaces can route independent workers through Hermes to Claude, GPT,
   Gemini or a gateway such as 9Router by task effort.
 - **Code navigation:** Graphify builds and refreshes a local graph for each
-  Git checkout and job worktree. The protocol uses it for bounded navigation;
-  installation also writes an interactive local 3D file network.
+  Git checkout and job worktree. `pf graph watch --modules` keeps every
+  independent checkout and the combined workspace network current after code
+  changes. The protocol uses it for bounded navigation; installation also
+  writes an interactive local 3D file network.
 - **Discovery:** audit and knowledge planning can discover checked-out Git
   submodules and stack directories without a descriptor. Project install
   drafts a descriptor and can install both kits into independent modules.
