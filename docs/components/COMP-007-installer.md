@@ -92,7 +92,10 @@ It was last run on 2026-10-19, and the settings merge has a unit test
 Use `--install-graphify` to provision the pinned Graphify CLI via `uv` when
 missing. A first interactive project install prompts for model routes, and
 `--configure-models` reopens setup. In automation, run `pf providers setup`
-with explicit flags after installing. [Model routing](../guide/01-getting-started.md#model-routing)
+with explicit flags after installing. The installer collects model aliases,
+never credentials; a Hermes/9Router/Honcho machine keeps those private and
+project-external. [Hermes + Honcho production guide](../guide/08-hermes-and-honcho.md)
+describes the route values and acceptance checks.
 
 <!-- documentation-routing:start -->
 ## Documentation routing

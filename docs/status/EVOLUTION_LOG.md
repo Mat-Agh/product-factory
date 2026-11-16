@@ -6,6 +6,14 @@
 Append-only. One dated entry for each factory-level change: what changed, why,
 and its evidence.
 
+## 2026-11-16 — Hermes and Honcho production operator guide
+
+- Added a production guide for installing and operating a Factory project
+  through Hermes with 9Router routes and optional guarded Honcho context.
+- The guide makes the boundary explicit: `pf` collects only non-secret route
+  aliases; machine credentials and shared-memory services stay in Hermes. It
+  includes the Connect reinstall, verification and first-session procedure.
+
 ## 2026-11-16 — Preserve Product atlas hashes
 
 - Product-docs installations no longer run the Factory docs-map writer over Product's authoritative pages. This keeps English/Persian Atlas content hashes and Product's own documentation gate intact while still importing missing generic knowledge. Prepared CLI 1.3.2.

@@ -14,7 +14,7 @@ Generated role files end with one newline so a fresh installation passes Git whi
 
 | Adapter | Covers |
 |---|---|
-| Hermes | Shared coordinator skill, project context and independent workers with canonical role prompts |
+| Hermes | Shared coordinator skill, project context, optional Honcho context and independent workers with canonical role prompts |
 | Codex | Shared coordinator skill and generated TOML roles with native model and effort overrides |
 | Antigravity | Shared coordinator skill and generated Markdown subagents with Pro and Flash tiers |
 | Gemini CLI, Cursor and other compatible hosts | Shared entry point and CLI worker dispatch |
@@ -22,6 +22,7 @@ Generated role files end with one newline so a fresh installation passes Git whi
 ## Known limitations
 
 - Native project roles require a host that supports them and a trusted project where applicable. Routed worker models require an account with access and tool support.
+- Honcho is a Hermes machine service rather than Factory project state. Its guarded shared context supplements durable Factory job artifacts; it never substitutes for them. See the [production guide](../guide/08-hermes-and-honcho.md).
 - The guard hook works only in Claude Code. Elsewhere, branch protection and the
   agent's own approval mode are the controls.
 

@@ -28,6 +28,7 @@ knowledge. Unfamiliar words are defined in the [glossary](GLOSSARY.md).
 | 05 | [portability-and-recovery](05-portability-and-recovery.md) | Mirrors, backups, and runbooks for a lost account, laptop or vendor |
 | 06 | [troubleshooting](06-troubleshooting.md) | Symptoms, causes and fixes |
 | 07 | [multi-repo workspaces](07-multi-repo-workspaces.md) | A multi-repo workspace under the factory, step by step |
+| 08 | [Hermes and Honcho](08-hermes-and-honcho.md) | Production routes, shared context and Factory jobs through Hermes |
 | — | [GLOSSARY](GLOSSARY.md) | Terms |
 | — | [examples/AGENTS.example.md](examples/AGENTS.example.md) | A filled-in product `AGENTS.md` that the factory can work with |
 
@@ -45,6 +46,7 @@ knowledge. Unfamiliar words are defined in the [glossary](GLOSSARY.md).
   - [05 — Portability and recovery](05-portability-and-recovery.md)
   - [06 — Troubleshooting](06-troubleshooting.md)
   - [07 — Install Product Factory in a multi-repo workspace](07-multi-repo-workspaces.md)
+  - [08 — Run Product Factory through Hermes and Honcho](08-hermes-and-honcho.md)
   - [Glossary](GLOSSARY.md)
 - Subfolders:
   - [Examples](examples/README.md)

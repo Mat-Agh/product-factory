@@ -1,7 +1,7 @@
 # 05 — Releases and versioning
 
 **Status:** Active
-**Last updated:** 2026-11-15
+**Last updated:** 2026-11-16
 
 ## Versions
 
@@ -13,7 +13,7 @@ The factory uses semantic versions internally. The production release uses the `
 | MINOR | New lane, agent, lens, command, descriptor key with a default, script |
 | PATCH | Wording, checklists, bug fixes, docs |
 
-The current release is [`v1`](https://github.com/Mat-Agh/product-factory/releases/tag/v1), containing CLI 1.3.1. It adds source previews, directed relations, focus, pan and zoom controls to the combined multi-repository code network, while preserving both thought-sphere and brain-cloud views. Existing product docs and SQL migrations remain in their owning repositories. The Linux x86-64 binary and SHA-256 checksum are attached to the signed release. See the [implementation status](../status/IMPLEMENTATION_STATUS.md) for verified features and remaining live runtime checks.
+The current release is [`v1`](https://github.com/Mat-Agh/product-factory/releases/tag/v1), containing CLI 1.3.2. It adds source previews, directed relations, focus, pan and zoom controls to the combined multi-repository code network, preserves Product-owned documentation, and documents the production Hermes + Honcho route and shared-context setup. Existing product docs and SQL migrations remain in their owning repositories. The Linux x86-64 binary and SHA-256 checksum are attached to the signed release. See the [implementation status](../status/IMPLEMENTATION_STATUS.md) for verified features and remaining live runtime checks.
 
 ## Releasing the factory
 
