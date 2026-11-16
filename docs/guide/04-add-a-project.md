@@ -106,6 +106,11 @@ Use `pf graph --root <repo> view` to open the local 3D code network and
 `pf graph --root <repo> query "<symbol>"` for bounded agent context.
 For a workspace with independent repositories, run `pf graph --root <workspace> view --modules` and open `.factory/graphify/workspace-view.html`. Switch between Brain cloud and Thought sphere in the viewer.
 Select a node to inspect its source preview, contained symbols, outgoing uses and incoming references. Shift+drag pans; the buttons and wheel control zoom.
+The canvas draws at most 400 files at once for responsiveness; its header shows
+the drawn count alongside all indexed files and symbols. Search covers the full
+index and lists matching classes and functions. Graphify extracts supported
+code syntax; it is not a guarantee that every variable or line of every
+language has a graph node. The source file is authoritative for exact coverage.
 To keep all independent graphs and the combined workspace network current while
 you work, run `pf graph --root <workspace> watch --modules`. The command is
 safe to keep under a user service; it reindexes only after a Git or source

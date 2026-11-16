@@ -29,7 +29,9 @@
   dependencies and no writes. It refreshes every 3 seconds.
 - **View:** queued requests, a labelled factory-state chip, module filter,
   dashboard/graph links, embedded live workspace code network and six job
-  columns. Cards show the request description, source label, explicit review
+  columns. Overview, Work, Code network and Systems share a consistent UI with
+  persistent dark/light theme and English/Persian language controls. Cards show
+  the request description, source label, explicit review
   verdict labels and blockers. Opening a card exposes its source issue, pull
   request and every saved artifact. It supports light and dark colour schemes
   and works at phone width.

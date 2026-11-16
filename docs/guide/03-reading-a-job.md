@@ -101,8 +101,9 @@ Human & done. Each card has a source label, explicit review verdict labels
 (`code: PASS`, for example), the request description and any blocker. A
 red-edged card needs you. Click a card to open its issue, pull request,
 description and every saved artifact. The same command centre exposes the
-current workspace code network and an Atlas link directory. The page refreshes
-every 3 seconds.
+current workspace code network and an Atlas link directory. Use the four tabs
+to move between overview, jobs, graph and systems; theme and English/Persian
+language choices are remembered in this browser. The page refreshes every 3 seconds.
 
 ## Answering `needs-human`
 

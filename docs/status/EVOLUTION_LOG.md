@@ -6,6 +6,15 @@
 Append-only. One dated entry for each factory-level change: what changed, why,
 and its evidence.
 
+## 2026-11-16 — Unified bilingual command centre
+
+- Refactored the shipped board into Overview, Work, Code network and Systems
+  sections with shared cards, metrics, responsive layout, browser-persisted
+  dark/light theme and English/Persian controls.
+- Clarified the graph canvas's 400-file draw limit, displayed drawn versus
+  indexed counts and made symbol search cover the full index.
+- Prepared CLI 1.3.4 so the installer embeds these assets.
+
 ## 2026-11-16 — Product Factory command centre and live graph watch
 
 - Replaced the ambiguous board-only view with a Product Factory command centre:

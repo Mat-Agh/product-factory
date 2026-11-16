@@ -5,19 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Product Factory</title>
 <style>
-  :root { --bg:#f7f7f5; --panel:#fff; --ink:#1d1d1b; --mute:#6b6b66; --line:#e3e2dc;
-          --pass:#1f7a4d; --chg:#b4541a; --pend:#9a9a93; --hum:#b3261e; --acc:#2c5bd6; }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-          --bg:#141413; --panel:#1e1e1c; --ink:#ecebe6; --mute:#9d9c95; --line:#33322f;
-          --pass:#5cc08d; --chg:#e9925a; --pend:#77766f; --hum:#ff7a70; --acc:#7da2ff; } }
+  :root { color-scheme:dark; --bg:#0c1320; --panel:#152133; --ink:#f0f5fc; --mute:#a5b5ca; --line:#34465f; --pass:#72d8b3; --chg:#ffbd75; --pend:#9aaabc; --hum:#ff8491; --acc:#8cb8ff; --shadow:0 15px 40px #02081055 }
+  :root[data-theme="light"] { color-scheme:light; --bg:#f0f5f9; --panel:#fff; --ink:#17263b; --mute:#52667e; --line:#d3dfeb; --pass:#087b5b; --chg:#a45b0c; --pend:#69788a; --hum:#b63747; --acc:#335eb5; --shadow:0 15px 40px #39577718 }
   * { box-sizing:border-box }
-  body { margin:0; font:14px/1.45 system-ui,-apple-system,Segoe UI,sans-serif; background:var(--bg); color:var(--ink) }
-  header { display:flex; gap:16px; align-items:center; padding:16px; border-bottom:1px solid var(--line); flex-wrap:wrap }
-  h1 { font-size:18px; margin:0 } .mute { color:var(--mute) }
-  .board { display:grid; grid-template-columns:repeat(6,minmax(180px,1fr)); gap:12px; padding:16px; overflow-x:auto }
+  body { margin:0; font:14px/1.5 system-ui,-apple-system,Segoe UI,sans-serif; background:radial-gradient(circle at 90% 0%,#399e8a22,transparent 30%),var(--bg); color:var(--ink) }
+  .shell { max-width:1700px; margin:auto; padding:24px clamp(16px,3vw,44px) 60px }
+  header { display:flex; gap:16px; align-items:center; padding:18px 0 22px; flex-wrap:wrap }
+  h1 { font-size:clamp(24px,3vw,38px); letter-spacing:-.045em; margin:0 } .mute { color:var(--mute) }
+  .board { display:grid; grid-template-columns:repeat(6,minmax(190px,1fr)); gap:12px; overflow-x:auto }
   @media (max-width:760px){ .board{ grid-template-columns:1fr } }
   .col h2 { font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--mute); margin:0 0 8px }
-  .card { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:10px; margin-bottom:8px; cursor:pointer }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:13px; padding:13px; margin-bottom:9px; cursor:pointer; box-shadow:var(--shadow) }
   .card.human { border-color:var(--hum); box-shadow:inset 3px 0 0 var(--hum) }
   .card b { display:block; font-size:13px; word-break:break-word }
   .meta { font-size:12px; color:var(--mute); margin-top:4px }
@@ -41,21 +39,34 @@
   .surface { display:block; border:1px solid var(--line); border-radius:8px; padding:10px; text-decoration:none; color:var(--ink); background:var(--panel) }
   .surface b { display:block; font-size:12px; color:var(--acc) }.surface span { display:block; color:var(--mute); font-size:11px; margin-top:3px }
   .network { padding:0 16px 16px }.network iframe { width:100%; height:min(68vh,720px); border:1px solid var(--line); border-radius:8px; background:var(--panel) }
+  .tabs { display:flex; gap:7px; padding:5px; background:var(--panel); border:1px solid var(--line); border-radius:14px; width:max-content; max-width:100%; overflow:auto; margin-bottom:20px }
+  .tabs button,.control { border:1px solid transparent; border-radius:10px; background:transparent; color:var(--mute); padding:8px 13px; white-space:nowrap }
+  .tabs button[aria-selected=true] { background:var(--acc); color:var(--bg); font-weight:750 }
+  .control { border-color:var(--line); color:var(--ink); background:var(--panel) }
+  .hero { display:flex; justify-content:space-between; align-items:center; gap:16px; padding:24px; background:linear-gradient(110deg,var(--panel),var(--bg)); border:1px solid var(--line); border-radius:18px; margin-bottom:18px }
+  .hero h2 { margin:0 0 4px; font-size:22px }.hero p{margin:0;color:var(--mute)}
+  .metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:18px }.metric { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:17px }.metric b{display:block;font-size:28px}.metric span{color:var(--mute)}
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:18px; margin-bottom:18px }.panel h2{margin:0 0 12px;font-size:17px}
+  .hidden{display:none!important}.surface:hover,.card:hover{border-color:var(--acc)}
+  @media(max-width:760px){.metrics{grid-template-columns:repeat(2,1fr)}.hero{align-items:start;flex-direction:column}}
 </style>
 </head>
 <body>
-<header>
+<div class="shell"><header>
   <h1>Product Factory</h1>
   <span class="mute" id="summary">loading…</span>
   <span class="chip state" id="state">Loading state</span>
-  <label>Module <select id="module"><option value="">All modules</option></select></label>
-  <nav class="nav"><a href="atlas.html">Atlas</a><a href="graphify/workspace-view.html" target="_blank" rel="noopener">Code network</a></nav>
+  <label><span data-i="module">Module</span> <select id="module" class="control"><option value="">All modules</option></select></label>
+  <select id="language" class="control" aria-label="Language"><option value="en">English</option><option value="fa">فارسی</option></select>
+  <button id="theme" class="control" type="button" aria-label="Toggle theme">☼</button>
+  <nav class="nav"><a href="atlas.html">Atlas</a><a href="graphify/workspace-view.html" target="_blank" rel="noopener" data-i="network">Code network</a></nav>
 </header>
-<details><summary id="queueSummary">Backlog</summary><ul id="queue"></ul></details>
-<section class="surfaces" id="surfaces" aria-label="Factory surfaces"></section>
-<details class="network"><summary>Live workspace code network</summary><iframe src="graphify/workspace-view.html" title="Live workspace code network"></iframe></details>
-<main class="board" id="board"></main>
-<dialog id="dlg"><header><b id="dlgTitle"></b><button onclick="dlg.close()">Close</button></header>
+<nav class="tabs" aria-label="Dashboard sections"><button data-tab="overview" aria-selected="true" data-i="overview">Overview</button><button data-tab="work" aria-selected="false" data-i="work">Work</button><button data-tab="network" aria-selected="false" data-i="network">Code network</button><button data-tab="systems" aria-selected="false" data-i="systems">Systems</button></nav>
+<section id="overview"><div class="hero"><div><h2 data-i="glance">Your factory at a glance</h2><p data-i="glanceSub">Jobs, evidence, code and connected services in one place.</p></div><span class="chip state" id="overviewState">Loading state</span></div><div class="metrics"><div class="metric"><span data-i="jobs">Jobs</span><b id="jobsCount">0</b></div><div class="metric"><span data-i="active">Active</span><b id="activeCount">0</b></div><div class="metric"><span data-i="attention">Needs attention</span><b id="attentionCount">0</b></div><div class="metric"><span data-i="queued">Queued</span><b id="queuedCount">0</b></div></div><div class="panel"><h2 data-i="latest">Latest work</h2><div id="recent"></div></div><div class="panel"><h2 data-i="intake">Intake queue</h2><ul id="queue"></ul></div></section>
+<section id="work" class="hidden"><div class="panel"><h2 data-i="jobBoard">Job board</h2><main class="board" id="board"></main></div></section>
+<section id="network" class="hidden"><div class="panel"><h2 data-i="liveNetwork">Live workspace code network</h2><p class="mute" data-i="networkNote">Search all indexed symbols in the full view. The canvas draws a manageable subset of files.</p><iframe class="network-frame" src="graphify/workspace-view.html" title="Live workspace code network" loading="lazy" style="width:100%;height:70vh;border:1px solid var(--line);border-radius:10px"></iframe></div></section>
+<section id="systems" class="hidden"><div class="panel"><h2 data-i="surfaces">Dashboards and tools</h2><div class="surfaces" id="surfaces" aria-label="Factory surfaces"></div></div><div class="panel"><h2 data-i="about">About Product Factory</h2><p data-i="aboutText">Product Factory owns the workflow and durable job evidence. Hermes is one possible agent runtime. The product repository remains the source of truth.</p></div></section></div>
+<dialog id="dlg"><header><b id="dlgTitle"></b><button onclick="dlg.close()" data-i="close">Close</button></header>
   <div class="files" id="dlgFiles"></div><pre id="dlgBody"></pre></dialog>
 <script>
 const COLS = [
@@ -70,9 +81,19 @@ const KNOWN = ["triage.md","discovery.md","spec.md","repro.md","design.md","plan
 const moduleFilter = document.getElementById("module");
 const queue = document.getElementById("queue");
 let loadedJobs = [];
+const L={en:{module:'Module',overview:'Overview',work:'Work',network:'Code network',systems:'Systems',glance:'Your factory at a glance',glanceSub:'Jobs, evidence, code and connected services in one place.',jobs:'Jobs',active:'Active',attention:'Needs attention',queued:'Queued',latest:'Latest work',intake:'Intake queue',jobBoard:'Job board',liveNetwork:'Live workspace code network',networkNote:'Search all indexed symbols in the full view. The canvas draws a manageable subset of files.',surfaces:'Dashboards and tools',about:'About Product Factory',aboutText:'Product Factory owns the workflow and durable job evidence. Hermes is one possible agent runtime. The product repository remains the source of truth.',ready:'Factory ready · no work started',running:'Factory active',waiting:'Factory waiting for review',noJobs:'No jobs yet. Give your agent a request to start.',noQueue:'Nothing queued yet.',allModules:'All modules',source:'Source',stage:'Stage',blocked:'Blocked',issue:'Open issue',pr:'Pull request',description:'Description',missing:'No description recorded yet.',close:'Close',backlog:'Backlog',needYou:'need you'},fa:{module:'بخش',overview:'نمای کلی',work:'کارها',network:'شبکهٔ کد',systems:'سامانه‌ها',glance:'نمای کلی کارخانهٔ محصول',glanceSub:'کارها، شواهد، کد و سرویس‌های متصل در یک جا.',jobs:'کارها',active:'فعال',attention:'نیازمند توجه',queued:'در صف',latest:'کارهای اخیر',intake:'صف درخواست‌ها',jobBoard:'تابلوی کارها',liveNetwork:'شبکهٔ زندهٔ کد',networkNote:'همهٔ نمادهای فهرست‌شده را در نمای کامل جست‌وجو کنید. بوم فقط بخشی از فایل‌ها را نمایش می‌دهد.',surfaces:'داشبوردها و ابزارها',about:'دربارهٔ کارخانهٔ محصول',aboutText:'کارخانهٔ محصول روند کار و شواهد پایدار را نگه می‌دارد. هرمس یکی از عامل‌های اجرایی است. مخزن محصول منبع اصلی اطلاعات است.',ready:'آماده · هنوز کاری شروع نشده',running:'کارخانه فعال است',waiting:'در انتظار بازبینی',noJobs:'هنوز کاری ثبت نشده است. برای شروع درخواستی به عامل بدهید.',noQueue:'درخواستی در صف نیست.',allModules:'همهٔ بخش‌ها',source:'منبع',stage:'مرحله',blocked:'مسدود',issue:'باز کردن مسئله',pr:'درخواست ادغام',description:'شرح',missing:'شرحی ثبت نشده است.',close:'بستن',backlog:'فهرست کارها',needYou:'نیازمند شما'}};
+let lang=localStorage.getItem('pf-language')==='fa'?'fa':'en';
+const t=k=>L[lang][k]||k;
+function language(){document.documentElement.lang=lang;document.documentElement.dir=lang==='fa'?'rtl':'ltr';document.getElementById('language').value=lang;document.querySelectorAll('[data-i]').forEach(e=>e.textContent=t(e.dataset.i));moduleFilter.options[0].text=t('allModules');render(loadedJobs);renderSurfaces(surfacesData);if(!queue.dataset.hasItems&&queue.firstElementChild)queue.firstElementChild.textContent=t('noQueue')}
+function tab(name){document.querySelectorAll('[data-tab]').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===name)));for(const id of ['overview','work','network','systems'])document.getElementById(id).classList.toggle('hidden',id!==name)}
+document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>tab(b.dataset.tab));
+document.getElementById('language').onchange=e=>{lang=e.target.value;localStorage.setItem('pf-language',lang);language()};
+document.getElementById('theme').onclick=()=>{const next=document.documentElement.dataset.theme==='light'?'dark':'light';document.documentElement.dataset.theme=next;localStorage.setItem('pf-theme',next)};
+document.documentElement.dataset.theme=localStorage.getItem('pf-theme')||'dark';
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const issueUrl = j => String(j.source || "").startsWith("issue:") ? String(j.source).slice(6) : "";
 const short = (s, n=180) => { s = String(s || "").trim(); return s.length > n ? s.slice(0, n - 1) + "…" : s; };
+let surfacesData=[];
 
 async function listDir(path) {
   const r = await fetch(path, {cache:"no-store"}); if (!r.ok) return [];
@@ -95,16 +116,17 @@ async function load() {
   ));
   loadedJobs = jobs;
   const atlas = await fetch("atlas.json", {cache:"no-store"}).then(r => r.ok ? r.json() : {}).catch(() => ({}));
-  renderSurfaces(atlas.dashboards || []);
+  surfacesData=atlas.dashboards || [];renderSurfaces(surfacesData);
   const selected = moduleFilter.value;
   const areas = [...new Set(jobs.map(j => j.area || j.module).filter(Boolean))].sort();
-  moduleFilter.replaceChildren(new Option("All modules", ""), ...areas.map(a => new Option(a, a)));
+  moduleFilter.replaceChildren(new Option(t('allModules'), ""), ...areas.map(a => new Option(a, a)));
   moduleFilter.value = areas.includes(selected) ? selected : "";
   render(jobs);
   const backlog = await fetch("backlog.md", {cache:"no-store"}).then(r => r.ok ? r.text() : "").catch(() => "");
   const items = backlog.split(/\r?\n/).filter(line => line.startsWith("- [ ] ")).map(line => line.slice(6));
-  document.getElementById("queueSummary").textContent = `Backlog · ${items.length} queued`;
-  queue.replaceChildren(...items.map(item => {
+  document.getElementById('queuedCount').textContent=items.length;
+  queue.dataset.hasItems=items.length?'yes':'';
+  queue.replaceChildren(...(items.length?items:[t('noQueue')]).map(item => {
     const entry = document.createElement("li"); entry.textContent = item; return entry;
   }));
 }
@@ -112,10 +134,10 @@ function renderSurfaces(entries) {
   const host = document.getElementById("surfaces"); host.replaceChildren();
   for (const item of entries) {
     const href = String(item.href || "");
-    if (!href || (!/^https?:\/\//i.test(href) && href.includes(".."))) continue;
+    if (!href || (!/^https?:\/\//i.test(href) && (href.includes("..") || !/^[a-zA-Z0-9_./#-]+$/.test(href)))) continue;
     const a = document.createElement("a"); a.className = "surface"; a.href = href;
     if (/^https?:\/\//i.test(href)) { a.target = "_blank"; a.rel = "noopener"; }
-    a.innerHTML = `<b>${esc(item.label || "Surface")}</b><span>${esc(item.description || "Open live view")}</span>`;
+    a.innerHTML = `<b>${esc(lang==='fa'&&item.label_fa||item.label||t('surfaces'))}</b><span>${esc(lang==='fa'&&item.description_fa||item.description||'')}</span>`;
     host.appendChild(a);
   }
 }
@@ -126,22 +148,25 @@ function render(jobs) {
   if (selected) jobs = jobs.filter(j => (j.area || j.module) === selected);
   const human = jobs.filter(j => j.stage === "needs-human").length;
   document.getElementById("summary").textContent =
-    `${jobs.length} jobs · ${jobs.filter(j=>!["done","closed","needs-human","pr-open"].includes(j.stage)).length} active · ${human} need you`;
+    `${jobs.length} ${t('jobs')} · ${jobs.filter(j=>!["done","closed","needs-human","pr-open"].includes(j.stage)).length} ${t('active')} · ${human} ${t('needYou')}`;
   const active = jobs.filter(j=>!["done","closed","needs-human","pr-open"].includes(j.stage)).length;
-  document.getElementById("state").textContent = active ? `Factory active · ${active} running` : jobs.length ? "Factory waiting for review" : "Factory ready · no work started";
+  const state=active ? `${t('running')} · ${active}` : jobs.length ? t('waiting') : t('ready');
+  document.getElementById("state").textContent=state;document.getElementById('overviewState').textContent=state;
+  document.getElementById('jobsCount').textContent=jobs.length;document.getElementById('activeCount').textContent=active;document.getElementById('attentionCount').textContent=human;
+  document.getElementById('recent').replaceChildren(...(jobs.length?jobs.slice().sort((a,b)=>String(b.updated||b.id).localeCompare(String(a.updated||a.id))).slice(0,4).map(j=>{const b=document.createElement('button');b.className='card';b.style.width='100%';b.innerHTML=`<b>${esc(j.id)}</b><span class="description">${esc(short(j.request||t('missing')))}</span>`;b.onclick=()=>openJob(j);return b}):[Object.assign(document.createElement('p'),{textContent:t('noJobs')})]));
   for (const [title, stages] of COLS) {
     const col = document.createElement("section"); col.className = "col";
-    col.innerHTML = `<h2>${title}</h2>`;
+    col.innerHTML = `<h2>${esc(lang==='fa'?({Product:'محصول',Plan:'برنامه',Build:'ساخت','Review & QA':'بازبینی و آزمون','Gate / PR':'دروازه و ادغام','Human & done':'انسان و پایان'}[title]||title):title)}</h2>`;
     for (const j of jobs.filter(j => stages.includes(j.stage)).sort((a,b)=>a.id.localeCompare(b.id))) {
       const c = document.createElement("button"); c.type = "button"; c.className = "card" + (j.stage==="needs-human" ? " human" : "");
       const chips = [
-        `<span class="chip source">${issueUrl(j) ? "Issue" : esc(j.source || "Manual")}</span>`,
-        `<span class="chip stage">Stage: ${esc(j.stage)}</span>`,
+        `<span class="chip source">${t('source')}: ${issueUrl(j) ? t('issue') : esc(j.source || '—')}</span>`,
+        `<span class="chip stage">${t('stage')}: ${esc(j.stage)}</span>`,
         ...Object.entries(j.reviews||{}).map(([k,v]) => `<span class="chip ${esc(v)}">${esc(k)}: ${esc(v)}</span>`)
       ].join("");
       c.innerHTML = `<b>${esc(j.id)}</b><span class="meta">${[j.area || j.module, j.type, j.stage, j.round && `r${j.round}`].filter(Boolean).map(esc).join(" · ")}</span>
-        <span class="description">${esc(short(j.request || j.reason || "No description recorded yet."))}</span>
-        <span class="chips">${chips}</span>${j.reason ? `<span class="meta">Blocked: ${esc(j.reason)}</span>` : ""}`;
+        <span class="description">${esc(short(j.request || j.reason || t('missing')))}</span>
+        <span class="chips">${chips}</span>${j.reason ? `<span class="meta">${t('blocked')}: ${esc(j.reason)}</span>` : ""}`;
       c.onclick = () => openJob(j); col.appendChild(c);
     }
     board.appendChild(col);
@@ -157,21 +182,21 @@ async function openJob(j) {
   dlgFiles.innerHTML = "";
   const issue = issueUrl(j);
   if (issue && /^https:\/\//.test(issue)) {
-    const link = document.createElement("a"); link.href = issue; link.textContent = "Open issue";
+    const link = document.createElement("a"); link.href = issue; link.textContent = t('issue');
     link.target = "_blank"; link.rel = "noopener"; dlgFiles.appendChild(link);
   }
   if (typeof j.pr === "string" && /^https:\/\//.test(j.pr)) {
-    const link = document.createElement("a"); link.href = j.pr; link.textContent = "Pull request";
+    const link = document.createElement("a"); link.href = j.pr; link.textContent = t('pr');
     link.target = "_blank"; link.rel = "noopener"; dlgFiles.appendChild(link);
   }
-  const request = document.createElement("button"); request.textContent = "Description";
-  request.onclick = () => { dlgBody.textContent = j.request || j.reason || "No description recorded yet."; };
+  const request = document.createElement("button"); request.textContent = t('description');
+  request.onclick = () => { dlgBody.textContent = j.request || j.reason || t('missing'); };
   dlgFiles.appendChild(request);
   files.forEach(f => { const b = document.createElement("button"); b.textContent = f; b.onclick = () => show(j.id, f); dlgFiles.appendChild(b); });
   show(j.id, files[0]); dlg.showModal();
 }
 async function show(id, f) { const r = await fetch(`jobs/${id}/${f}`, {cache:"no-store"}); dlgBody.textContent = r.ok ? await r.text() : "(missing)"; }
-load(); setInterval(load, 3000);
+language();load(); setInterval(load, 3000);
 </script>
 </body>
 </html>

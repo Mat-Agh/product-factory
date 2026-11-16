@@ -1,7 +1,7 @@
 # Current repository state
 
 **Status:** Active
-**Last updated:** 2026-11-15
+**Last updated:** 2026-11-16
 
 This repository owns the Product Factory: an agentic pipeline that takes a product
 idea or request through triage, product, design, planning, build, parallel
@@ -39,7 +39,8 @@ It contains:
 - **Job control:** `pf job` serializes intake, creates an isolated worktree per
   job, verifies module scope and advances only on the required artifacts. The
   coordinator uses the installed native role dispatcher. The local board
-  shows queued requests, module filters, review rounds and evidence.
+  shows queued requests, module filters, review rounds and evidence in a
+  responsive English/Persian dashboard with persistent light and dark themes.
 - **Session integration:** an always-on rule makes every Claude session in a
   factory repo, or in a module of a factory workspace, route change requests
   through `/factory`. Module kits and path-scoped module rules cover multi-repo
