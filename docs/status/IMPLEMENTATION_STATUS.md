@@ -2,7 +2,7 @@
 
 **Status:** Active audit record
 **Last updated:** 2026-11-17
-**Factory revision:** CLI 1.5.1 patch candidate (see [EVOLUTION_LOG](EVOLUTION_LOG.md))
+**Factory revision:** CLI 1.5.1 production release (see [EVOLUTION_LOG](EVOLUTION_LOG.md))
 
 This page is the evidence map of what exists, what has been verified, and what is
 still open. Update it in the same commit as any change to a component or its

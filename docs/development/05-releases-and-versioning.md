@@ -5,7 +5,7 @@
 
 ## Versions
 
-The factory uses semantic versions internally. The production release uses the `v1` tag; its bundled CLI reports its tested internal version. Reissuing `v1` is an explicit operator action that replaces its prior release and tag after verifying the replacement assets.
+The factory uses semantic versions for production releases. A signed `vX.Y.Z` tag identifies the tested source and its matching CLI binary. The older `v1` tag remains a historical release.
 
 | Bump | When |
 |---|---|
@@ -13,7 +13,7 @@ The factory uses semantic versions internally. The production release uses the `
 | MINOR | New lane, agent, lens, command, descriptor key with a default, script |
 | PATCH | Wording, checklists, bug fixes, docs |
 
-The current published release is [`v1.5.0`](https://github.com/Mat-Agh/product-factory/releases/tag/v1.5.0). CLI 1.5.1 is the next patch candidate, updating the documented Hermes routing and Connect installation evidence. The release remains subject to the human merge, signed tag and publication gates below. See the [implementation status](../status/IMPLEMENTATION_STATUS.md) for verified features and remaining live runtime checks.
+The current production release is [`v1.5.1`](https://github.com/Mat-Agh/product-factory/releases/tag/v1.5.1). It updates the documented Hermes GPT/DeepSeek routing and Connect installation evidence. See the [implementation status](../status/IMPLEMENTATION_STATUS.md) for verified features and remaining live runtime checks.
 
 ## Releasing the factory
 
