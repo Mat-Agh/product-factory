@@ -1,7 +1,7 @@
 # Current repository state
 
 **Status:** Active
-**Last updated:** 2026-11-16
+**Last updated:** 2026-11-17
 
 This repository owns the Product Factory: an agentic pipeline that takes a product
 idea or request through triage, product, design, planning, build, parallel
@@ -72,9 +72,11 @@ It contains:
 
 **Verification state:** CLI tests include scratch worktree runs, Graphify
 updates and provider dispatch with a synthetic credential. The Connect
-installation resolves three configured private 9Router routes, and a separate
-Hermes live probe returned HTTP 200 for GPT, Gemini Flash, Qwen and all five
-combos on 2026-11-15. A complete Factory job through review and delivery has
+installation resolves three configured private 9Router routes. On 2026-11-17,
+the five live Hermes combos contained only GPT and DeepSeek members, and all
+five answered through GPT fallback. DeepSeek accepted the API key but returned
+insufficient balance for both Pro and Flash chat requests. A complete Factory
+job through review and delivery has
 not yet run on a real product. That remains the Phase 1 exit criterion. Details:
 [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md).
 
