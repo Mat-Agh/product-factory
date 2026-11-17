@@ -1,10 +1,17 @@
 # Evolution log
 
 **Status:** Active — append-only
-**Last updated:** 2026-11-16
+**Last updated:** 2026-11-17
 
 Append-only. One dated entry for each factory-level change: what changed, why,
 and its evidence.
+
+## 2026-11-17 — CLI 1.5.1 production routing and Connect installation
+
+- Updated the Hermes operator guide and current-state record for five GPT/DeepSeek-only 9Router combos. Connect keeps its three non-secret `router:hermes-*` route aliases.
+- Verified all five live combos answered through GPT fallback. DeepSeek accepted its API key but returned insufficient balance for Pro and Flash; the account needs credit before DeepSeek is usable.
+- Released CLI 1.5.1 as a signed production build and installed the tagged version on Connect.
+- Release gates passed: 39 Rust tests, Clippy, formatting, 80 guard cases, 157-document strict docs map, 31 Mermaid blocks parsed, and Factory doctor. The local CLI installation and Connect workspace doctor were healthy; Connect's three route aliases resolved through its private router config.
 
 ## 2026-11-16 — Version 1.5.0 release: Hermes coordinator and model fallback verification
 

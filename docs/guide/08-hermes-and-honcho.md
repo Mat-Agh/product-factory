@@ -1,7 +1,7 @@
 # 08 — Run Product Factory through Hermes and Honcho
 
 **Status:** Active
-**Last updated:** 2026-11-16
+**Last updated:** 2026-11-17
 
 Use this guide when Hermes is the agent host and its optional **Honcho** service
 provides durable, guarded context between role changes. There is no Factory
@@ -48,11 +48,16 @@ For Hermes + 9Router, provide these values:
 
 | Prompt | Value | Purpose |
 |---|---|---|
-| `deep` | `router:hermes-deep` | GPT-first, Gemini-second decisions, planning and review |
-| `build` | `router:hermes-build` | Gemini-first, GPT-second, Qwen worker route |
-| `economy` | `router:hermes-economy` | Gemini-first, GPT-second, Qwen low-cost worker route |
+| `deep` | `router:hermes-deep` | GPT Astra, then DeepSeek V4 Pro for decisions, planning and review |
+| `build` | `router:hermes-build` | GPT Luna, then DeepSeek Flash for build work |
+| `economy` | `router:hermes-economy` | DeepSeek Flash, then GPT Luna for routine work |
 
-These aliases are not credentials. The installer writes them to
+These aliases are not credentials. All five live 9Router combos contain only
+ChatGPT and DeepSeek members. As of 2026-11-17, the DeepSeek key authenticates
+but chat requests return insufficient balance; the GPT fallbacks answer while
+the account has no credit. Add credit and run `./bin/agentctl test-routes` in
+the Hermes checkout to verify DeepSeek before relying on its routes. The
+installer writes the aliases to
 `.factory/model-routes.json`, trusts the shared project skill in Hermes when
 available, and leaves router secrets in the local Hermes scope. In automation:
 
