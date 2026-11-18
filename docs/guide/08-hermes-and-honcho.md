@@ -44,28 +44,25 @@ Use the released `pf` binary and ask the installer to collect route names:
 pf install project /path/to/product --install-graphify --configure-models
 ```
 
-For Hermes + 9Router, provide these values:
+For Hermes, provide direct provider routes or router aliases:
 
 | Prompt | Value | Purpose |
 |---|---|---|
-| `deep` | `router:hermes-deep` | GPT Astra, then DeepSeek V4 Pro for decisions, planning and review |
-| `build` | `router:hermes-build` | GPT Luna, then DeepSeek Flash for build work |
-| `economy` | `router:hermes-economy` | DeepSeek Flash, then GPT Luna for routine work |
+| `deep` | `fableai:claude-fable-5-2` | Claude Fable 5.2 (Fable API), with DeepSeek fallback for reasoning, planning, and review |
+| `build` | `deepseek:deepseek-v4-pro` | DeepSeek V4 Pro, with DeepSeek Flash and Claude fallbacks for build work |
+| `economy` | `deepseek:deepseek-flash` | DeepSeek Flash, with Claude Haiku fallback for routine work |
 
-These aliases are not credentials. All five live 9Router combos contain only
-ChatGPT and DeepSeek members. As of 2026-11-17, the DeepSeek key authenticates
-but chat requests return insufficient balance; the GPT fallbacks answer while
-the account has no credit. Add credit and run `./bin/agentctl test-routes` in
-the Hermes checkout to verify DeepSeek before relying on its routes. The
-installer writes the aliases to
+These aliases and provider IDs are not credentials. Private API keys stay in the
+Hermes environment (`HERMES_CUSTOM_FABLEAI_API_KEY`, `DEEPSEEK_API_KEY`). The
+installer writes the routes to
 `.factory/model-routes.json`, trusts the shared project skill in Hermes when
-available, and leaves router secrets in the local Hermes scope. In automation:
+available, and leaves credentials in the local Hermes scope. In automation:
 
 ```bash
 pf providers --root /path/to/product setup \
-  --deep router:hermes-deep \
-  --build router:hermes-build \
-  --economy router:hermes-economy
+  --deep fableai:claude-fable-5-2 \
+  --build deepseek:deepseek-v4-pro \
+  --economy deepseek:deepseek-flash
 pf providers --root /path/to/product check
 ```
 

@@ -54,7 +54,14 @@ fn route(text: &str) -> Result<Option<Route<'_>>, String> {
         "openai-api" => &["OPENAI_API_KEY"],
         "gemini" => &["GEMINI_API_KEY", "GOOGLE_API_KEY"],
         "router" => &["PF_ROUTER_API_KEY"],
-        _ => return Err("Provider must be anthropic, openai-api, gemini, or router".into()),
+        "deepseek" => &["DEEPSEEK_API_KEY"],
+        "fableai" => &["HERMES_CUSTOM_FABLEAI_API_KEY", "FABLE_API_KEY"],
+        _ => {
+            return Err(
+                "Provider must be anthropic, openai-api, gemini, router, deepseek, or fableai"
+                    .into(),
+            );
+        }
     };
     let valid_prefix = match provider {
         "anthropic" => model.starts_with("claude-"),
@@ -66,6 +73,8 @@ fn route(text: &str) -> Result<Option<Route<'_>>, String> {
                     .is_some_and(|[a, b]| *a == b'o' && b.is_ascii_digit())
         }
         "gemini" => model.starts_with("gemini-"),
+        "deepseek" => model.starts_with("deepseek-"),
+        "fableai" => model.starts_with("claude-"),
         "router" => {
             !model.is_empty()
                 && !model.starts_with("sk-")
@@ -227,7 +236,7 @@ pub fn setup(
     }
     if interactive {
         println!(
-            "Use native or provider:model-id. Providers: anthropic, openai-api, gemini, router."
+            "Use native or provider:model-id. Providers: fableai, deepseek, anthropic, openai-api, gemini, router."
         );
         println!("Enter model identifiers only. Set API keys through your local environment.");
     }
@@ -429,6 +438,8 @@ fn run(root: &Path, id: &str, role: &str, allow_api: bool) -> Result<i32, String
     );
     let endpoint = if route.provider == "router" {
         Some(router_url()?)
+    } else if route.provider == "fableai" {
+        Some("https://api.fableaiapi.com/v1".to_string())
     } else {
         None
     };

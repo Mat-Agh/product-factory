@@ -13,7 +13,7 @@ The factory uses semantic versions for production releases. A signed `vX.Y.Z` ta
 | MINOR | New lane, agent, lens, command, descriptor key with a default, script |
 | PATCH | Wording, checklists, bug fixes, docs |
 
-The current production release is [`v1.5.1`](https://github.com/Mat-Agh/product-factory/releases/tag/v1.5.1). It updates the documented Hermes GPT/DeepSeek routing and Connect installation evidence. See the [implementation status](../status/IMPLEMENTATION_STATUS.md) for verified features and remaining live runtime checks.
+The current production release is [`v1.6.0`](https://github.com/Mat-Agh/product-factory/releases/tag/v1.6.0). It updates direct Fable AI (Claude) and DeepSeek provider routing, auxiliary pinning, and MoA optimization. See the [implementation status](../status/IMPLEMENTATION_STATUS.md) for verified features and remaining live runtime checks.
 
 ## Releasing the factory
 

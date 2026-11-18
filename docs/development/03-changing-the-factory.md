@@ -23,6 +23,7 @@ a dated entry in [EVOLUTION_LOG](../status/EVOLUTION_LOG.md) and the affected ro
 | The guard hook | add the case to `BLOCK`/`ALLOW` in `cli/src/guard.rs` first, then [COMP-004](../components/COMP-004-guard-hook.md) policy table |
 | `pf install` (`cli/src/install.rs`) | [COMP-007](../components/COMP-007-installer.md), [guide/01](../guide/01-getting-started.md), [guide/04](../guide/04-add-a-project.md) |
 | `pf doctor` (`cli/src/doctor.rs`) | [COMP-008](../components/COMP-008-doctor.md) check table, [guide/06](../guide/06-troubleshooting.md) if a new failure mode appears |
+| `pf audit` (`cli/src/audit.rs`) | [COMP-017](../components/COMP-017-adoption.md), [09-tools-scripts-and-commands](09-tools-scripts-and-commands.md), and the audit tests |
 | Any `pf` subcommand or flag | [09-tools-scripts-and-commands](09-tools-scripts-and-commands.md), [COMP-015](../components/COMP-015-pf-cli.md), and the matching component |
 | A new, moved or renamed document | put it under `docs/<area>/`; run `pf docs-map --fix --strict --allow kit/`; describe it in the area README's own text; add a route in the [link map](16-documentation-link-map.md) if agents need it |
 | A diagram | edit the inline ` ```mermaid ` block in the document, then run `pf diagrams check` and `pf diagrams validate` ([COMP-014](../components/COMP-014-diagrams.md)) |

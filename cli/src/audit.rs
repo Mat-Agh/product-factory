@@ -108,6 +108,19 @@ fn read(p: &Path) -> String {
         .unwrap_or_default()
 }
 
+fn has_factory_rule(root: &Path, dir: &str) -> bool {
+    ["product-factory.md", "product-factory.mdc"]
+        .iter()
+        .any(|name| root.join(dir).join(name).is_file())
+}
+
+fn hermes_is_intake_only(instructions: &str, has_hermes_file: bool) -> bool {
+    let text = instructions.to_lowercase();
+    !has_hermes_file
+        && text.contains("handles issue intake")
+        && text.contains("product factory owns delivery")
+}
+
 fn tracked_files(root: &Path) -> Vec<String> {
     util::output(
         "git",
@@ -277,7 +290,11 @@ pub fn audit(factory: &Path, root: &Path) -> (Vec<Finding>, Value) {
         .map(|p| read(&root.join(p)))
         .collect::<Vec<_>>()
         .join("\n");
-    if mirror_dirs.len() >= 2 || all_instr.to_lowercase().contains("in sync") {
+    let mirrors_are_covered =
+        !mirror_dirs.is_empty() && mirror_dirs.iter().all(|dir| has_factory_rule(root, dir));
+    if (mirror_dirs.len() >= 2 || all_instr.to_lowercase().contains("in sync"))
+        && !mirrors_are_covered
+    {
         add(
             Severity::Conflict,
             "instructions",
@@ -569,7 +586,8 @@ pub fn audit(factory: &Path, root: &Path) -> (Vec<Finding>, Value) {
 
     // 7. Other automations.
     let hermes = all_instr.to_lowercase().matches("hermes").count();
-    if hermes > 0 || root.join("HERMES.md").exists() {
+    let has_hermes_file = root.join("HERMES.md").exists();
+    if (hermes > 0 || has_hermes_file) && !hermes_is_intake_only(&all_instr, has_hermes_file) {
         add(
             Severity::Conflict,
             "automation",
@@ -798,5 +816,18 @@ mod tests {
         );
         assert_eq!(sample_branch(Some(&d)), "feature/001-sample-change");
         assert_eq!(sample_branch(None), "factory/001-sample-change");
+    }
+
+    #[test]
+    fn recognizes_intake_only_hermes_routing() {
+        assert!(hermes_is_intake_only(
+            "Hermes handles issue intake. Product Factory owns delivery.",
+            false
+        ));
+        assert!(!hermes_is_intake_only("Hermes owns delivery.", false));
+        assert!(!hermes_is_intake_only(
+            "Hermes handles issue intake. Product Factory owns delivery.",
+            true
+        ));
     }
 }

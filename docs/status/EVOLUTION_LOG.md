@@ -1,10 +1,32 @@
 # Evolution log
 
 **Status:** Active — append-only
-**Last updated:** 2026-11-17
+**Last updated:** 2026-11-18
 
 Append-only. One dated entry for each factory-level change: what changed, why,
 and its evidence.
+
+## 2026-11-18 — Version 1.6.0 release: Fable AI, DeepSeek direct provider routing, auxiliary pinning, and MoA optimization
+
+- Added native support in `pf providers` for direct `fableai` (Claude models via Fable API endpoint) and `deepseek` (DeepSeek models) routes, bypassing OpenRouter and 9Router.
+- Prioritized reasoning tiers for Claude first (`fableai:claude-fable-5-2`) with DeepSeek fallback, while reversing build and economy tiers to prioritize cheaper models first (`deepseek:deepseek-v4-pro` and `deepseek:deepseek-flash`) with Claude as fallback.
+- Configured auxiliary models globally and per profile to prevent expensive auto-fallbacks to Opus: `vision` pinned to `claude-haiku-5-5` (fast multimodal), routine tasks (`compression`, `title_generation`, `approval`, etc.) pinned to `deepseek-flash`, and evaluation (`background_review`, `curator`) pinned to `deepseek-v4-pro`.
+- Optimized Mixture of Agents (MoA) presets with `think-moa` (dual references `deepseek-v4-pro` + `claude-sonnet-5-5` into `claude-opus-5-5` aggregator, `fanout: user_turn`) and `fast-moa` (`deepseek-flash` + `claude-haiku-5-5` into `deepseek-v4-pro`).
+- Verified both Fable API and DeepSeek API connectivity, completions, and model catalogs directly within Hermes.
+- Released CLI 1.6.0 with all tests, formatting, Clippy, guard, diagrams, and doctor checks passing.
+
+## 2026-11-18 — Reconciled adoption audit outcomes
+
+- `pf audit` now treats the standard `product-factory` rule in every existing
+  Cursor, Codex, and agent rule mirror as reconciled rather than reporting a
+  mirror conflict.
+- It also recognizes the documented division in which Hermes handles issue
+  intake and Product Factory owns delivery, while still flagging an unmanaged
+  Hermes handoff or a local `HERMES.md`.
+- Added unit coverage for the intake-only routing predicate. Connect's active
+  Factory scope is Product, the complete customer Back-End (including its
+  installer/deployment/release tooling), and KMP Client; Dashboard and
+  Federation remain external boundaries.
 
 ## 2026-11-17 — CLI 1.5.1 production routing and Connect installation
 
